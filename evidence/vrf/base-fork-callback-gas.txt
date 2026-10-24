@@ -1,0 +1,22 @@
+Ran 1 test for test/fork/BaseVrfFork.t.sol:BaseVrfForkTest
+[PASS] test_fork_realCoordinatorRequestAndCallbackGas() (gas: 16225196)
+Logs:
+  batch 1
+    callback gas used 603471
+    settled inside callback 1
+    estimated VRF charge at 0.00615 gwei (wei) 9308354640000
+    estimated VRF charge per acquisition (wei) 9308354640000
+  batch 4
+    callback gas used 1294002
+    settled inside callback 4
+    estimated VRF charge at 0.00615 gwei (wei) 16103179680000
+    estimated VRF charge per acquisition (wei) 4025794920000
+  batch 10
+    callback gas used 1897170
+    settled inside callback 6
+    estimated VRF charge at 0.00615 gwei (wei) 22038352800000
+    estimated VRF charge per acquisition (wei) 2203835280000
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 380.26ms (19.61ms CPU time)
+
+Ran 1 test suite in 382.91ms (380.26ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
