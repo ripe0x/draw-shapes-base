@@ -1,0 +1,8 @@
+out/
+cache/
+broadcast/
+node_modules/
+web/dist/
+.env
+*.local.env
+__pycache__/
