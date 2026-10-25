@@ -61,7 +61,8 @@ contract GenesisRehearsalTest is Test, Deployer {
             guardian: guardianAddr,
             keeper: keeperAddr,
             timelockDelay: 2 days,
-            create2Deployer: address(this)
+            create2Deployer: address(this),
+                alloc: launchAllocation()
         });
         s = _deploySystem(c, address(this));
         vrf.fundSubscriptionWithNative{value: 0.02 ether}(sub);

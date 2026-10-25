@@ -33,6 +33,15 @@ contract Deploy is Deployer {
         c.timelockDelay = vm.parseJsonUint(json, ".timelockDelay");
         c.create2Deployer = CREATE2_FACTORY;
         uint256 maintenanceFloat = vm.parseJsonUint(json, ".maintenanceFloat");
+        if (vm.keyExistsJson(json, ".testnetAllocation")) {
+            // a scaled opening allocation is for testnets only; Base mainnet always uses launchAllocation()
+            require(block.chainid != 8453, "testnetAllocation is not allowed on Base mainnet");
+            c.alloc.ordinaryPool = vm.parseJsonUint(json, ".testnetAllocation.ordinaryPool");
+            c.alloc.treasuryReserve = vm.parseJsonUint(json, ".testnetAllocation.treasuryReserve");
+            c.alloc.backstopFloor = vm.parseJsonUint(json, ".testnetAllocation.backstopFloor");
+            c.alloc.marketLiquidity = vm.parseJsonUint(json, ".testnetAllocation.marketLiquidity");
+            c.alloc.boardItems = vm.parseJsonUint(json, ".testnetAllocation.boardItems");
+        }
         _requireConfig(c);
         if (block.chainid == 8453) {
             require(
@@ -58,14 +67,15 @@ contract Deploy is Deployer {
         require(s.engine.isSupplier(address(s.controller)) && s.engine.isSupplier(address(s.vault)), "suppliers");
         require(!s.engine.activated() && !s.liquidity.launched(), "must not be live");
         require(s.engine.pendingGovernance() == address(s.timelock), "engine handover");
-        require(s.controller.listedCount() == s.controller.boardItems(), "board built");
-        require(s.controller.backing() == 1.65 ether, "reference backing");
+        require(s.controller.listedCount() >= s.controller.boardItems() && s.controller.queueLength() == 0, "board built");
+        if (_isLaunchAllocation(s.alloc)) require(s.controller.backing() == 1.65 ether, "reference backing");
+        else require(block.chainid != 8453, "launch allocation required on Base mainnet");
         require(s.token.totalSupply() == 35_000_000 ether, "supply");
         require(s.token.balanceOf(address(s.farm)) == 25_000_000 ether, "farm funded");
         require(s.token.balanceOf(address(s.liquidity)) == 10_000_000 ether, "liquidity tokens");
         require(s.hook.treasury() == address(s.treasury) && s.hook.operator() == c.creator, "hook recipients");
         require(s.engine.tokenWorksRecipient() == c.tokenWorks && s.engine.devRecipient() == c.dev, "fee recipients");
-        require(address(s.timelock).balance >= 2 ether, "market liquidity escrowed");
+        require(address(s.timelock).balance >= s.alloc.marketLiquidity, "market liquidity escrowed");
         (,,, uint256 total) = s.engine.quoteAcquisitionPrice(1);
         console2.log("quoted payment per pull (wei)", total);
     }
@@ -86,6 +96,10 @@ contract Deploy is Deployer {
         vm.serializeAddress(o, "farm", address(s.farm));
         vm.serializeAddress(o, "treasury", address(s.treasury));
         vm.serializeAddress(o, "buyback", address(s.buyback));
+        vm.serializeUint(o, "ordinaryPool", s.alloc.ordinaryPool);
+        vm.serializeUint(o, "marketLiquidity", s.alloc.marketLiquidity);
+        vm.serializeUint(o, "boardItems", s.alloc.boardItems);
+        vm.serializeUint(o, "deployBlock", block.number);
         string memory out = vm.serializeAddress(o, "lens", address(s.lens));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));
 

@@ -44,7 +44,8 @@ contract BaseDeployForkTest is Test, Deployer {
                 guardian: makeAddr("guardian"),
                 keeper: makeAddr("keeper"),
                 timelockDelay: 2 days,
-                create2Deployer: address(this)
+                create2Deployer: address(this),
+                alloc: launchAllocation()
             }),
             address(this)
         );

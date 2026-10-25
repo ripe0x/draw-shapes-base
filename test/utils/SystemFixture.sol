@@ -49,7 +49,8 @@ abstract contract SystemFixture is Test, Deployer {
                 guardian: guardianAddr,
                 keeper: keeperAddr,
                 timelockDelay: 2 days,
-                create2Deployer: address(this)
+                create2Deployer: address(this),
+                alloc: _allocation()
             }),
             address(this)
         );
@@ -57,6 +58,11 @@ abstract contract SystemFixture is Test, Deployer {
         _handOver(s);
         swapper = new Swapper(manager);
         key = s.liquidity.poolKey();
+    }
+
+    /// @dev The opening allocation the fixture deploys with (testnet suites override it).
+    function _allocation() internal view virtual returns (Allocation memory) {
+        return launchAllocation();
     }
 
     function _timelock(address[] memory t, uint256[] memory v, bytes[] memory d, bytes32 salt) internal {

@@ -53,6 +53,18 @@ abstract contract Deployer is Script {
         address keeper; // POL deployment keeper
         uint256 timelockDelay;
         address create2Deployer; // address that executes `new X{salt}` (script: CREATE2 factory; test: this)
+        Allocation alloc; // zero = the launch allocation (LaunchParams); testnets only may scale it down
+    }
+
+    /// @notice Opening ETH allocation and board size. Base mainnet always uses `launchAllocation()`
+    ///         (enforced by Deploy.s.sol); a testnet may scale it so a faucet-sized balance can run the
+    ///         full system with unchanged prices, mix, fees and rules.
+    struct Allocation {
+        uint256 ordinaryPool;
+        uint256 treasuryReserve;
+        uint256 backstopFloor;
+        uint256 marketLiquidity;
+        uint256 boardItems;
     }
 
     struct System {
@@ -69,9 +81,26 @@ abstract contract Deployer is Script {
         Treasury treasury;
         Buyback buyback;
         Lens lens;
+        Allocation alloc;
     }
 
     error MissingAddress(string name);
+
+    function launchAllocation() public pure returns (Allocation memory) {
+        return Allocation({
+            ordinaryPool: LaunchParams.ORDINARY_POOL,
+            treasuryReserve: LaunchParams.TREASURY_RESERVE,
+            backstopFloor: 0.3 ether,
+            marketLiquidity: LaunchParams.MARKET_LIQUIDITY,
+            boardItems: 100
+        });
+    }
+
+    function _isLaunchAllocation(Allocation memory a) internal pure returns (bool) {
+        Allocation memory l = launchAllocation();
+        return a.ordinaryPool == l.ordinaryPool && a.treasuryReserve == l.treasuryReserve
+            && a.backstopFloor == l.backstopFloor && a.marketLiquidity == l.marketLiquidity && a.boardItems == l.boardItems;
+    }
 
     function _requireConfig(Config memory c) internal pure {
         if (c.poolManager == address(0)) revert MissingAddress("poolManager");
@@ -87,6 +116,7 @@ abstract contract Deployer is Script {
     /// @dev Deploys everything with `me` (the broadcaster) as temporary governance.
     function _deploySystem(Config memory c, address me) internal returns (System memory s) {
         _requireConfig(c);
+        s.alloc = c.alloc.ordinaryPool == 0 ? launchAllocation() : c.alloc;
         // ---- governance
         address[] memory admins = new address[](1);
         admins[0] = c.adminSafe;
@@ -128,6 +158,10 @@ abstract contract Deployer is Script {
         );
         s.engine.setSupplier(address(s.controller), true);
         s.engine.setSupplier(address(s.vault), true);
+        if (!_isLaunchAllocation(s.alloc)) {
+            s.controller.setBoard(s.alloc.boardItems, 0);
+            s.controller.setTargets(s.alloc.ordinaryPool, s.controller.maintenanceFloor());
+        }
 
         // ---- ENGINE: 10M to protocol liquidity, 25M to the farm. Both addresses are fixed first.
         address farmAddr = vm.computeCreateAddress(me, vm.getNonce(me) + 1);
@@ -169,7 +203,7 @@ abstract contract Deployer is Script {
         );
         require(address(s.hook) == hookAddr, "hook address");
         s.treasury = new Treasury(
-            address(s.controller), address(s.vault), address(s.liquidity), address(s.timelock), c.keeper, 0.5 ether, 0.3 ether, 9_000
+            address(s.controller), address(s.vault), address(s.liquidity), address(s.timelock), c.keeper, s.alloc.treasuryReserve, s.alloc.backstopFloor, 9_000
         );
         s.buyback = new Buyback(
             IPoolManager(c.poolManager),
@@ -212,13 +246,13 @@ abstract contract Deployer is Script {
     ///      closed until activation): 2.2 ETH ordinary pool, 0.5 ETH treasury reserve, the
     ///      maintenance float, and the 2 ETH market liquidity held by the timelock for `launch`.
     function _fundAndBuild(System memory s, uint256 maintenanceFloat) internal {
-        s.controller.fundPool{value: LaunchParams.ORDINARY_POOL}();
+        s.controller.fundPool{value: s.alloc.ordinaryPool}();
         for (uint256 i; i < 5 && s.controller.listedCount() < s.controller.boardItems(); ++i) {
             s.controller.build(40);
         }
-        s.treasury.fundReserve{value: LaunchParams.TREASURY_RESERVE}();
+        s.treasury.fundReserve{value: s.alloc.treasuryReserve}();
         if (maintenanceFloat != 0) s.controller.fundMaintenance{value: maintenanceFloat}();
-        (bool ok,) = address(s.timelock).call{value: LaunchParams.MARKET_LIQUIDITY}("");
+        (bool ok,) = address(s.timelock).call{value: s.alloc.marketLiquidity}("");
         require(ok, "fund timelock");
     }
 
@@ -249,14 +283,19 @@ abstract contract Deployer is Script {
         (targets[4], datas[4]) = (address(s.liquidity), abi.encodeCall(ProtocolLiquidity.setTreasury, (address(s.treasury))));
         (targets[5], values[5], datas[5]) = (
             address(s.liquidity),
-            LaunchParams.MARKET_LIQUIDITY,
-            abi.encodeCall(ProtocolLiquidity.launch, (referenceSqrtPrice()))
+            s.alloc.marketLiquidity,
+            abi.encodeCall(ProtocolLiquidity.launch, (referenceSqrtPrice(s.alloc.marketLiquidity)))
         );
         (targets[6], datas[6]) = (address(s.engine), abi.encodeCall(DrawEngine.activate, ()));
     }
 
     /// @notice sqrtPriceX96 of 10M ENGINE per 2 ETH (2e-7 ETH per ENGINE).
     function referenceSqrtPrice() public pure returns (uint160) {
-        return uint160(FP.sqrt(FP.fullMulDiv(LaunchParams.LIQUIDITY_TOKENS, 1 << 192, LaunchParams.MARKET_LIQUIDITY)));
+        return referenceSqrtPrice(LaunchParams.MARKET_LIQUIDITY);
+    }
+
+    /// @notice sqrtPriceX96 of 10M ENGINE per `marketEth` (a scaled testnet market keeps the token side).
+    function referenceSqrtPrice(uint256 marketEth) public pure returns (uint160) {
+        return uint160(FP.sqrt(FP.fullMulDiv(LaunchParams.LIQUIDITY_TOKENS, 1 << 192, marketEth)));
     }
 }
