@@ -20,7 +20,7 @@ scenario outputs under disclosed assumptions and do not demonstrate market deman
 
 ## Test results (local)
 
-`forge test`: 68 tests in 13 suites passing (unit, fuzz, invariant with 6 invariants × 4,096 calls,
+`forge test` with `BASE_RPC_URL` set: 71 tests in 15 suites passing (unit, fuzz, invariant with 6 invariants × 4,096 calls, presentation,
 14-day genesis rehearsal, extension, treasury, 26-scenario v4 market grid). Base mainnet fork suites
 (`BASE_RPC_URL` set): real VRF coordinator request + callback gas, and full deployment / activation /
 pull / trade on Base's canonical PoolManager — passing. `Deploy.s.sol` broadcast to a local anvil
