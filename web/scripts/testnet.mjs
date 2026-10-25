@@ -27,6 +27,9 @@ const RPC = process.env.RPC_URL ?? (FORK ? "http://127.0.0.1:8547" : "https://se
 const KEY = process.env.DEPLOYER_KEY;
 if (!KEY) throw new Error("DEPLOYER_KEY is required (testnet key only)");
 const SEED_GRAIL = process.env.SEED_GRAIL !== "0";
+// without the 0.5 ETH opening GRAIL, a testnet-only ladder (0.05 -> 0.1 ETH, set through the timelock)
+// still exercises GRAIL funding, minting, listing, decay and selection on a faucet-sized budget
+const SMALL_GRAIL = !SEED_GRAIL && process.env.SMALL_GRAIL !== "0";
 const CONFIG = process.env.CONFIG ?? "base-sepolia";
 const coordinatorAbi = parseAbi([
   "function createSubscription() returns (uint256)",
@@ -98,8 +101,10 @@ const rpc = (method, params) => pub.request({ method, params });
 
 // ------------------------------------------------------------------ 0. preflight
 await step("preflight", async () => {
+  // fork rehearsal of a specific budget: FORK_BALANCE=1.495 sets the deployer's balance
+  if (FORK && process.env.FORK_BALANCE) await rpc("anvil_setBalance", [deployer.address, toHex(parseEther(process.env.FORK_BALANCE))]);
   const bal = await pub.getBalance({ address: deployer.address });
-  const need = parseEther(SEED_GRAIL ? "2.0" : "1.5");
+  const need = parseEther(SEED_GRAIL ? "2.0" : "1.45");
   say("deployer", deployer.address, "balance", formatEther(bal), "ETH; needs about", formatEther(need));
   if (bal < need) throw new Error(`deployer ${deployer.address} holds ${formatEther(bal)} ETH; fund it with ${formatEther(need - bal)} more Base Sepolia ETH`);
   const code = await pub.getCode({ address: base.vrfCoordinator });
@@ -190,17 +195,34 @@ await step("post-activation-governance", async () => {
   const cfg = { listBps: c[0], floorBps: c[1], probCapBps: c[2], stepUpSeconds: c[3], stepDownSeconds: c[4], decayWeiPerPull: parseEther("0.002") };
   const origin = await rd(A.engine, ops.engine, "ledgerOrigin");
   const releaseAt = origin + 14n * 86_400n;
-  const r = await timelock("setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only)",
-    [A.controller, A.grailVault], [0n, 0n],
-    [encodeFunctionData({ abi: ops.controller, functionName: "setSurplusSink", args: [A.buyback, releaseAt] }),
-     encodeFunctionData({ abi: ops.vault, functionName: "setConfig", args: [cfg] })],
-    keccak256(toHex("draw-shapes/post-activation")));
+  const targets = [A.controller, A.grailVault], values = [0n, 0n];
+  const datas = [encodeFunctionData({ abi: ops.controller, functionName: "setSurplusSink", args: [A.buyback, releaseAt] }),
+    encodeFunctionData({ abi: ops.vault, functionName: "setConfig", args: [cfg] })];
+  if (SMALL_GRAIL) { targets.push(A.grailVault); values.push(0n); datas.push(encodeFunctionData({ abi: ops.vault, functionName: "setLadder", args: [[1, 2]] })); }
+  const r = await timelock(`setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only)${SMALL_GRAIL ? " + vault.setLadder(0.05, 0.1 ETH, testnet only)" : ""}`,
+    targets, values, datas, keccak256(toHex("draw-shapes/post-activation")));
   return { ...r, surplusSink: await rd(A.controller, ops.controller, "surplusSink"), surplusReleaseStart: releaseAt };
 });
 
+if (SMALL_GRAIL) {
+  await step("testnet-grail-funded", async () => {
+    const target = await rd(A.grailVault, ops.vault, "nextTarget");
+    const fee = await rd(A.shapes, ops.shapes, "mintFee");
+    await tx("vault.fundGrail(testnet GRAIL backing + mint fee)", deployer, { address: A.grailVault, abi: ops.vault, functionName: "fundGrail", value: target + fee });
+    await tx("vault.step(mint + list GRAIL)", deployer, { address: A.grailVault, abi: ops.vault, functionName: "step" });
+    const items = await rd(A.grailVault, ops.vault, "items");
+    const g = await rd(A.lens, ops.lens, "grail");
+    return { backing: items[0].backing, notional: items[0].notional, listingId: items[0].listingId, tokenId: items[0].tokenId, status: g.status, oddsPpm: g.oddsPpm };
+  });
+}
+
 // ------------------------------------------------------------------ helpers for pulls
 await step("fund-accounts", async () => {
-  await sendEth("fund player", player.address, parseEther("0.7"));
+  // the player gets what the deployer can spare (prizes are redeemed between scenarios to recycle ETH)
+  const bal = await pub.getBalance({ address: deployer.address });
+  const forPlayer = bal - parseEther("0.03");
+  if (forPlayer < parseEther("0.2")) throw new Error(`only ${formatEther(bal)} ETH left for scenarios`);
+  await sendEth("fund player", player.address, forPlayer > parseEther("0.7") ? parseEther("0.7") : forPlayer);
   await sendEth("fund referrer", referrer.address, parseEther("0.003"));
   await sendEth("fund keeper-2", keeper2.address, parseEther("0.01"));
   return {};
@@ -261,6 +283,21 @@ async function deliveries(ids) {
   }
   return out;
 }
+// redeems the player's delivered prizes for their ETH backing (recycles test ETH; also exercises redemption)
+async function recycle(ids, label) {
+  let returned = 0n, n = 0;
+  for (const d of await deliveries(ids)) {
+    if (d.status !== 2 || !d.toBeneficiary) continue;
+    const owner = await rd(d.collection, ownerAbi, "ownerOf", [d.tokenId]).catch(() => null);
+    if (!owner || owner.toLowerCase() !== player.address.toLowerCase()) continue;
+    const isShapes = d.collection.toLowerCase() === A.shapes.toLowerCase();
+    const before = await pub.getBalance({ address: player.address });
+    const r = await tx(`redeem ${isShapes ? "Shape" : "Draw Pack"} #${d.tokenId} (${label})`, player, { address: d.collection, abi: isShapes ? ops.shapes : ops.packs, functionName: "redeem", args: [d.tokenId] });
+    returned += (await pub.getBalance({ address: player.address })) - before + r.gasUsed * r.effectiveGasPrice;
+    n++;
+  }
+  return { redeemed: n, ethReturnedWei: returned };
+}
 const keeperCtx = (acct) => ({ pub, wallet: wallet(acct), account: acct, dep: { ...A, grailVault: A.grailVault }, log: (o) => state.txs.push({ keeper: acct.address, ...o }),
   distributeMinWei: 0n, isPolKeeper: acct.address === deployer.address, thresholds: { unsettled: 100, headStallSec: 600, queueStallSec: 900, boardDepthShare: 0.7,
   cashMinWei: parseEther("0.05"), vrfMinWei: parseEther("0.005"), stepDueStallSec: 900, settleStallSec: 900, refundRate: 0.05 } });
@@ -292,10 +329,18 @@ await step("keeper-booking-restock", async () => {
   const delivered = await deliveries(state.steps["batch-of-ten"].ids.map(BigInt));
   return { keeper: k, before: { nextToBook: before.nextToBook, active: before.activeListings, cash: before.cash }, after: { nextToBook: after.nextToBook, active: after.activeListings, cash: after.cash, maintenance: after.maintenance }, deliveries: delivered };
 });
+await step("redeem-prize-for-backing", async () => {
+  // every won Shape or Draw Pack holds its ETH backing: redeem the batch's prizes and measure the ETH returned
+  const ids = [...state.steps["single-pull"].ids, ...state.steps["batch-of-ten"].ids].map(BigInt);
+  const won = (await deliveries(ids)).filter((d) => d.status === 2);
+  const r = await recycle(ids, "batch prizes");
+  return { ...r, notionalWei: won.reduce((a, d) => a + BigInt(d.notional), 0n) };
+});
 await step("grail-decay-and-selection", async () => {
   const g0 = await rd(A.lens, ops.lens, "grail");
   const p = await pull("acquireBatch(5) for GRAIL decay", 5);
   await awaitFulfilment(p);
+  state.grailPullIds = p.ids;
   await keeperTick(deployer); // books; vault step runs when stepDue (decay included)
   const due = await rd(A.grailVault, ops.vault, "stepDue");
   if (due) await keeperTick(deployer);
@@ -305,7 +350,8 @@ await step("grail-decay-and-selection", async () => {
 });
 await step("slippage-refund-probe", async () => {
   // zero negative tolerance: any price drop before an item is processed refunds it (fee + settlement fee)
-  const p = await pull("acquireBatch(10, maxNegativeSlippage 0)", 10, { negSlippage: 0n });
+  await recycle((state.grailPullIds ?? []).map(BigInt), "GRAIL scenario");
+  const p = await pull("acquireBatch(8, maxNegativeSlippage 0)", 8, { negSlippage: 0n });
   const f = await awaitFulfilment(p);
   const refunded = f.statuses.filter((s) => s === 4).length;
   const credit = await rd(A.engine, ops.engine, "acquisitionRefundCredit", [player.address]);
@@ -354,7 +400,9 @@ await step("genesis-ledger", async () => {
 await step("outage-and-recovery", async () => {
   // keepers stopped: three batches settle in their callbacks, nothing restocks
   const before = await rd(A.lens, ops.lens, "game");
-  for (let i = 0; i < 3; i++) { const p = await pull(`outage acquireBatch(3) #${i + 1}`, 3); await awaitFulfilment(p); }
+  await recycle(state.steps["slippage-refund-probe"].ids.map(BigInt), "slippage scenario");
+  const outIds = [];
+  for (let i = 0; i < 3; i++) { const p = await pull(`outage acquireBatch(3) #${i + 1}`, 3); await awaitFulfilment(p); outIds.push(...p.ids); }
   const during = await rd(A.lens, ops.lens, "game");
   const queue = await rd(A.controller, ops.controller, "queueLength");
   // two keepers return at the same time: idempotent, nothing is booked twice
@@ -362,15 +410,6 @@ await step("outage-and-recovery", async () => {
   const after = await rd(A.lens, ops.lens, "game");
   return { activeBefore: before.activeListings, activeDuring: during.activeListings, unbookedDuring: during.lastIssued - during.nextToBook + 1n, queueDuring: queue,
     activeAfter: after.activeListings, booked: after.nextToBook > after.lastIssued, keeper1: k1, keeper2: k2 };
-});
-await step("redeem-prize-for-backing", async () => {
-  // a won Shape or Draw Pack holds its ETH backing: redeem one and measure the ETH returned
-  const won = (await deliveries(state.steps["batch-of-ten"].ids.map(BigInt))).find((d) => d.status === 2 && d.toBeneficiary);
-  const isShapes = won.collection.toLowerCase() === A.shapes.toLowerCase();
-  const before = await pub.getBalance({ address: player.address });
-  const r = await tx(`redeem ${isShapes ? "Shape" : "Draw Pack"} #${won.tokenId}`, player, { address: won.collection, abi: isShapes ? ops.shapes : ops.packs, functionName: "redeem", args: [won.tokenId] });
-  const after = await pub.getBalance({ address: player.address });
-  return { collection: isShapes ? "Shapes" : "Draw Packs", tokenId: won.tokenId, notional: won.notional, ethReturnedWei: after - before + r.gasUsed * r.effectiveGasPrice };
 });
 if (FORK) {
   // fork only: chain time is skipped to reach epoch close and genesis end (never claimed as live evidence)
@@ -404,7 +443,7 @@ if (FORK) {
     const k1 = await keeperTick(deployer);
     // a few pulls on a scaled board leave no realised surplus (NAV below capital), so the buyback is
     // funded directly here to exercise buyAndBurn through the keeper
-    if ((await pub.getBalance({ address: A.buyback })) < parseEther("0.005")) await sendEth("fund buyback (fork exercise)", A.buyback, parseEther("0.03"));
+    if ((await pub.getBalance({ address: A.buyback })) < parseEther("0.005")) await rpc("anvil_setBalance", [A.buyback, toHex(parseEther("0.03"))]);
     const burnSupply = await rd(A.token, ops.token, "totalSupply");
     await rpc("evm_increaseTime", [toHex(3601)]); await rpc("evm_mine", []);
     const k2 = await keeperTick(keeper2);

@@ -5,60 +5,60 @@
   "steps": {
     "preflight": {
       "done": true,
-      "at": "2026-10-25T14:13:03.486Z",
+      "at": "2026-10-25T15:59:28.188Z",
       "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "player": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
       "referrer": "0x57A653Bdc3b270dc3485cF93a91dEEC782Cc6F86",
       "keeper2": "0x9AFE2ffA8F6f86cd493b5a45b84026B5A7603d34",
-      "balanceWei": "10000000000000000000000"
+      "balanceWei": "1495000000000000000"
     },
     "vrf-subscription": {
       "done": true,
-      "at": "2026-10-25T14:13:04.575Z",
-      "subId": "105492294325630297195757723471493320216513636850918545864700060199243680130360"
+      "at": "2026-10-25T15:59:29.334Z",
+      "subId": "93740964345155959026884399586682809851959088968630792962808768111077189578736"
     },
     "deploy": {
       "done": true,
-      "at": "2026-10-25T14:13:22.620Z",
+      "at": "2026-10-25T15:59:51.915Z",
       "boardItems": 25,
-      "buyback": "0x2cB923220Bdf5cB4f059dCd158272B2389C1229b",
+      "buyback": "0x5EAdf61cAD25c3afdeFF19A519171ccd12102691",
       "chainId": 84532,
-      "controller": "0x9Cd62e8c3DEc4964BF4E40db53F92Fb0a3724dD6",
-      "deployBlock": 50078535,
-      "drawPacks": "0x6EDD1aF883d6D531Ad3E33E538d2710B55D1Fe4A",
-      "engine": "0x5D35a5058726986Af56E2330B5C78133132856d3",
+      "controller": "0x4F2c9F89eAB2EEd07ce9CdD51032964eb18808B8",
+      "deployBlock": 50110457,
+      "drawPacks": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
+      "engine": "0x9Cd62e8c3DEc4964BF4E40db53F92Fb0a3724dD6",
       "env": "base-sepolia-live-fork",
-      "farm": "0x1c7f642A4D2c45A1f5857ffCba5c9bDd95E10636",
-      "grailVault": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
-      "hook": "0xDEf1f124E8240c21E1280AaC3fba23fEB9d860CC",
-      "lens": "0x46124c5dC4feF35bd69F616C13b6867D15Fc5FF9",
-      "liquidity": "0x2e39B31f6CbB0E71501a2B0c97f97458e5107638",
+      "farm": "0x1AC7550D9982cec449F97E59BF79269B2041EaF9",
+      "grailVault": "0xF947c120C807E751A78dB66787DBC0941c7d9872",
+      "hook": "0xF72F3DffBbdcAefD256926B82023Aca10C4520cc",
+      "lens": "0xF75Dc2e0ACE6504C18495E21F701fF148ee545f8",
+      "liquidity": "0x4d6fBFe02a68d506B334C8CB771e506aA86a5d39",
       "marketLiquidity": 200000000000000000,
       "ordinaryPool": 700000000000000000,
-      "shapes": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-      "timelock": "0x02C530868A845AD00c642912031e8f02540B715C",
-      "token": "0x2AC507072654D151dE510b7862A4B430dF113043",
-      "treasury": "0x4d6fBFe02a68d506B334C8CB771e506aA86a5d39",
+      "shapes": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+      "timelock": "0x99468b0Ad4738aE189269eF5dEa28267Bc877f92",
+      "token": "0x2e39B31f6CbB0E71501a2B0c97f97458e5107638",
+      "treasury": "0x8E045Ae70F51c9d7411D5C7B70dD4882039F282d",
       "activation": {
         "datas": [
           "0x238efcbc",
           "0x238efcbc",
           "0x238efcbc",
           "0x238efcbc",
-          "0xf0f442600000000000000000000000004d6fbfe02a68d506b334c8cb771e506aa86a5d39",
+          "0xf0f442600000000000000000000000008e045ae70f51c9d7411d5c7b70dd4882039f282d",
           "0xec31c0980000000000000000000000000000000000001b9f115c1e507f3671e7b7d2f215",
           "0x0f15f4c0"
         ],
         "targets": [
-          "0x5D35a5058726986Af56E2330B5C78133132856d3",
-          "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
           "0x9Cd62e8c3DEc4964BF4E40db53F92Fb0a3724dD6",
-          "0xDEf1f124E8240c21E1280AaC3fba23fEB9d860CC",
-          "0x2e39B31f6CbB0E71501a2B0c97f97458e5107638",
-          "0x2e39B31f6CbB0E71501a2B0c97f97458e5107638",
-          "0x5D35a5058726986Af56E2330B5C78133132856d3"
+          "0xF947c120C807E751A78dB66787DBC0941c7d9872",
+          "0x4F2c9F89eAB2EEd07ce9CdD51032964eb18808B8",
+          "0xF72F3DffBbdcAefD256926B82023Aca10C4520cc",
+          "0x4d6fBFe02a68d506B334C8CB771e506aA86a5d39",
+          "0x4d6fBFe02a68d506B334C8CB771e506aA86a5d39",
+          "0x9Cd62e8c3DEc4964BF4E40db53F92Fb0a3724dD6"
         ],
-        "timelock": "0x02C530868A845AD00c642912031e8f02540B715C",
+        "timelock": "0x99468b0Ad4738aE189269eF5dEa28267Bc877f92",
         "values": [
           0,
           0,
@@ -69,116 +69,123 @@
           0
         ]
       },
-      "deployTxs": 42,
-      "deployGas": "68870829",
-      "deployCostWei": "68910122436465129",
+      "deployTxs": 43,
+      "deployGas": "69225580",
+      "deployCostWei": "69263513823836485",
       "deployHashes": [
-        "0x526d1c3642ff86f142537f461ee92077d56352d1bd72edf7cf86bde7333b708a",
-        "0x60b7b6b439ea1b801a901dfae7896ad7eda90f67493989d0dd9cce42836321b3",
-        "0x4e6d53f9b3dd9f35e017a9fef093bae38b8e5afe6386a4820d9f1ac791e110a5",
-        "0x042f7b35a81e8f7f206485935548f1d1fda6fd0bbd5f6974f7ab7e372d75374b",
-        "0xc8079c428e218acac4c365497f38e9e2826fd42cb6a8a6ae4b61534b0a231571",
-        "0xa7e6359d29f352fcf424022a1d9d0f62dea0986d8d29fd03cd9439989ef64187",
-        "0xe4f7974cb1bb77c3efd16744091642eef54bf6ff3556e8542eacafeb2322f5d8",
-        "0x41be5acd1fd5a67558114bc4bae0f5cd0f041204402a2abc489741aac5d8af23",
-        "0xf1d1888af37a2dccaf08ecfca7da1ef5a588731349646ece8cee49f60830dcf0",
-        "0x686a1c645015c29b8c9a4547729005f117630e534545cad46fc22133fe231687",
-        "0xd2d98003b825aa94ae7401ca7f4cd7b90a1796d179406672104ba2993ea480a8",
-        "0x472d0aff8fc746b0bdb82004055520d4673c150db527780cdfe310c176e2da0f",
-        "0x21a8beacec8307a64212df264491afaf609d1af23dcb9751d7ef89e3c9cd75e9",
-        "0x285abb132f54849285897f8f2f1dd4f282659ee979c022c2439ea8979f4f9919",
-        "0x33973fee7976b06ef65c46732802d9715f45faff44a3e212902635d3e6b2c7b7",
-        "0x21e1f0252a8be3abba4c4a66aa56ae5869972f98e7f2e9a6163cc1f70fbd6212",
-        "0xad804f725acdfa07a2b7501029a4a4924ee9d6a0b9364dc13ac2b95c4baa1410",
-        "0x83eade49bd206ac608455da2a193c4e447df6c2abfb050edfadebcafa9b32fdd",
-        "0x40539c1a4e1210140e6c21c28beefba56c77e44ff653fa3026e53a17829631b3",
-        "0xa3b4e603c13622df094a133d1f76a611e4247a905a3dd0a50f4c17c6c5f82558",
-        "0x99f23c7b9c80a371b313cf49f1b62309e0f71007aa4e0af0fcc03cdff702c214",
-        "0x4cba4b3eafac5abf5407e7aa9427723c729c71a4b8926d4e276f8628e9759258",
-        "0x50110342911bdc1702862c61aaaa467952c52b324031db4e877bb84039c02f91",
-        "0xfcede24bfa5fb438930754487bdb58dcae5854fb98a066f24107280d21c479e8",
-        "0x66dec04c959000938e8c04b9cb870645f66c647bfa9c9f541b76609a74480737",
-        "0xf6f72128abf914a8642197bc97e97ab061ff8510162fe12b133e54ed72a8f8aa",
-        "0x257c5520ab96a25f3a266fea776a85bf191cd8b3ded8c60fb2bf30cfca048ef8",
-        "0xf45e13edd1cefd841a8459e39646df6c4915822be63fcfd78e973023140973a8",
-        "0xe94d05050bcb1c17b34228d933b87347be88a499d014dac34313e3a429d233ab",
-        "0xfc9ce69efbb15fbb9979ec106a3deca773678112f11b568a4c0b0f2bf22e0599",
-        "0xb4efe6eedf4589ebccdeeb2e87a73fbf39336888a90a37cb7a83f39932952e66",
-        "0xc6f3b7f3859cf258f098a999137a405efb8c92406f7a8f3be19e1c5076454382",
-        "0xc52cc8ac5d408363b6813d6b2a22aa59190b6a09cc95f604a972e9fd348713d5",
-        "0x70d3a7b5bfb19bd4e441c084a6c2d65eca12b434245cea68faf997a6f2ba6e7d",
-        "0xc8d2ff183d13aa3683954ca21cf971b602be3fff9e26caa282cbac2e8a78e631",
-        "0x4061efbe9bb2faba3e16a236d699b2a72150458a97fca5cff6179ea401d685bf",
-        "0x6ba65f84a1bd8729d77d7f7f94a0dff0e2eebceecc57aa87fe9f791c3f9521ca",
-        "0x3cacedebb78b02fa110eeb1920b60ffe33ac03023c2f4432560d1fe2327edcc8",
-        "0x41dce58f6e5db10e81927b29f4158f84ffe8d9f354062e854c48141af03efd52",
-        "0x4840dfbfc98443116644bb747c65c641f3ec29365f7a8b5ffe1e25fa0667c85e",
-        "0x4653cc2abb6dfef30d22b9cc5ae2e38931600890388a0a84d55771349f044eda",
-        "0x446c51f53cb8ecb599f029bf73a9481066c4fc89cd95ad31318b92ad62e40826"
+        "0x3ed992e239eab1adf8d0e2ac13b755c9dec7964a3924491e0af7c4215aab00a1",
+        "0x972e805e50c21ec633c46dcdff316d34ad97743ed67d7ca6c0e966741db51155",
+        "0xf553e2721e5bb8451db6630f8d7217995be6e5e1114e3fcbeb2be3abc8211b63",
+        "0x56675e7bc0dd9e1574f6c0ca30585588930a90973c6fff6d160cb1de14363ce4",
+        "0x06d38ef21c8e2eec5800f940b3ade0d16475f60a3b6ceb88ac3b865a0ba88170",
+        "0xcaea1ca1c6f4060c5f1b380e07d0875463d9497564e37a25be6e543803a0d44d",
+        "0xa443dfe3a8269ffdd9f628dc133f1836b6ffd653375fd1959f5cd539eea38bab",
+        "0xaad4479e501d874f7e45d0faf46dc9667f8ff4185934752e598827f635add592",
+        "0x896c42324dcc2342e14e666ca93e48888edf9b13175841d7ec28336d2657136d",
+        "0x77801d62737ec18d5852214320d3e6927848eaec64d1c93ce091528eef986098",
+        "0x0b03a8af51275d4ae4e7a3b431fa9f82ab3000182ae6347c18d54a3af6ffeb80",
+        "0x5b4bb37e0d69f5212954e0836aff1a1c548c23df89e5a2ed0d21841ce0562cfc",
+        "0x9722dc88b6329a185eed006e77a7067573ea00e8a81dd4b6e49e4eee597cc705",
+        "0x5c0059b46e9ffde0c3e71a6543d26801ad74865fa2964978e1e38f22756e4148",
+        "0x87115b5ddaf737f3ca70e4ce337aafbbd399d8f6e1751c68ed2aae2ea57aea50",
+        "0x983530f9b2db92929ce085dcf9ae5cef4f559167bbc0567eb9e69b26bca0e240",
+        "0x32deca204d26c5ec49c7bc513fda9d1d58d37bfc63c59dba630f75981942e942",
+        "0x0a582cbac465ec09f483dc21f84cb0e1c9d394c218108444a607bb17922edab3",
+        "0x87cae0c64ceee50e203e32febbc8aa2095a53e4c9387a77f62633b4525d7a180",
+        "0x64038ba9f9c7bf8338290b06460d2a343a88850db7bbe312bfa04185c3e6890c",
+        "0x4f593f4d437e80556a75f15a0c403671f20f4ae5feb4118ee5bf81fcdc2005b9",
+        "0x2897e53a46418da59845c02a3cad9a07d60faf5958b249577affaa60ba2f0ea7",
+        "0xaca6c194bab8783eff921bd45b9e8cbba84885ca5b5da429199e34a42a4a9e5f",
+        "0xfd5c5c9823ea5c42b39d527ebbaefbac55aa7b8c24f161ea815bc85a19435dba",
+        "0x78e57f6780735e49466d0172519089c17b1266e88c7b41b172ee003102c48d56",
+        "0x8902328e51f72ef9592bebb9562ea685757cdc7003b23f1626898d1525a6e74e",
+        "0xd8eaaa84e546b56ac94e79c8b69c2e8646f36d79f2122a99ac1ec92f0102daa8",
+        "0xa381da8666b0f4df06752f130475426a5e678fd3d05982f4ca801498e5a7df8f",
+        "0xa56ff38d1d2c4705ccfec9769b65957069cbee2d9298bdb386c6075cce18471a",
+        "0x42a7609316f673e76c39fc12cffac6809aa16ad24da25e9409b4868b53196776",
+        "0x340eab8d9e5ce7a64c9fcd2c718035c930fde84aa1d006899d63a506d07eb1f0",
+        "0x7c419ff12c063764f5bfed2e7e9dd74c9e86d88a846a53d6b970d46af461d7f4",
+        "0x67a36de61ef0c0a31192329294ca086417ad726eace5a295fe9fadf51e8cacfc",
+        "0x014641488e170e11957a83fee5eac721422c6d941a64108e06cb78b08bae0f4a",
+        "0x1d707ce4228d1000b6797253eb0400a838df87a7c8b4ab69b79554521539df6d",
+        "0x5d94c397ddfae8c2a3e046fcfe02a684ecb7eb5f0ef7acdc6034094c669d1f1a",
+        "0x69d240fb5056de827abc07fd7970dbed0d9f40b0eb8c4566f04800079b2796e1",
+        "0x2eba01d4bccbcc514633401afe55b432245f0bd9cc0962d31e74fda01a274927",
+        "0xe397f785b0bdc031a802a7fd489e1425a45c78ab40c5b45a2a175c3093b3d3c8",
+        "0xdf21fd6649e126395bee00ac7071768be79382d47fae5614f3dd15cb189ded73",
+        "0xbacad4c0dfe7f4520a7e950a951123c06dd346efe9eb56e55425d6ae2a20894e",
+        "0x9948e54bc483258ca82308597ffb268fdd5497e4f60d4971a9a7c0e213a1f90b",
+        "0x9f296095990da7a6f07b10adee2773d619b47d2a1f574ca336972ed6bfcb469f"
       ]
     },
     "vrf-consumer": {
       "done": true,
-      "at": "2026-10-25T14:13:22.764Z",
+      "at": "2026-10-25T15:59:52.066Z",
       "consumers": [
-        "0x5D35a5058726986Af56E2330B5C78133132856d3"
+        "0x9Cd62e8c3DEc4964BF4E40db53F92Fb0a3724dD6"
       ],
       "nativeBalance": "30000000000000000"
     },
-    "opening-grail": {
-      "done": true,
-      "at": "2026-10-25T14:13:22.831Z",
-      "backing": "500000000000000000",
-      "notional": "400000000000000000",
-      "listingId": "28",
-      "tokenId": "39"
-    },
     "activation": {
       "done": true,
-      "at": "2026-10-25T14:13:23.724Z",
+      "at": "2026-10-25T15:59:56.858Z",
       "delay": "600",
-      "scheduledAt": "1792937602",
-      "executedAt": "1792938204",
-      "waitedSec": "602",
+      "scheduledAt": "1792943991",
+      "executedAt": "1792944592",
+      "waitedSec": "601",
       "timeSkippedOnFork": true,
       "activated": true,
       "launched": true,
-      "governance": "0x02C530868A845AD00c642912031e8f02540B715C"
+      "governance": "0x99468b0Ad4738aE189269eF5dEa28267Bc877f92"
     },
     "post-activation-governance": {
       "done": true,
-      "at": "2026-10-25T14:13:23.781Z",
+      "at": "2026-10-25T15:59:56.912Z",
       "delay": "600",
-      "scheduledAt": "1792938204",
-      "executedAt": "1792938805",
+      "scheduledAt": "1792944596",
+      "executedAt": "1792945197",
       "waitedSec": "601",
       "timeSkippedOnFork": true,
-      "surplusSink": "0x2cB923220Bdf5cB4f059dCd158272B2389C1229b",
-      "surplusReleaseStart": "1794147804"
+      "surplusSink": "0x5EAdf61cAD25c3afdeFF19A519171ccd12102691",
+      "surplusReleaseStart": "1794154192"
+    },
+    "testnet-grail-funded": {
+      "done": true,
+      "at": "2026-10-25T15:59:56.970Z",
+      "backing": "50000000000000000",
+      "notional": "40000000000000000",
+      "listingId": "28",
+      "tokenId": "39",
+      "status": [
+        1
+      ],
+      "oddsPpm": [
+        "14074"
+      ]
     },
     "fund-accounts": {
       "done": true,
-      "at": "2026-10-25T14:13:23.997Z"
+      "at": "2026-10-25T15:59:57.173Z"
     },
     "single-pull": {
       "done": true,
-      "at": "2026-10-25T14:13:24.133Z",
+      "at": "2026-10-25T15:59:57.290Z",
       "ids": [
         "1"
       ],
-      "requestId": "111592318136081007090872967745673373387233919425857811448935638968780416383764",
+      "requestId": "59607883502140959785850970694247609506541412225725963994080165054431419591130",
       "quote": {
-        "fee": "15965745659104431",
-        "sfee": "159657456591044",
+        "fee": "15763505914890470",
+        "sfee": "157635059148904",
         "vrfFee": "13562500000000",
-        "total": "16138965615695475"
+        "total": "15934703474039374"
       },
-      "requestTx": "0x9aaa9300560fc7ba98f4b2dd6940ffd4814aa8b90886a7f7fba6137d7743086c",
-      "requestGas": "481301",
+      "requestTx": "0x94d16245bc13d123e3a9173d61df7f9ab73b39f1661a98b627693f76bbbc6af5",
+      "requestGas": "481289",
       "subBefore": "30000000000000000",
       "fulfil": {
-        "hash": "0xac0141c5b0c1c7f00869c8a2d1c8450eba0c70547d959f203d3681e614cb3805",
-        "gasUsed": "587321",
+        "hash": "0x706231760637f4ceea8a7b849fadad446ffb2157c820aed1a09c4e598bcd70c5",
+        "gasUsed": "585246",
         "simulated": true,
         "payment": null,
         "latencySec": 0
@@ -191,8 +198,8 @@
         {
           "id": "1",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "15",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "4",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -201,7 +208,7 @@
     },
     "batch-of-ten": {
       "done": true,
-      "at": "2026-10-25T14:13:24.341Z",
+      "at": "2026-10-25T15:59:57.484Z",
       "ids": [
         "2",
         "3",
@@ -214,19 +221,19 @@
         "10",
         "11"
       ],
-      "requestId": "80382782757280767859393662656460986540728554965189803949707627264082855557312",
+      "requestId": "71432431078210670206719168770204381381749280665911467396826523730502091140958",
       "quote": {
-        "fee": "16184289703255590",
-        "sfee": "161842897032555",
+        "fee": "15968918368979586",
+        "sfee": "159689183689795",
         "vrfFee": "28825000000000",
-        "total": "163490151002881450"
+        "total": "161314900526693810"
       },
-      "requestTx": "0x309c4ffed5bd5df662b7cd71e25750d0340fa9ecc2cef43d13399432e85c0411",
+      "requestTx": "0x3c81c5067609719925815704bdcb9784b90d34278dce1faf9f85edfcb21a2d37",
       "requestGas": "1986525",
       "subBefore": "30013562500000000",
       "fulfil": {
-        "hash": "0x1b9fff57074d985432d759bc984cdb3acab9b775016bb2d76ad36a33ed13c58d",
-        "gasUsed": "1749250",
+        "hash": "0xb42c7800e867051663612a1c20e362c3418e4f226010a4ec36d7a38473a87498",
+        "gasUsed": "1754516",
         "simulated": true,
         "payment": null,
         "latencySec": 0
@@ -250,8 +257,8 @@
         {
           "id": "2",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "16",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "6",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -259,8 +266,8 @@
         {
           "id": "3",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "2",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "11",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -268,35 +275,35 @@
         {
           "id": "4",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "9",
-          "notional": "11700000000000000",
+          "collection": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
+          "tokenId": "2",
+          "notional": "23400000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "5",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "10",
-          "notional": "11700000000000000",
+          "collection": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
+          "tokenId": "5",
+          "notional": "23400000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "6",
           "status": 2,
-          "collection": "0x6EDD1aF883d6D531Ad3E33E538d2710B55D1Fe4A",
-          "tokenId": "9",
-          "notional": "35100000000000000",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "8",
+          "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "7",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "7",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "15",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -321,22 +328,22 @@
     },
     "keeper-booking-restock": {
       "done": true,
-      "at": "2026-10-25T14:13:28.686Z",
+      "at": "2026-10-25T16:00:01.889Z",
       "keeper": {
         "actions": [
           {
             "action": "settle",
-            "hash": "0x2b106a43ec2041c25040f5442a0bc49b6f93e1b3a3f6b62a2219a133906818b7",
-            "gasUsed": "6721837"
+            "hash": "0x1a0d39c6278fed3a55d24d09f86f55f46291488b85c30fc28401ca828f3d6921",
+            "gasUsed": "7533079"
           },
           {
             "action": "grail-step",
-            "hash": "0xeff4a7c95a34bb4322d5663f0a3ee25a51a34060c50d3fd63fef7c113fc4c6bf",
-            "gasUsed": "339067"
+            "hash": "0xa640b639232f26098265cbc693ade6ae87059aa97bc1128b250345322cb7e17d",
+            "gasUsed": "336227"
           }
         ],
         "alerts": [],
-        "netCostWei": "-2939597200768"
+        "netCostWei": "-2131175366476"
       },
       "before": {
         "nextToBook": "1",
@@ -346,15 +353,15 @@
       "after": {
         "nextToBook": "12",
         "active": "28",
-        "cash": "152588611049085760",
-        "maintenance": "11825915754341121"
+        "cash": "154741885617853374",
+        "maintenance": "11953120654473522"
       },
       "deliveries": [
         {
           "id": "2",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "16",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "6",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -362,8 +369,8 @@
         {
           "id": "3",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "2",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "11",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -371,35 +378,35 @@
         {
           "id": "4",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "9",
-          "notional": "11700000000000000",
+          "collection": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
+          "tokenId": "2",
+          "notional": "23400000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "5",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "10",
-          "notional": "11700000000000000",
+          "collection": "0x6bd69ffdC10d166Dc8A804E6117ab4afc75805c2",
+          "tokenId": "5",
+          "notional": "23400000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "6",
           "status": 2,
-          "collection": "0x6EDD1aF883d6D531Ad3E33E538d2710B55D1Fe4A",
-          "tokenId": "9",
-          "notional": "35100000000000000",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "8",
+          "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "7",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "7",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "15",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -407,8 +414,8 @@
         {
           "id": "8",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "11",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "10",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
@@ -416,15 +423,20 @@
         {
           "id": "9",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "12",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "7",
           "notional": "11700000000000000",
           "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
           "toBeneficiary": true
         },
         {
           "id": "10",
-          "status": 4
+          "status": 2,
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "1",
+          "notional": "11700000000000000",
+          "deliveredTo": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+          "toBeneficiary": true
         },
         {
           "id": "11",
@@ -432,51 +444,58 @@
         }
       ]
     },
+    "redeem-prize-for-backing": {
+      "done": true,
+      "at": "2026-10-25T16:00:06.234Z",
+      "redeemed": 10,
+      "ethReturnedWei": "120000000000000000",
+      "notionalWei": "140400000000000000"
+    },
     "grail-decay-and-selection": {
       "done": true,
-      "at": "2026-10-25T14:13:28.961Z",
+      "at": "2026-10-25T16:00:06.464Z",
       "before": {
         "items": [
           {
             "tokenId": "39",
-            "backing": "500000000000000000",
-            "notional": "378000000000000000",
+            "backing": "50000000000000000",
+            "notional": "25000000000000000",
             "listingId": "28",
             "listedAtPull": "11"
           }
         ],
         "oddsPpm": [
-          "1546"
+          "22876"
         ],
         "status": [
           1
         ],
-        "funded": "11015530488054336",
+        "funded": "11778759101017175",
         "selectable": "1"
       },
       "after": {
         "items": [
           {
             "tokenId": "39",
-            "backing": "500000000000000000",
-            "notional": "368000000000000000",
+            "backing": "50000000000000000",
+            "notional": "25000000000000000",
             "listingId": "28",
-            "listedAtPull": "16"
+            "listedAtPull": "11"
           }
         ],
         "oddsPpm": [
-          "1642"
+          "23789"
         ],
         "status": [
           1
         ],
-        "funded": "15071273174245554",
+        "funded": "22522073832724590",
         "selectable": "1"
       }
     },
     "slippage-refund-probe": {
       "done": true,
-      "at": "2026-10-25T14:13:33.342Z",
+      "at": "2026-10-25T16:00:06.830Z",
       "ids": [
         "17",
         "18",
@@ -485,23 +504,21 @@
         "21",
         "22",
         "23",
-        "24",
-        "25",
-        "26"
+        "24"
       ],
-      "requestId": "64634548952919886444547884891494482578955172709299859232793124765573777743220",
+      "requestId": "2065823723664601459587836238724662199748808604073332942140703977360573047553",
       "quote": {
-        "fee": "16926028858005257",
-        "sfee": "169260288580052",
+        "fee": "16652808136224302",
+        "sfee": "166528081362243",
         "vrfFee": "28825000000000",
-        "total": "170981716465853090"
+        "total": "134583514740692360"
       },
-      "requestTx": "0x0d5b0ea8096eb5234b5aec2da0050f4e2fc96a2d076498a1c18e807b0301a6ce",
-      "requestGas": "1986501",
+      "requestTx": "0xc135579c4b2d420f77043d623a8d50121b462a0f2d0f9650d962f9abedd89505",
+      "requestGas": "1644401",
       "subBefore": "30071212500000000",
       "fulfil": {
-        "hash": "0x6a86dcf32b46c3f2e0d5ef58195837ac30610cb038ac34ebe32190be7a3d776b",
-        "gasUsed": "1753589",
+        "hash": "0x69b9e29c05534e4bb6316d2826c260f55f97dd64158f5769b178af3f9dc32760",
+        "gasUsed": "1072134",
         "simulated": true,
         "payment": null,
         "latencySec": 0
@@ -509,39 +526,37 @@
       "statuses": [
         2,
         2,
-        2,
-        2,
-        2,
-        2,
-        5,
-        5,
-        5,
-        5
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
       ],
       "subscriptionDelta": "0",
-      "refunded": 0,
-      "refundCreditWei": "32692265200576290",
-      "withdraw": "0x2b0061e4bc68f3d3ba8429613c7ce4a09df8f33933e32cf20e7eff77e366105a"
+      "refunded": 6,
+      "refundCreditWei": "117044624858188651",
+      "withdraw": "0xf51d8fda6fcfe9972d39e3a95e4fffb5e18a2d3d3fa6f3c8a79432bd6eafe720"
     },
     "on-behalf-and-referral": {
       "done": true,
-      "at": "2026-10-25T14:13:33.538Z",
+      "at": "2026-10-25T16:00:07.010Z",
       "ids": [
-        "27"
+        "25"
       ],
-      "requestId": "95695361262610089088250021252392363339125103410840193616977991841775985968916",
+      "requestId": "35297732474536370125366048762437551700181302982009947728676996303789295471031",
       "quote": {
-        "fee": "16348382757324576",
-        "sfee": "163483827573245",
+        "fee": "16013546874796794",
+        "sfee": "160135468747967",
         "vrfFee": "13562500000000",
-        "total": "16525429084897821"
+        "total": "16187244843544761"
       },
-      "requestTx": "0x2cc86e0cb644bba92784540cad6e23435f44c3657d54339d05e222098890674f",
+      "requestTx": "0xb2b8648b6223581e93fc48bc4451e8d335b1ad5d7862ddc2e0041ca09eb0dda5",
       "requestGas": "447101",
       "subBefore": "30100037500000000",
       "fulfil": {
-        "hash": "0x073b0a9588522bc1ef227dfbacee015b1ddccea6b0ba06f3168bade9184de078",
-        "gasUsed": "527796",
+        "hash": "0xd0f612f3db2936153ae1acf44a051bd12bc610b9778c020c8c7c00e8077c2f7e",
+        "gasUsed": "529146",
         "simulated": true,
         "payment": null,
         "latencySec": 0
@@ -552,22 +567,22 @@
       "subscriptionDelta": "0",
       "deliveries": [
         {
-          "id": "27",
+          "id": "25",
           "status": 2,
-          "collection": "0xc2c63Bb8aa0f2e63Ba4De216DFbab1eB5A767609",
-          "tokenId": "69",
+          "collection": "0xD532f56b47A7B11a9f8F29763321fFaEdcF08Aa5",
+          "tokenId": "56",
           "notional": "11700000000000000",
           "deliveredTo": "0x57A653Bdc3b270dc3485cF93a91dEEC782Cc6F86",
           "toBeneficiary": true
         }
       ],
-      "referrerCreditWei": "1982579769177128",
-      "referrerWithdraw": "0xb2575d58d607f25d0b1120e18e96b018b0d263b12ef2d0323387158e6b00718c",
-      "tokenWorksCreditWei": "2146063596750381"
+      "referrerCreditWei": "1364285609410682",
+      "referrerWithdraw": "0x6e1c81bdc24310e12065f450ede4abecced2207c3af46d01d2e5ce707f7456ce",
+      "tokenWorksCreditWei": "1524421078158665"
     },
     "engine-trading-and-fees": {
       "done": true,
-      "at": "2026-10-25T14:13:33.757Z",
+      "at": "2026-10-25T16:00:07.230Z",
       "swapper": "0x6d757bb331b86fbae11dbed931125d4c94000cdd",
       "engineBought": "467111534795042897998082",
       "hookFeesWei": "300343582235236",
@@ -576,255 +591,251 @@
       "operatorAccruedWei": "37542947779404",
       "treasuryAccruedWei": "262800634455832",
       "treasuryReceivedWei": "262800634455832",
-      "vaultFundAfter": "35536760236778328",
-      "polPending": "0"
+      "vaultFundAfter": "25181226462116681",
+      "polPending": "26280063445584"
     },
     "genesis-ledger": {
       "done": true,
-      "at": "2026-10-25T14:13:33.761Z",
+      "at": "2026-10-25T16:00:07.233Z",
       "epoch": "0",
-      "accepted": "27",
-      "resolved": "27",
-      "units": "25",
-      "bonus": "29",
-      "playerUnits": "24",
-      "playerBonus": "28",
-      "epoch0ClosesAt": "1793024604",
+      "accepted": "25",
+      "resolved": "25",
+      "units": "18",
+      "bonus": "30",
+      "playerUnits": "17",
+      "playerBonus": "29",
+      "epoch0ClosesAt": "1793030992",
       "note": "Claims open once epoch 0 has ended and resolved (24 h of real time); rerun to claim."
     },
     "outage-and-recovery": {
       "done": true,
-      "at": "2026-10-25T14:13:38.308Z",
-      "activeBefore": "27",
-      "activeDuring": "18",
+      "at": "2026-10-25T16:00:11.787Z",
+      "activeBefore": "28",
+      "activeDuring": "19",
       "unbookedDuring": "9",
       "queueDuring": "0",
-      "activeAfter": "27",
+      "activeAfter": "28",
       "booked": true,
       "keeper1": {
         "actions": [
           {
             "action": "settle",
-            "hash": "0x2ac64d6bcfc5b19db7a0ae1e6773b2df55049a215f49ad5618e562f9bff2c773",
+            "hash": "0xdc5ecdc0aa78b28e2d2e3e2158c8fc538207ca64c3a9e7475207dcfb50023dba",
             "gasUsed": "80714"
+          },
+          {
+            "action": "deploy-pol",
+            "hash": "0xa6653f7c0d1c7ce3589c124cf724b6a92c8d9b34671d5f8bf118ab8d921d8d88",
+            "gasUsed": "171722"
           }
         ],
         "alerts": [],
-        "netCostWei": "80714564998"
+        "netCostWei": "252437767052"
       },
       "keeper2": {
         "actions": [
           {
             "action": "settle",
-            "hash": "0xec793038a4940d5f8451931ea9cf775aa0b8a72ddc0e32fce501d27a2460a11d",
-            "gasUsed": "6865235"
+            "hash": "0xa34b9f5f413ad062335683c4584647598b2335f4d8ad70c3bc956f0ab3681d02",
+            "gasUsed": "5734969"
           }
         ],
         "alerts": [],
-        "netCostWei": "-3134767900709"
+        "netCostWei": "-4265033618609"
       }
-    },
-    "redeem-prize-for-backing": {
-      "done": true,
-      "at": "2026-10-25T14:13:38.379Z",
-      "collection": "Shapes",
-      "tokenId": "16",
-      "notional": "11700000000000000",
-      "ethReturnedWei": "10000000000000000"
     },
     "fork-time-skip-epoch-0": {
       "done": true,
-      "at": "2026-10-25T14:13:38.401Z",
-      "skippedSec": 85844,
+      "at": "2026-10-25T16:00:11.813Z",
+      "skippedSec": 85840,
       "isFinal0": true,
       "keeper": []
     },
     "claims": {
       "done": true,
-      "at": "2026-10-25T14:13:38.429Z",
-      "claimable": "1735248447204968944099378",
-      "hash": "0x6df089183f0e12c6f66268429f5cefe7095096168b004302b2cbbb0a7f401f04"
+      "at": "2026-10-25T16:00:11.832Z",
+      "claimable": "1723268118616955826258151",
+      "hash": "0x03332da24e4c0ba091e8186d3bcb01412c452eacf1d108f3867ffb1134863f95"
     },
     "fork-time-skip-genesis-end": {
       "done": true,
-      "at": "2026-10-25T14:13:38.591Z",
+      "at": "2026-10-25T16:00:23.846Z",
       "keeperActions": [
-        "retire-unearned",
         "buyback"
       ],
       "surplusReleasedWei": "0",
-      "buybackEthSpentWei": "3142630987908162",
-      "engineBurnedByBuyback": "147612185088989513822614",
+      "buybackEthSpentWei": "3143034286101780",
+      "engineBurnedByBuyback": "147612184481313264623332",
       "retiredUnearned": "23214285714285714285714286",
-      "supplyBefore": "35000000000000000000000000",
+      "supplyBefore": "11785714285714285714285714",
       "supplyAfterRetire": "11785714285714285714285714",
-      "supplyAfter": "11638102100625296200463100"
+      "supplyAfter": "11638102101232972449662382"
     }
   },
   "txs": [
     {
       "label": "vrf.createSubscription",
-      "hash": "0x95954cb82ad1961a71b3ef19c430e15a7e2fafa0346479200b7e2fd4c18d8358",
+      "hash": "0xedff3ae7190e7ad38dcc0f4781f7d77c5f777578eb4523604a1f1987d4b2240c",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078534,
+      "block": 50110456,
       "status": "success",
       "gasUsed": "109806",
-      "effectiveGasPrice": "1004380747",
-      "costWei": "110287032305082",
+      "effectiveGasPrice": "1004384390",
+      "costWei": "110287432328340",
       "valueWei": "0"
     },
     {
       "label": "vrf.fundSubscriptionWithNative",
-      "hash": "0x78a695965b18b5ffef87a1aecacf3be2b88afe557eb78e2f7f2a6af6f63c7d5c",
+      "hash": "0x0fe76090e46a5ee0e2eca3a6fb6e3ebd08ff82ab81f1e517e49385cbe5f3e4f2",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078535,
+      "block": 50110457,
       "status": "success",
       "gasUsed": "56137",
-      "effectiveGasPrice": "1003834156",
-      "costWei": "56352238015372",
+      "effectiveGasPrice": "1003837345",
+      "costWei": "56352417036265",
       "valueWei": "30000000000000000"
     },
     {
       "label": "vrf.addConsumer(engine)",
-      "hash": "0x427cd4698cbf9fa68ef61eaaf8fbc848a6a599a738b7fb1cee2b3351af621683",
+      "hash": "0x194a21da1151bcfc779849f518b751b5b887ae911a6b9faa795f837a1a11b13f",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078578,
+      "block": 50110501,
       "status": "success",
       "gasUsed": "95278",
-      "effectiveGasPrice": "1000014481",
-      "costWei": "95279379720718",
-      "valueWei": "0"
-    },
-    {
-      "label": "vault.fundGrail(opening GRAIL)",
-      "hash": "0xd71acc9172bf9c5c0f88efc87bc6e797f81019ba58bfa7f5d73bba23652c7164",
-      "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078579,
-      "status": "success",
-      "gasUsed": "67321",
-      "effectiveGasPrice": "1000012674",
-      "costWei": "67321853226354",
-      "valueWei": "501000000000000000"
-    },
-    {
-      "label": "vault.step(mint + list opening GRAIL)",
-      "hash": "0xe6a45b2d9dbd5b4f14b366bbbbff860d02cd8e272c31fb3ce2b96f0f896cab72",
-      "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078580,
-      "status": "success",
-      "gasUsed": "837995",
-      "effectiveGasPrice": "1000011092",
-      "costWei": "838004295040540",
+      "effectiveGasPrice": "1000012692",
+      "costWei": "95279209268376",
       "valueWei": "0"
     },
     {
       "label": "timelock.scheduleBatch(activation)",
-      "hash": "0x8af6729629643b2775fea4cd3fd3ced421578c146a51ae8aed4d37a754b4840e",
+      "hash": "0x720b6bc7d7ac53c4836eab7964d30bd3bc528e90c0d03fbe000e6919daac9ba0",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078581,
+      "block": 50110502,
       "status": "success",
       "gasUsed": "93752",
-      "effectiveGasPrice": "1000009725",
-      "costWei": "93752911738200",
+      "effectiveGasPrice": "1000011109",
+      "costWei": "93753041490968",
       "valueWei": "0"
     },
     {
       "label": "timelock.executeBatch(activation)",
-      "hash": "0x92d815bad40646cb5798209c7ec192628f34b60aa93653a602bb1b1c724936b2",
+      "hash": "0x89f490a578646d98b31ddebfd4ff97abcb88c0b84c4cd0215747b93402626cee",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078583,
+      "block": 50110504,
       "status": "success",
       "gasUsed": "480591",
-      "effectiveGasPrice": "1000007448",
-      "costWei": "480594579441768",
+      "effectiveGasPrice": "1000008508",
+      "costWei": "480595088868228",
       "valueWei": "0"
     },
     {
-      "label": "timelock.scheduleBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only))",
-      "hash": "0xce36c4e867a5da1fe5de38bd1972e16ec5daeba3cbf7e36c947790613923aa3c",
+      "label": "timelock.scheduleBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only))",
+      "hash": "0x488c7f8a080fde602dbab5f089d788275ff6ea0482dcb76776cb16489b7b1e6c",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078584,
+      "block": 50110505,
       "status": "success",
-      "gasUsed": "67856",
-      "effectiveGasPrice": "1000006525",
-      "costWei": "67856442760400",
+      "gasUsed": "75160",
+      "effectiveGasPrice": "1000007454",
+      "costWei": "75160560242640",
       "valueWei": "0"
     },
     {
-      "label": "timelock.executeBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only))",
-      "hash": "0x607a8ddf8f3735f54b267680de0ff93ca9b74cb0052aba47e39fe306a315ead8",
+      "label": "timelock.executeBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only))",
+      "hash": "0x2a2a84624c83632867cb3842993e5717f110b5f83779a6cbc094ec9149613f3e",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "block": 50078586,
+      "block": 50110507,
       "status": "success",
-      "gasUsed": "92302",
-      "effectiveGasPrice": "1000004998",
-      "costWei": "92302461325396",
+      "gasUsed": "115856",
+      "effectiveGasPrice": "1000005709",
+      "costWei": "115856661421904",
+      "valueWei": "0"
+    },
+    {
+      "label": "vault.fundGrail(testnet GRAIL backing + mint fee)",
+      "hash": "0x210a9a1acb2ec90f6f4a6c35ff0a2fa32ef3e29602484be21a1ae7871b11ff30",
+      "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "block": 50110508,
+      "status": "success",
+      "gasUsed": "67321",
+      "effectiveGasPrice": "1000004997",
+      "costWei": "67321336403037",
+      "valueWei": "51000000000000000"
+    },
+    {
+      "label": "vault.step(mint + list GRAIL)",
+      "hash": "0x9294480f8f72445ca6bd43f4411e7d61e3c3068b0968a71b34711635cd391a6e",
+      "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "block": 50110509,
+      "status": "success",
+      "gasUsed": "840662",
+      "effectiveGasPrice": "1000004374",
+      "costWei": "840665677055588",
       "valueWei": "0"
     },
     {
       "label": "fund player",
-      "hash": "0x121f7b4c3ea0069ec6e46f2bf208534518f73fa6a7cf55d2047675340aab7f6b",
+      "hash": "0xa6ce583dd1c3169a5b6de65b48dc30bdc4ca1c2b2fc9e466cc8b463d5986db8f",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "to": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078587,
+      "block": 50110510,
       "status": "success",
       "gasUsed": "21000",
-      "valueWei": "700000000000000000"
+      "valueWei": "242801214752048169"
     },
     {
       "label": "fund referrer",
-      "hash": "0xdd04e266359b080d511599e0267d78c2d117dba55a0451d251d45273580c4fb2",
+      "hash": "0xf46125fcea782e4343fec14442f4653bb81ab58e95271f985a92bc30f923d501",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "to": "0x57A653Bdc3b270dc3485cF93a91dEEC782Cc6F86",
-      "block": 50078588,
+      "block": 50110511,
       "status": "success",
       "gasUsed": "21000",
       "valueWei": "3000000000000000"
     },
     {
       "label": "fund keeper-2",
-      "hash": "0xcf0363283d4b3011f51769a3360db855fabf1ac6adb40f41efe3c003d382a5d7",
+      "hash": "0x03221fba7812fab452966452d7ff60a4bca2a2e001faed357311010f45bccea1",
       "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "to": "0x9AFE2ffA8F6f86cd493b5a45b84026B5A7603d34",
-      "block": 50078589,
+      "block": 50110512,
       "status": "success",
       "gasUsed": "21000",
       "valueWei": "10000000000000000"
     },
     {
       "label": "acquireBatch(1) with referrer",
-      "hash": "0x9aaa9300560fc7ba98f4b2dd6940ffd4814aa8b90886a7f7fba6137d7743086c",
+      "hash": "0x94d16245bc13d123e3a9173d61df7f9ab73b39f1661a98b627693f76bbbc6af5",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078590,
+      "block": 50110513,
       "status": "success",
-      "gasUsed": "481301",
-      "effectiveGasPrice": "1000002933",
-      "costWei": "481302411655833",
-      "valueWei": "16142356240695475"
+      "gasUsed": "481289",
+      "effectiveGasPrice": "1000002571",
+      "costWei": "481290237394019",
+      "valueWei": "15938094099039374"
     },
     {
-      "label": "vrf fulfilment 111592318136081007090872967745673373387233919425857811448935638968780416383764 (fork: coordinator impersonated)",
-      "hash": "0xac0141c5b0c1c7f00869c8a2d1c8450eba0c70547d959f203d3681e614cb3805",
-      "gasUsed": "587321",
+      "label": "vrf fulfilment 59607883502140959785850970694247609506541412225725963994080165054431419591130 (fork: coordinator impersonated)",
+      "hash": "0x706231760637f4ceea8a7b849fadad446ffb2157c820aed1a09c4e598bcd70c5",
+      "gasUsed": "585246",
       "simulated": true,
       "payment": null,
       "latencySec": 0
     },
     {
       "label": "acquireBatch(10)",
-      "hash": "0x309c4ffed5bd5df662b7cd71e25750d0340fa9ecc2cef43d13399432e85c0411",
+      "hash": "0x3c81c5067609719925815704bdcb9784b90d34278dce1faf9f85edfcb21a2d37",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078595,
+      "block": 50110518,
       "status": "success",
       "gasUsed": "1986525",
-      "effectiveGasPrice": "1000001509",
-      "costWei": "1986527997666225",
-      "valueWei": "163497357252881450"
+      "effectiveGasPrice": "1000001324",
+      "costWei": "1986527630159100",
+      "valueWei": "161322106776693810"
     },
     {
-      "label": "vrf fulfilment 80382782757280767859393662656460986540728554965189803949707627264082855557312 (fork: coordinator impersonated)",
-      "hash": "0x1b9fff57074d985432d759bc984cdb3acab9b775016bb2d76ad36a33ed13c58d",
-      "gasUsed": "1749250",
+      "label": "vrf fulfilment 71432431078210670206719168770204381381749280665911467396826523730502091140958 (fork: coordinator impersonated)",
+      "hash": "0xb42c7800e867051663612a1c20e362c3418e4f226010a4ec36d7a38473a87498",
+      "gasUsed": "1754516",
       "simulated": true,
       "payment": null,
       "latencySec": 0
@@ -834,38 +845,148 @@
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0x2b106a43ec2041c25040f5442a0bc49b6f93e1b3a3f6b62a2219a133906818b7",
+      "hash": "0x1a0d39c6278fed3a55d24d09f86f55f46291488b85c30fc28401ca828f3d6921",
       "status": "success",
-      "gasUsed": "6721837",
-      "costWei": "6727093476534",
-      "block": "50078600"
+      "gasUsed": "7533079",
+      "costWei": "7538254225273",
+      "block": "50110523"
     },
     {
       "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "level": "info",
       "event": "tx",
       "label": "grail-step",
-      "hash": "0xeff4a7c95a34bb4322d5663f0a3ee25a51a34060c50d3fd63fef7c113fc4c6bf",
+      "hash": "0xa640b639232f26098265cbc693ade6ae87059aa97bc1128b250345322cb7e17d",
       "status": "success",
-      "gasUsed": "339067",
-      "costWei": "339302990632",
-      "block": "50078601"
+      "gasUsed": "336227",
+      "costWei": "336432770924",
+      "block": "50110524"
+    },
+    {
+      "label": "redeem Shape #4 (batch prizes)",
+      "hash": "0x0e3de39d9853b30cada50b6f9c8b3d678cf3b77b9066371fbf6d50996981b7a7",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110525,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000536",
+      "costWei": "61989033226104",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #6 (batch prizes)",
+      "hash": "0xb8e86b9cad9459c6e997f3a7db6320052b049b1c1d2a8bd32ac8554f600c09e5",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110526,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000470",
+      "costWei": "61989029134830",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #11 (batch prizes)",
+      "hash": "0x798ec914a04c4aec3603ef52a8d3e04616e2d9eaeb3b7e9ecf05e204730a3d3a",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110527,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000412",
+      "costWei": "61989025539468",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #2 (batch prizes)",
+      "hash": "0xab501d558fdeaf5d4155343ff396f58fbf5b1e48be4162cbfed0899ffa4e1d2c",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110528,
+      "status": "success",
+      "gasUsed": "153912",
+      "effectiveGasPrice": "1000000361",
+      "costWei": "153912055562232",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #5 (batch prizes)",
+      "hash": "0xc5470f5b806f87006f4a4fc324e489c9fb3974046c2b7cca5d8d3e35af0bebf7",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110529,
+      "status": "success",
+      "gasUsed": "153912",
+      "effectiveGasPrice": "1000000316",
+      "costWei": "153912048636192",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #8 (batch prizes)",
+      "hash": "0xd5c276524c92d8ee599973e675f9be468dec62510f01acefcf82da7d9dbb9ea4",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110530,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000277",
+      "costWei": "61989017170953",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #15 (batch prizes)",
+      "hash": "0xd9241fb04d7385178aaa0415034fd1eef2f1f8a4e399910d69c14e0bd75991ce",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110531,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000243",
+      "costWei": "61989015063327",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #10 (batch prizes)",
+      "hash": "0x6a7e02d7377240340a1ab438dfad4c493bd3c8e4340ebd9a75eed096e7511193",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110532,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000213",
+      "costWei": "61989013203657",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #7 (batch prizes)",
+      "hash": "0x061d8f0669b141fbbc2b2eaea3b3edf2abd26d347193a1096dce3e675065d787",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110533,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000187",
+      "costWei": "61989011591943",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #1 (batch prizes)",
+      "hash": "0xad9a8f56bebd20e2d5e10f2329dc628483b22f0c9da3ab2dbaf779f6c3834141",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110534,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000164",
+      "costWei": "61989010166196",
+      "valueWei": "0"
     },
     {
       "label": "acquireBatch(5) for GRAIL decay",
-      "hash": "0x20c21cd0b5e495aa9824372e7fbf6179444800e40f0093009fc938baf1e73ffa",
+      "hash": "0xfa24143e4eff8b5b5d0678d2856ad8030654294ff21f56ab8b36aacfd44ba1ad",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078602,
+      "block": 50110535,
       "status": "success",
       "gasUsed": "1131282",
-      "effectiveGasPrice": "1000000610",
-      "costWei": "1131282690082020",
-      "valueWei": "82669789239928470"
+      "effectiveGasPrice": "1000000144",
+      "costWei": "1131282162904608",
+      "valueWei": "80904442967723805"
     },
     {
-      "label": "vrf fulfilment 59338213665806933520070854849476234254913090740425197683639592875922270363042 (fork: coordinator impersonated)",
-      "hash": "0x3610e6eb894600a9c1a6b0989b89e163bd6abd3eedfcaab6c53c310f97149112",
-      "gasUsed": "1437511",
+      "label": "vrf fulfilment 24980385080479029250422223585137706859664592052669719574516684666781189137557 (fork: coordinator impersonated)",
+      "hash": "0x7dce0e6c4ed890a05bfbb43427e8c349152a4374ae4aae1c76cf71d90345b45c",
+      "gasUsed": "1403156",
       "simulated": true,
       "payment": null,
       "latencySec": 0
@@ -875,51 +996,95 @@
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0xd104f9a31ca2969f458dde1251b4c2ded318ef9b4ac172eab228b600d465c1dd",
+      "hash": "0x66d13b8443d987f898e11579b2e50e83ce6f721c913a7fb17d292576c47e50f5",
       "status": "success",
-      "gasUsed": "4573527",
-      "costWei": "4574976808059",
-      "block": "50078607"
+      "gasUsed": "3256878",
+      "costWei": "3257125522728",
+      "block": "50110540"
     },
     {
-      "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "level": "info",
-      "event": "tx",
-      "label": "grail-step",
-      "hash": "0x0f133f76efaea8102d64c9926e6ba00244cdb8c6bfabb4ea2adb6dd2fdedc3d7",
-      "status": "success",
-      "gasUsed": "319167",
-      "costWei": "319256685927",
-      "block": "50078608"
-    },
-    {
-      "label": "acquireBatch(10, maxNegativeSlippage 0)",
-      "hash": "0x0d5b0ea8096eb5234b5aec2da0050f4e2fc96a2d076498a1c18e807b0301a6ce",
+      "label": "redeem Shape #50 (GRAIL scenario)",
+      "hash": "0x0a6888e38e5e00a8c412c89fcc19c659a23e069fc78e3311c508bc796d3e1849",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078609,
+      "block": 50110541,
       "status": "success",
-      "gasUsed": "1986501",
-      "effectiveGasPrice": "1000000247",
-      "costWei": "1986501490665747",
-      "valueWei": "170988922715853090"
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000068",
+      "costWei": "61989004215252",
+      "valueWei": "0"
     },
     {
-      "label": "vrf fulfilment 64634548952919886444547884891494482578955172709299859232793124765573777743220 (fork: coordinator impersonated)",
-      "hash": "0x6a86dcf32b46c3f2e0d5ef58195837ac30610cb038ac34ebe32190be7a3d776b",
-      "gasUsed": "1753589",
+      "label": "redeem Shape #43 (GRAIL scenario)",
+      "hash": "0xced75963424cb9c5ebc889f3ac198afaee5dd428be557991c79ec0661fa7153d",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110542,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000060",
+      "costWei": "61989003719340",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #9 (GRAIL scenario)",
+      "hash": "0x1e24d38043e9eb8fb4fe568cfde2f711fb4955f8413c1cd56c72eb27e20f0630",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110543,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000053",
+      "costWei": "61989003285417",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #5 (GRAIL scenario)",
+      "hash": "0x59411ce3d0425413c8172fb7e8da908b2c18a4ac38f5bbaae40898f567184e3d",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110544,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000047",
+      "costWei": "61989002913483",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #49 (GRAIL scenario)",
+      "hash": "0xe0c096ef4182921c9a5ff44f54f7373d7dabcc8f187ab086607a85a5cb3ec483",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110545,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000042",
+      "costWei": "61989002603538",
+      "valueWei": "0"
+    },
+    {
+      "label": "acquireBatch(8, maxNegativeSlippage 0)",
+      "hash": "0xc135579c4b2d420f77043d623a8d50121b462a0f2d0f9650d962f9abedd89505",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110546,
+      "status": "success",
+      "gasUsed": "1644401",
+      "effectiveGasPrice": "1000000037",
+      "costWei": "1644401060842837",
+      "valueWei": "134590720990692360"
+    },
+    {
+      "label": "vrf fulfilment 2065823723664601459587836238724662199748808604073332942140703977360573047553 (fork: coordinator impersonated)",
+      "hash": "0x69b9e29c05534e4bb6316d2826c260f55f97dd64158f5769b178af3f9dc32760",
+      "gasUsed": "1072134",
       "simulated": true,
       "payment": null,
       "latencySec": 0
     },
     {
       "label": "withdrawAcquisitionRefund",
-      "hash": "0x2b0061e4bc68f3d3ba8429613c7ce4a09df8f33933e32cf20e7eff77e366105a",
+      "hash": "0xf51d8fda6fcfe9972d39e3a95e4fffb5e18a2d3d3fa6f3c8a79432bd6eafe720",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078614,
+      "block": 50110551,
       "status": "success",
       "gasUsed": "36762",
-      "effectiveGasPrice": "1000000130",
-      "costWei": "36762004779060",
+      "effectiveGasPrice": "1000000021",
+      "costWei": "36762000772002",
       "valueWei": "0"
     },
     {
@@ -927,38 +1092,27 @@
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0xe30dc3e6b67e4b484778ac1906d470305e5d3db13ab3a766889768c9dadf09c7",
+      "hash": "0x83e136326c9b41ac549565b865145638ed14be6d2deb92e894a556e314f1f7f7",
       "status": "success",
-      "gasUsed": "6535435",
-      "costWei": "6536180039590",
-      "block": "50078615"
-    },
-    {
-      "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "level": "info",
-      "event": "tx",
-      "label": "grail-step",
-      "hash": "0xf6f9ee54954506f43b9806b8e34b3be9b622f799978f5f1a44c69c217c99ff7b",
-      "status": "success",
-      "gasUsed": "143464",
-      "costWei": "143478633328",
-      "block": "50078616"
+      "gasUsed": "1734387",
+      "costWei": "1734419953353",
+      "block": "50110552"
     },
     {
       "label": "acquireBatch(1) paid by player for referrer",
-      "hash": "0x2cc86e0cb644bba92784540cad6e23435f44c3657d54339d05e222098890674f",
+      "hash": "0xb2b8648b6223581e93fc48bc4451e8d335b1ad5d7862ddc2e0041ca09eb0dda5",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078617,
+      "block": 50110553,
       "status": "success",
       "gasUsed": "447101",
-      "effectiveGasPrice": "1000000090",
-      "costWei": "447101040239090",
-      "valueWei": "16528819709897821"
+      "effectiveGasPrice": "1000000017",
+      "costWei": "447101007600717",
+      "valueWei": "16190635468544761"
     },
     {
-      "label": "vrf fulfilment 95695361262610089088250021252392363339125103410840193616977991841775985968916 (fork: coordinator impersonated)",
-      "hash": "0x073b0a9588522bc1ef227dfbacee015b1ddccea6b0ba06f3168bade9184de078",
-      "gasUsed": "527796",
+      "label": "vrf fulfilment 35297732474536370125366048762437551700181302982009947728676996303789295471031 (fork: coordinator impersonated)",
+      "hash": "0xd0f612f3db2936153ae1acf44a051bd12bc610b9778c020c8c7c00e8077c2f7e",
+      "gasUsed": "529146",
       "simulated": true,
       "payment": null,
       "latencySec": 0
@@ -968,125 +1122,147 @@
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0x41febae6378fa6fbb606c09ddc379fc48b6d5140b6bbc44cbdb1dbd7cba5fe50",
+      "hash": "0x57aea3847cea3092b67611c28f8756f577a0cef65415999e600a7db13b9b1206",
       "status": "success",
-      "gasUsed": "1007559",
-      "costWei": "1007608370391",
-      "block": "50078622"
+      "gasUsed": "1001937",
+      "costWei": "1001948021307",
+      "block": "50110558"
     },
     {
       "label": "withdrawFeeCredit(referrer)",
-      "hash": "0xb2575d58d607f25d0b1120e18e96b018b0d263b12ef2d0323387158e6b00718c",
+      "hash": "0x6e1c81bdc24310e12065f450ede4abecced2207c3af46d01d2e5ce707f7456ce",
       "from": "0x57A653Bdc3b270dc3485cF93a91dEEC782Cc6F86",
-      "block": 50078623,
+      "block": 50110559,
       "status": "success",
       "gasUsed": "38216",
-      "effectiveGasPrice": "1000000043",
-      "costWei": "38216001643288",
+      "effectiveGasPrice": "1000000010",
+      "costWei": "38216000382160",
       "valueWei": "0"
     },
     {
       "label": "deploy Swapper (test router)",
-      "hash": "0x966a089a6dffcb58a5cb11dc02298da4664b19bfe8510e29dc941600874c9e92",
+      "hash": "0x072091fe279bba054a8b77af6ff15bdaf323bb1601153b1f507a2990295e8a39",
       "gasUsed": "726205"
     },
     {
       "label": "swap: buy ENGINE with 0.01 ETH",
-      "hash": "0xeddf47690550958782227447561c5f3b0bd458cdba54af1f876a02e4ef35ed53",
+      "hash": "0x054b83d8a960357ef73e5dd3c8112ae1538c4028e59b58500d81472e0bccb0f5",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078625,
+      "block": 50110561,
       "status": "success",
       "gasUsed": "213776",
-      "effectiveGasPrice": "1000000034",
-      "costWei": "213776007268384",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "213776001710208",
       "valueWei": "10000000000000000"
     },
     {
       "label": "approve router",
-      "hash": "0x919e450fb744502e992c33e398a191441d81457eda6c3f7c9282de2181ddb6cb",
+      "hash": "0x2abe7af913cd8a9195443a70270325c2eae308d7bf3978d4d6e99767944b84d0",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078626,
+      "block": 50110562,
       "status": "success",
       "gasUsed": "45958",
-      "effectiveGasPrice": "1000000030",
-      "costWei": "45958001378740",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "45958000367664",
       "valueWei": "0"
     },
     {
       "label": "swap: sell half the ENGINE",
-      "hash": "0x8355776dc2b51689f9cfaf3e2de5a95a212a8be0627c7db293d142c8e7d4b8da",
+      "hash": "0x6318114185cf68d0a8c5a2c614a15181de83bbee130cc26cb2d80f7e44c519e1",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078627,
+      "block": 50110563,
       "status": "success",
       "gasUsed": "137105",
-      "effectiveGasPrice": "1000000027",
-      "costWei": "137105003701835",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "137105001096840",
       "valueWei": "0"
     },
     {
       "label": "hook.distribute",
-      "hash": "0xacaa281797267bf0960c717bf3e83230b2aafb9a2e4c0c7b603b04513ac60eba",
+      "hash": "0x779d4cbecd11e7e0848e98611a3a866c8207c9435a323bd61df1259beee27e03",
       "from": "0x9AFE2ffA8F6f86cd493b5a45b84026B5A7603d34",
-      "block": 50078628,
+      "block": 50110564,
       "status": "success",
-      "gasUsed": "175961",
-      "effectiveGasPrice": "1000000024",
-      "costWei": "175961004223064",
+      "gasUsed": "217932",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "217932001743456",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #2 (slippage scenario)",
+      "hash": "0x82fc01fb0b92ffa37e1d26cadc486571a13dfc6ee9c6d9fc97ff5e67c333cae7",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110565,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "61989000495912",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #37 (slippage scenario)",
+      "hash": "0x45e34bc083944aa4432d41c6f20f5fea904299948e58012398fd24d53ca8952c",
+      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
+      "block": 50110566,
+      "status": "success",
+      "gasUsed": "62007",
+      "effectiveGasPrice": "1000000008",
+      "costWei": "62007000496056",
       "valueWei": "0"
     },
     {
       "label": "outage acquireBatch(3) #1",
-      "hash": "0x2b3ac5cc8b4eeaf6635f3ebd06409b15913a14a3746d2a961d4b59048180ccf7",
+      "hash": "0x1413e669b872a3ddc1520aff75e49133f087e6429d6faf57086107ee9ed704e7",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078629,
+      "block": 50110567,
       "status": "success",
       "gasUsed": "789181",
-      "effectiveGasPrice": "1000000022",
-      "costWei": "789181017361982",
-      "valueWei": "49569896629693463"
+      "effectiveGasPrice": "1000000008",
+      "costWei": "789181006313448",
+      "valueWei": "48555343905634283"
     },
     {
-      "label": "vrf fulfilment 34940757999605054160779696926785960726202852942226116476926313888514960558347 (fork: coordinator impersonated)",
-      "hash": "0x91d70eb87d3f4ec62999c8ed3172548ab22eb1e154d5dcf9568fd661dce021db",
-      "gasUsed": "983547",
+      "label": "vrf fulfilment 44682429068695447572894652091995398756461278535592075094690115980233480985324 (fork: coordinator impersonated)",
+      "hash": "0x342fcb62c68fae1b204e09e0e257a9252993cd7069a23d06064156843b5df6d1",
+      "gasUsed": "979657",
       "simulated": true,
       "payment": null,
       "latencySec": 0
     },
     {
       "label": "outage acquireBatch(3) #2",
-      "hash": "0x0af320cfd0a349236517b8d4af6bdcf2431ee1696d71a09b14a711367d04474d",
+      "hash": "0x84a86c6c6182464366bd8c510e502b199c5fff98e514fcaf0ac8840ab342a8b9",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078634,
+      "block": 50110572,
       "status": "success",
       "gasUsed": "789181",
-      "effectiveGasPrice": "1000000013",
-      "costWei": "789181010259353",
-      "valueWei": "50609306168553587"
+      "effectiveGasPrice": "1000000007",
+      "costWei": "789181005524267",
+      "valueWei": "50801355034522868"
     },
     {
-      "label": "vrf fulfilment 20355205071560463655489935348291865438334950153560681851612454252901582341393 (fork: coordinator impersonated)",
-      "hash": "0xd17b0006f5e17e12e3bc661497f5135570216dcce321385c316ae2f7f1cb2078",
-      "gasUsed": "942198",
+      "label": "vrf fulfilment 38095169902775120812380418031976007558185720775828607192370965590842180112099 (fork: coordinator impersonated)",
+      "hash": "0x8a2e5c0f163150b39c0d685dea6cce83d357be531b2ef2f0cf3cd27c78115b1b",
+      "gasUsed": "954601",
       "simulated": true,
       "payment": null,
       "latencySec": 0
     },
     {
       "label": "outage acquireBatch(3) #3",
-      "hash": "0x09ef14201efd385f34695e2da13ab11c8a516bdd0a58954c316aa4eba654b0f2",
+      "hash": "0x8680596f28a3c045d30886844930822b09ced316d8a06f172a35395afb4a299a",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078639,
+      "block": 50110577,
       "status": "success",
       "gasUsed": "789181",
-      "effectiveGasPrice": "1000000008",
-      "costWei": "789181006313448",
-      "valueWei": "49699870434788843"
+      "effectiveGasPrice": "1000000007",
+      "costWei": "789181005524267",
+      "valueWei": "52176210420679643"
     },
     {
-      "label": "vrf fulfilment 81930253936869671377203591457478252871230430031888858137517952635013840555232 (fork: coordinator impersonated)",
-      "hash": "0x8355354ff4138573d1d9e0d695c59280ce83cea6457e268c473a2ca62d39ac2f",
-      "gasUsed": "921737",
+      "label": "vrf fulfilment 56374753517289020718738919890422127119688922542761496539183813753708242177932 (fork: coordinator impersonated)",
+      "hash": "0x794c3089df5b38209a452a080a6eef708f499baa04fffb18cd31f35af9a88370",
+      "gasUsed": "935056",
       "simulated": true,
       "payment": null,
       "latencySec": 0
@@ -1096,39 +1272,39 @@
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0xec793038a4940d5f8451931ea9cf775aa0b8a72ddc0e32fce501d27a2460a11d",
+      "hash": "0xa34b9f5f413ad062335683c4584647598b2335f4d8ad70c3bc956f0ab3681d02",
       "status": "success",
-      "gasUsed": "6865235",
-      "costWei": "6865283056645",
-      "block": "50078644"
+      "gasUsed": "5734969",
+      "costWei": "5735009144783",
+      "block": "50110582"
     },
     {
       "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       "level": "info",
       "event": "tx",
       "label": "settle",
-      "hash": "0x2ac64d6bcfc5b19db7a0ae1e6773b2df55049a215f49ad5618e562f9bff2c773",
+      "hash": "0xdc5ecdc0aa78b28e2d2e3e2158c8fc538207ca64c3a9e7475207dcfb50023dba",
       "status": "success",
       "gasUsed": "80714",
       "costWei": "80714564998",
-      "block": "50078645"
+      "block": "50110583"
     },
     {
-      "label": "redeem Shape #16",
-      "hash": "0xfb0e0eb2bcf15425211013aea118aa3df849f5e988184afd9f9ffff9d87e329d",
-      "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078646,
+      "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "level": "info",
+      "event": "tx",
+      "label": "deploy-pol",
+      "hash": "0xa6653f7c0d1c7ce3589c124cf724b6a92c8d9b34671d5f8bf118ab8d921d8d88",
       "status": "success",
-      "gasUsed": "61989",
-      "effectiveGasPrice": "1000000007",
-      "costWei": "61989000433923",
-      "valueWei": "0"
+      "gasUsed": "171722",
+      "costWei": "171723202054",
+      "block": "50110584"
     },
     {
       "label": "farm.claim([0])",
-      "hash": "0x6df089183f0e12c6f66268429f5cefe7095096168b004302b2cbbb0a7f401f04",
+      "hash": "0x03332da24e4c0ba091e8186d3bcb01412c452eacf1d108f3867ffb1134863f95",
       "from": "0xF2140A09d4D4F57706A587898D5a195c5C059a67",
-      "block": 50078648,
+      "block": 50110586,
       "status": "success",
       "gasUsed": "154259",
       "effectiveGasPrice": "1000000007",
@@ -1136,36 +1312,22 @@
       "valueWei": "0"
     },
     {
-      "keeper": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "level": "info",
-      "event": "tx",
-      "label": "retire-unearned",
-      "hash": "0xb77ff083a1d6a1f161a179e193669afdd97964568540cf145f57bbd01d0f5442",
-      "status": "success",
-      "gasUsed": "262600",
-      "costWei": "262601838200",
-      "block": "50078650"
-    },
-    {
-      "label": "fund buyback (fork exercise)",
-      "hash": "0xaaec2bb142951f8993b670bdf39429573248abe717cafbd31d15b4825465e79c",
-      "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      "to": "0x2cB923220Bdf5cB4f059dCd158272B2389C1229b",
-      "block": 50078651,
-      "status": "success",
-      "gasUsed": "22474",
-      "valueWei": "30000000000000000"
-    },
-    {
       "keeper": "0x9AFE2ffA8F6f86cd493b5a45b84026B5A7603d34",
       "level": "info",
       "event": "tx",
       "label": "buyback",
-      "hash": "0x13bad765e595ec970dbd1568c1525bec9af8134c608d195eb2ea2d4bad8c8adc",
+      "hash": "0xd832786f849410bf904a05feeefaf605c3228b0c9eec7844191440890d2e6b8a",
       "status": "success",
-      "gasUsed": "219730",
-      "costWei": "219731538110",
-      "block": "50078653"
+      "gasUsed": "219694",
+      "costWei": "219695537858",
+      "block": "50110591"
     }
+  ],
+  "grailPullIds": [
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
   ]
 }

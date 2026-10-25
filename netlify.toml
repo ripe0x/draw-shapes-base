@@ -1,0 +1,29 @@
+# Netlify: the player app (web/) built against the Base Sepolia deployment
+# (web/src/deployment.sepolia.json, written by script/testnet/sepolia.sh). ABIs are committed
+# (web/src/abi.json), so no Foundry build is needed on Netlify.
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  VITE_NETWORK = "base-sepolia"
+  VITE_RPC_URL = "https://sepolia.base.org"
+
+# branch deploys and deploy previews play the Sepolia game too
+[context.branch-deploy.environment]
+  VITE_NETWORK = "base-sepolia"
+[context.deploy-preview.environment]
+  VITE_NETWORK = "base-sepolia"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"

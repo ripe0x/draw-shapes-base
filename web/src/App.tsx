@@ -23,7 +23,7 @@ const short = (a?: string) => (a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "");
 const odds = (ppm?: bigint) => (ppm && ppm > 0n ? `1 in ${Math.round(1e6 / Number(ppm)).toLocaleString()}` : "–");
 
 type Live = { game?: any; quote?: any; board?: any[]; grail?: any; genesis?: any; market?: any; split?: any; refund?: bigint;
-  buyback?: { spent: bigint; burned: bigint; start: bigint; supply: bigint }; claimable?: bigint[]; balance?: bigint; chainNow?: bigint; error?: string };
+  buyback?: { spent: bigint; burned: bigint; start: bigint; supply: bigint }; claimable?: bigint[]; balance?: bigint; chainNow?: bigint; grailStepDue?: boolean; error?: string };
 type TxState = { label: string; phase: "wallet" | "submitted" | "confirmed" | "failed"; hash?: string; detail?: string };
 
 function useReferrer(): Address | undefined {
@@ -66,6 +66,7 @@ export default function App() {
         read<bigint>("buyback", "startTime"), read<bigint>("token", "totalSupply"),
       ]);
       const chainNow = (await publicClient.getBlock()).timestamp; // chain time, not the local clock
+      const grailStepDue = await read<boolean>("vault", "stepDue");
       let refund = 0n, balance: bigint | undefined, claimable: bigint[] = [];
       if (account) {
         [refund, balance] = await Promise.all([read<bigint>("engine", "acquisitionRefundCredit", [account]), publicClient.getBalance({ address: account })]);
@@ -78,7 +79,7 @@ export default function App() {
           claimable = rows.filter((x): x is bigint => x !== undefined);
         }
       }
-      setLive({ game, quote, board, grail, genesis, market, split, refund, balance, claimable, buyback: { spent, burned, start, supply }, chainNow });
+      setLive({ game, quote, board, grail, genesis, market, split, refund, balance, claimable, buyback: { spent, burned, start, supply }, chainNow, grailStepDue });
       setLoaded(true);
     } catch (e: any) {
       setLive((l) => ({ ...l, error: e?.shortMessage ?? String(e) }));
@@ -203,6 +204,14 @@ export default function App() {
         {network !== "base" && <span className="state off">{chain.name}: test network, no real value</span>}
         <button onClick={account ? undefined : connect}>{account ? short(account) : "Connect wallet"}</button>
       </header>
+      {network === "base-sepolia" && (
+        <div className="note">
+          Test network: pulls use Base Sepolia test ETH with no real value. Get some from the{" "}
+          <a href="https://portal.cdp.coinbase.com/products/faucet" target="_blank" rel="noreferrer">Coinbase</a>,{" "}
+          <a href="https://console.optimism.io/faucet" target="_blank" rel="noreferrer">Superchain</a> or{" "}
+          <a href="https://faucets.chain.link/base-sepolia" target="_blank" rel="noreferrer">Chainlink</a> faucets.
+        </div>
+      )}
       {wrongNetwork && (
         <div className="banner">Your wallet is on another network. <button onClick={switchNetwork}>Switch to {chain.name}</button></div>
       )}
@@ -301,6 +310,15 @@ export default function App() {
         )}
         {g?.activated && live.board?.length && g.activeListings * 10n < 7n * live.board.reduce((n: bigint, r: any) => n + r.target, 0n) ? (
           <p className="note">The board is restocking; prices and odds follow what is selectable.</p>
+        ) : null}
+        {g?.activated && (g.nextToBook <= g.lastIssued || live.board?.some((r: any) => r.queued > 0n) || live.grailStepDue) ? (
+          <p className="note">
+            Settlement or restocking is waiting for a keeper. Anyone can run it; the game refunds the gas of a call that restocks.{" "}
+            <button disabled={!!busy} onClick={async () => {
+              if (g.nextToBook <= g.lastIssued || live.board?.some((r: any) => r.queued > 0n)) await send("Settle & restock", "controller", "settle", [20n]);
+              if (await read<boolean>("vault", "stepDue")) await send("GRAIL step", "vault", "step", []);
+            }}>Settle & restock</button>
+          </p>
         ) : null}
       </section>
 
