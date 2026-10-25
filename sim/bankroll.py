@@ -3,12 +3,12 @@
 
 Faithful to the contracts where it matters for solvency (src/game/DrawController.sol,
 src/engine/DrawEngine.sol, src/game/PricingLib.sol):
-- notional p = b * 1.065 + mintFee * rungs; weight = 1e36 // p; fee = harmonic mean of active listings
+- notional p = b * (1 + premium + maintenance + feed) + mintFee * rungs (launch 1.07); weight = 1e36 // p; fee = harmonic mean of active listings
   (GRAILs included) at request time; settlement fee is outside the pool.
 - requests within a settle window are priced at request time and settle in order against the live
   board (captured items leave immediately, replacements wait for the keeper's settle);
 - at each settle: proceeds become cash, margin = proceeds - value (netted, negative carries), mint
-  line repaid first, rest split premium:maintenance:feed = 4:0.5:2 (maintenance and feed leave the
+  line repaid first, rest split premium:maintenance:feed (launch 3.5:0.5:3) (maintenance and feed leave the
   pool), replacement rows from Draw Shapes' deficit / surprise / band draw, minted from cash only;
 - GRAIL vault: feed + trading-fee share; a GRAIL (0.5, 1, 5 ETH ladder) is listed only when fully
   funded, at 80 % of backing decaying 0.00002 ETH per pull to 50 %; its capture never touches the
@@ -24,9 +24,9 @@ FEE = 0.001
 ROWS = [  # rungs (backings), share bps
     ([0.01], 6200), ([0.01, 0.01], 2600), ([0.01, 0.01, 0.01], 700), ([0.05], 400), ([0.1], 100)]
 BOARD = 100
-# premium / maintenance / GRAIL feed bps; BANKROLL_SPLIT="350,50,300" runs the alternative and writes
-# results/bankroll-<split>.md
-SPLIT = tuple(int(x) for x in os.environ.get("BANKROLL_SPLIT", "400,50,200").split(","))
+# premium / maintenance / GRAIL feed bps (launch 3.5 / 0.5 / 3); BANKROLL_SPLIT="400,50,200" runs another
+# split and writes results/bankroll-<split>.md
+SPLIT = tuple(int(x) for x in os.environ.get("BANKROLL_SPLIT", "350,50,300").split(","))
 MARKUP = 1 + sum(SPLIT) / BPS
 SURPRISE_BPS, RESTORE_K, BAND_BPS = 200, 8, 3000
 LADDER = [0.5, 1.0, 5.0]
@@ -311,7 +311,7 @@ def main():
            "| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
     for r in rows:
         out.append("| " + " | ".join(f"{r[c]:.4f}" if isinstance(r[c], float) else str(r[c]) for c in cols) + " |")
-    name = "bankroll.md" if SPLIT == (400, 50, 200) else f"bankroll-{'-'.join(map(str, SPLIT))}.md"
+    name = "bankroll.md" if SPLIT == (350, 50, 300) else f"bankroll-{'-'.join(map(str, SPLIT))}.md"
     path = os.path.join(os.path.dirname(__file__), "results", name)
     open(path, "w").write("\n".join(out) + "\n")
     print("\n".join(out))
