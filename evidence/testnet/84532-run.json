@@ -224,6 +224,180 @@
           "toBeneficiary": true
         }
       ]
+    },
+    "batch-of-ten": {
+      "done": true,
+      "at": "2026-10-25T17:58:42.674Z",
+      "ids": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "requestId": "63123750908519524823758993897184430472085467584117785558063229366484879055295",
+      "quote": {
+        "fee": "15968918368979586",
+        "sfee": "159689183689795",
+        "vrfFee": "28825000000000",
+        "total": "161314900526693810"
+      },
+      "requestTx": "0x2ba8b1c33bdb33b841ad4e7c2b2672da1ef08b41f5bbf184c0ddb46bcbad0e5f",
+      "requestGas": "1986525",
+      "requestBlock": 50139042,
+      "subBefore": "45017656702398264",
+      "fulfil": {
+        "hash": "0xc28eed6c19854fedaa31d344793158a34133681d77b5b3b4d0840aae752f7463",
+        "payment": "2557900800868",
+        "success": true,
+        "gasUsed": "256377",
+        "effectiveGasPrice": "6000000",
+        "latencyBlocks": 7205,
+        "latencySec": 1441,
+        "latencyWallSec": 1441.448
+      },
+      "statuses": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "subscriptionDelta": "2557900800868",
+      "settledInCallback": 10,
+      "headAfter": "3",
+      "deliveries": [
+        {
+          "id": "3",
+          "status": 6
+        },
+        {
+          "id": "4",
+          "status": 6
+        },
+        {
+          "id": "5",
+          "status": 6
+        },
+        {
+          "id": "6",
+          "status": 6
+        },
+        {
+          "id": "7",
+          "status": 6
+        },
+        {
+          "id": "8",
+          "status": 6
+        },
+        {
+          "id": "9",
+          "status": 6
+        },
+        {
+          "id": "10",
+          "status": 6
+        },
+        {
+          "id": "11",
+          "status": 6
+        },
+        {
+          "id": "12",
+          "status": 6
+        }
+      ]
+    },
+    "keeper-booking-restock": {
+      "done": true,
+      "at": "2026-10-25T17:58:45.536Z",
+      "keeper": {
+        "actions": [
+          {
+            "action": "settle",
+            "hash": "0x4a72d14b3363546fe01f1484dfc5d58f14abfdade532560aedd98a2f6963e5db",
+            "gasUsed": "1495087"
+          },
+          {
+            "action": "grail-step",
+            "hash": "0x22a110c2f22e4c33eca3d604e6047884b8a279baca67df11c56f08fbca081c68",
+            "gasUsed": "336227"
+          }
+        ],
+        "alerts": [],
+        "netCostWei": "-7484985999816"
+      },
+      "before": {
+        "nextToBook": "1",
+        "active": "27",
+        "cash": "152000000000000000"
+      },
+      "after": {
+        "nextToBook": "13",
+        "active": "28",
+        "cash": "154381752957445236",
+        "maintenance": "10321777552492176"
+      },
+      "deliveries": [
+        {
+          "id": "3",
+          "status": 3
+        },
+        {
+          "id": "4",
+          "status": 3
+        },
+        {
+          "id": "5",
+          "status": 3
+        },
+        {
+          "id": "6",
+          "status": 3
+        },
+        {
+          "id": "7",
+          "status": 3
+        },
+        {
+          "id": "8",
+          "status": 3
+        },
+        {
+          "id": "9",
+          "status": 3
+        },
+        {
+          "id": "10",
+          "status": 3
+        },
+        {
+          "id": "11",
+          "status": 3
+        },
+        {
+          "id": "12",
+          "status": 3
+        }
+      ]
+    },
+    "redeem-prize-for-backing": {
+      "done": true,
+      "at": "2026-10-25T17:58:47.956Z",
+      "redeemed": 1,
+      "ethReturnedWei": "9999999999999908",
+      "notionalWei": "11700000000000000"
     }
   },
   "txs": [
@@ -432,6 +606,61 @@
       "effectiveGasPrice": "6000000",
       "costWei": "11919150000000",
       "valueWei": "161322106776693810"
+    },
+    {
+      "label": "vrf fulfilment 63123750908519524823758993897184430472085467584117785558063229366484879055295",
+      "hash": "0xc28eed6c19854fedaa31d344793158a34133681d77b5b3b4d0840aae752f7463",
+      "payment": "2557900800868",
+      "success": true,
+      "gasUsed": "256377",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 7205,
+      "latencySec": 1441,
+      "latencyWallSec": 1441.448
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0x4a72d14b3363546fe01f1484dfc5d58f14abfdade532560aedd98a2f6963e5db",
+      "status": "success",
+      "gasUsed": "1495087",
+      "costWei": "8970522000000",
+      "block": "50146275"
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "grail-step",
+      "hash": "0x22a110c2f22e4c33eca3d604e6047884b8a279baca67df11c56f08fbca081c68",
+      "status": "success",
+      "gasUsed": "336227",
+      "costWei": "2017362000000",
+      "block": "50146280"
+    },
+    {
+      "label": "redeem Shape #8 (batch prizes)",
+      "hash": "0x6a20ee9bdfa930b51ea03e9fae6c0c8a3b12b5c9cb5b6b699c9a2c97423fb776",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50146295,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "acquireBatch(5) for GRAIL decay",
+      "hash": "0x950f9a0d5787e0bef0727fb54869fa2a580331655842adb50fe2fee31f7fcc4e",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50146302,
+      "status": "success",
+      "gasUsed": "1131282",
+      "effectiveGasPrice": "6000017",
+      "costWei": "6787711231794",
+      "valueWei": "78975116440031280"
     }
   ],
   "findings": [
