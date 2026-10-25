@@ -977,7 +977,16 @@ contract DrawEngine is ReentrancyGuard {
         uint256 settlementFee = settlementFeeFor(fee);
         (uint256 vrfFee, uint256 vrfMargin) = vrfFeeParts(count);
         uint256 cost = count * (fee + settlementFee) + vrfFee + vrfMargin;
-        if (msg.value < cost) revert InsufficientPayment();
+        // A buyer's own refund credit pays first, so a refund simply rolls into the next pull.
+        uint256 paid = msg.value;
+        if (paid < cost && msg.sender == purchaser) {
+            uint256 credit = acquisitionRefundCredit[purchaser];
+            uint256 used = cost - paid < credit ? cost - paid : credit;
+            acquisitionRefundCredit[purchaser] = credit - used;
+            acquisitionRefundCreditTotal -= used;
+            paid += used;
+        }
+        if (paid < cost) revert InsufficientPayment();
 
         if (referrer == purchaser || referrer == address(this)) referrer = address(0);
 
@@ -1011,7 +1020,7 @@ contract DrawEngine is ReentrancyGuard {
             _requestRandomness(firstSequence + uint64(done), n);
         }
 
-        uint256 excess = msg.value - cost;
+        uint256 excess = paid - cost;
         if (excess != 0) SafeTransferLib.forceSafeTransferETH(msg.sender, excess);
     }
 

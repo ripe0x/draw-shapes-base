@@ -161,6 +161,42 @@ contract FollowupTest is GameFixture {
         assertEq(margin, 0);
     }
 
+    /// @notice A refund rolls into the next pull: the buyer's own credit pays before msg.value, the
+    ///         books stay exact, and nobody else can spend a player's credit by buying for them.
+    function test_refundCredit_paysForTheNextPull_ownCreditOnly() public {
+        _openAndActivate();
+        (uint256 fee, uint256 sfee,, uint256 total3) = engine.quoteAcquisitionPrice(3);
+        uint256 any = engine.ANY_INVENTORY_VERSION();
+        vm.prank(alice);
+        engine.acquireBatch{value: total3}(alice, address(0), 3, 0, 0, 1_000, any, block.timestamp);
+        vm.roll(vm.getBlockNumber() + engine.selectionTimeoutBlocks() + 1);
+        engine.processAcquisitions(10);
+        uint256 credit = engine.acquisitionRefundCredit(alice);
+        assertEq(credit, 3 * (fee + sfee), "late words refunded as credit");
+
+        // someone else buying for alice cannot spend her credit
+        vm.deal(bob, 1 ether);
+        vm.prank(bob);
+        vm.expectRevert(DrawEngine.InsufficientPayment.selector);
+        engine.acquireBatch(alice, address(0), 1, 0, 0, 1_000, any, block.timestamp);
+
+        // alice's next pull is paid from her credit, with no ETH sent
+        (,,, uint256 total1) = engine.quoteAcquisitionPrice(1);
+        uint256 balBefore = alice.balance;
+        vm.prank(alice);
+        engine.acquireBatch(alice, address(0), 1, 0, 0, 1_000, any, block.timestamp);
+        assertEq(engine.acquisitionRefundCredit(alice), credit - total1, "credit spent on the pull");
+        assertEq(alice.balance, balBefore, "no ETH needed");
+        assertEq(address(engine).balance, engine.liabilities(), "books exact");
+
+        // with ETH sent covering the price, the credit is left alone and the excess returned
+        uint256 left = engine.acquisitionRefundCredit(alice);
+        vm.prank(alice);
+        engine.acquireBatch{value: total1 + 1 ether}(alice, address(0), 1, 0, 0, 1_000, any, block.timestamp);
+        assertEq(engine.acquisitionRefundCredit(alice), left, "credit untouched when ETH covers the pull");
+        assertEq(address(engine).balance, engine.liabilities());
+    }
+
     /*//////////////////////////////////////////////////////////////
                          PURCHASE ON BEHALF
     //////////////////////////////////////////////////////////////*/
