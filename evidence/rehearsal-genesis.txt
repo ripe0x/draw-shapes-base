@@ -1,33 +1,31 @@
-Compiling 1 files with Solc 0.8.28
-Solc 0.8.28 finished in 51.81s
-Compiler run successful!
+No files changed, compilation skipped
 Ran 3 tests for test/rehearsal/GenesisRehearsal.t.sol:GenesisRehearsalTest
 [PASS] test_activationIsAtomic() (gas: 270301)
 [PASS] test_deployFailsWithoutVerifiedTokenWorks() (gas: 12914)
-[PASS] test_fullGenesisRehearsal() (gas: 2319669728)
+[PASS] test_fullGenesisRehearsal() (gas: 2320171335)
 Logs:
-  opening quote per pull (wei) 15030208260911705
-  referrer credit 109598794229730560
-  token works credit 109657834430030200
-  development credit 219374709060364220
+  opening quote per pull (wei) 15094762843966669
+  referrer credit 109304679483860980
+  token works credit 109379537005287610
+  development credit 218833931532005980
   VRF fees collected 8071000000000000
-  VRF billed (mock) 6432885528080000
-  GRAIL capture proceeds 0
+  VRF billed (mock) 6408728770880000
+  GRAIL capture proceeds 30721379585771071
   pulls accepted 2800
   pulls fulfilled 2800
-  player ETH in 44309836109732753600
-  settlement fees (ref+TW+dev) 438631337720124980
-  creator mint fees accrued 3691000000000000000
-  operator trading fees 47393312754535215
-  treasury trading receipts 331753189281748310
-  GRAIL funded: feed 702268564521941393
-  GRAIL funded: trading 314748341238300149
+  player ETH in 44197403950136738240
+  settlement fees (ref+TW+dev) 437518148021154570
+  creator mint fees accrued 3685000000000000000
+  operator trading fees 47388317713294926
+  treasury trading receipts 331718223993066287
+  GRAIL funded: feed 1107468609655633681
+  GRAIL funded: trading 326828161976179393
   GRAILs minted backing 1000000000000000000
-  ordinary NAV 3436298066360202056
-  premium booked 1404537129043883770
-  POL liquidity 4483193374914061235425
-  releasable surplus after genesis (wei) 1236298066360202056
-  ordinary NAV (wei) 3436298066360202056
-  ENGINE burned by first buyback 150537031406948139525557
-Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 2.07s (1.82s CPU time)
-Ran 1 test suite in 2.08s (2.07s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)
+  ordinary NAV 3346046711264906859
+  premium booked 1292046711264906859
+  POL liquidity 4476589093735505851209
+  releasable surplus after genesis (wei) 1146046711264906859
+  ordinary NAV (wei) 3346046711264906859
+  ENGINE burned by first buyback 150437374470959378697566
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 1.95s (1.81s CPU time)
+Ran 1 test suite in 1.96s (1.95s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)

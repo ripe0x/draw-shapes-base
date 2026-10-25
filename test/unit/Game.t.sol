@@ -157,10 +157,11 @@ contract GameTest is GameFixture {
         GrailVault.GrailItem memory it = vault.items()[0];
         for (uint256 round; round < 10; ++round) {
             (, uint256 vrfId) = _pull(alice, 20);
-            _fulfill(vrfId, uint256(keccak256(abi.encode("d", round))));
+            _fulfill(vrfId, uint256(keccak256(abi.encode("decay", round))));
             _settleAll();
         }
         vault.step();
+        assertEq(vault.liveGrails(), 1, "these words do not capture the GRAIL (decay, not a win, is under test)");
         GrailVault.GrailItem memory after_ = vault.items()[0];
         // 200 pulls x 0.00002 = 0.004 ETH, at least 1% of 0.4
         assertEq(after_.notional, it.notional - 200 * 0.00002 ether, "decayed by the pull clock");

@@ -101,7 +101,8 @@ library LaunchParams {
         p.engine = engine;
         p.governance = governance;
         p.guardian = guardian;
-        p.feeSplit = DrawController.FeeSplit({premiumBps: 400, maintenanceBps: 50, feedBps: 200});
+        // premium 3.5 %, maintenance 0.5 %, GRAIL feed 3 % (docs/GRAIL_AVAILABILITY.md, docs/LAUNCH_CONFIG.md)
+        p.feeSplit = DrawController.FeeSplit({premiumBps: 350, maintenanceBps: 50, feedBps: 300});
         p.mix = mix();
         p.boardItems = 100;
         p.cashFloor = 0;

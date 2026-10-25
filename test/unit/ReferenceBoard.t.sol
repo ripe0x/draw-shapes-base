@@ -29,16 +29,16 @@ contract ReferenceBoardTest is GameFixture {
     }
 
     function test_referenceBoard_notionals() public view {
-        assertEq(controller.rowNotional(0), 0.01165 ether);
-        assertEq(controller.rowNotional(1), 0.0233 ether);
-        assertEq(controller.rowNotional(2), 0.03495 ether);
-        assertEq(controller.rowNotional(3), 0.05425 ether);
-        assertEq(controller.rowNotional(4), 0.1075 ether);
+        assertEq(controller.rowNotional(0), 0.0117 ether);
+        assertEq(controller.rowNotional(1), 0.0234 ether);
+        assertEq(controller.rowNotional(2), 0.0351 ether);
+        assertEq(controller.rowNotional(3), 0.0545 ether);
+        assertEq(controller.rowNotional(4), 0.108 ether);
     }
 
     function test_referenceBoard_priceReconcilesToTheWei() public {
         _openAndActivate();
-        uint256[5] memory price = [uint256(0.01165 ether), 0.0233 ether, 0.03495 ether, 0.05425 ether, 0.1075 ether];
+        uint256[5] memory price = [uint256(0.0117 ether), 0.0234 ether, 0.0351 ether, 0.0545 ether, 0.108 ether];
         uint256[5] memory count = [uint256(62), 26, 7, 4, 1];
         uint256 sumW;
         uint256 sumWP;
@@ -57,10 +57,10 @@ contract ReferenceBoardTest is GameFixture {
         assertEq(vrfFee, engine.vrfFeeFor(1), "VRF fee quoted separately");
         assertGt(vrfFee, 0);
         assertEq(total, fee + fee / 100 + vrfFee);
-        // exact reference numbers (premium 4 %, maintenance 0.5 %, feed 2 %)
-        assertEq(fee, 14_878_540_357_338_322, "acquisition fee");
-        assertEq(sFee, 148_785_403_573_383, "settlement fee");
-        assertEq(fee + sFee, 15_027_325_760_911_705, "reference price before VRF");
+        // exact reference numbers (launch: premium 3.5 %, maintenance 0.5 %, feed 3 %)
+        assertEq(fee, 14_942_455_786_105_613, "acquisition fee");
+        assertEq(sFee, 149_424_557_861_056, "settlement fee");
+        assertEq(fee + sFee, 15_091_880_343_966_669, "reference price before VRF");
 
         // expected backing E[b] = Σ n b / p / Σ n / p
         uint256[5] memory b = [uint256(0.01 ether), 0.02 ether, 0.03 ether, 0.05 ether, 0.1 ether];
@@ -69,9 +69,9 @@ contract ReferenceBoardTest is GameFixture {
             num += count[r] * (1e36 / price[r]) * b[r];
         }
         uint256 eb = num / sumW;
-        assertEq(eb, 12_819_637_956_291_283, "expected backing");
-        // ordinary RTP before VRF: 85.31 %
-        assertEq(eb * 10_000 / (fee + sFee), 8530);
+        assertEq(eb, 12_819_466_318_547_036, "expected backing");
+        // ordinary RTP before VRF: 84.94 %
+        assertEq(eb * 10_000 / (fee + sFee), 8494);
         console2.log("acquisition fee (wei)", fee);
         console2.log("settlement fee (wei)", sFee);
         console2.log("player payment (wei)", total);
@@ -126,18 +126,18 @@ contract ReferenceBoardTest is GameFixture {
         assertEq(engine.feeCreditOf(dev), sfee - sfee / 4);
     }
 
-    /// The 3.5 / 0.5 / 3 alternative (governance `setFeeSplit`, not the launch default): exact values.
-    function test_alternativeSplit_exactPrice() public {
-        controller.setFeeSplit(DrawController.FeeSplit({premiumBps: 350, maintenanceBps: 50, feedBps: 300}));
+    /// The previous 4 / 0.5 / 2 split (comparison; governance `setFeeSplit`): exact values.
+    function test_previousSplit_4_05_2_exactPrice() public {
+        controller.setFeeSplit(DrawController.FeeSplit({premiumBps: 400, maintenanceBps: 50, feedBps: 200}));
         _openAndActivate();
-        assertEq(controller.rowNotional(0), 0.0117 ether);
-        assertEq(controller.rowNotional(1), 0.0234 ether);
-        assertEq(controller.rowNotional(2), 0.0351 ether);
-        assertEq(controller.rowNotional(3), 0.0545 ether);
-        assertEq(controller.rowNotional(4), 0.108 ether);
+        assertEq(controller.rowNotional(0), 0.01165 ether);
+        assertEq(controller.rowNotional(1), 0.0233 ether);
+        assertEq(controller.rowNotional(2), 0.03495 ether);
+        assertEq(controller.rowNotional(3), 0.05425 ether);
+        assertEq(controller.rowNotional(4), 0.1075 ether);
         uint256 fee = engine.acquisitionFee();
-        assertEq(fee, 14_942_455_786_105_613, "acquisition fee");
-        assertEq(engine.settlementFeeFor(fee), 149_424_557_861_056, "settlement fee");
+        assertEq(fee, 14_878_540_357_338_322, "acquisition fee");
+        assertEq(engine.settlementFeeFor(fee), 148_785_403_573_383, "settlement fee");
         (,, uint256 vrf1, uint256 t10) = engine.quoteAcquisitionPrice(10);
         assertGt(vrf1, 0);
         assertEq(t10, 10 * (fee + fee / 100) + engine.vrfFeeFor(10));
@@ -151,8 +151,8 @@ contract ReferenceBoardTest is GameFixture {
         vault.fundGrail{value: 0.501 ether}();
         vault.step();
         uint256 withGrail = engine.acquisitionFee();
-        assertEq(before, 14_878_540_357_338_322);
-        assertEq(withGrail, 15_021_738_222_452_202, "fee with a listed 0.5 ETH GRAIL");
+        assertEq(before, 14_942_455_786_105_613);
+        assertEq(withGrail, 15_086_244_705_354_466, "fee with a listed 0.5 ETH GRAIL");
         console2.log("fee uplift with a listed GRAIL (ppm)", (withGrail - before) * 1e6 / before);
     }
 }
