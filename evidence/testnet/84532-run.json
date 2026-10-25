@@ -170,6 +170,17 @@
     "fund-accounts": {
       "done": true,
       "at": "2026-10-25T16:48:46.475Z"
+    },
+    "testnet-vrf-window": {
+      "done": true,
+      "at": "2026-10-25T17:11:38.740Z",
+      "delay": "600",
+      "scheduledAt": "1792947692",
+      "executedAt": "1792948298",
+      "waitedSec": "606",
+      "timeSkippedOnFork": false,
+      "selectionTimeoutBlocks": "7200",
+      "refundedLateWords": "1"
     }
   },
   "txs": [
@@ -334,6 +345,28 @@
       "effectiveGasPrice": "6000000",
       "costWei": "374484000000",
       "valueWei": "0"
+    },
+    {
+      "label": "timelock.executeBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only))",
+      "hash": "0x314277c7bf35cdaf08c2434792ab861a28d8b5eb741debc2c7753be3281fd7df",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50132149,
+      "status": "success",
+      "gasUsed": "74895",
+      "effectiveGasPrice": "6000000",
+      "costWei": "449370000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "acquireBatch(1) with referrer",
+      "hash": "0xef5c695aff2910e5309fee365d80465f660d4146bc948b0ae14da50609160b80",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50132155,
+      "status": "success",
+      "gasUsed": "447089",
+      "effectiveGasPrice": "6000000",
+      "costWei": "2682534000000",
+      "valueWei": "15938094099039374"
     }
   ],
   "findings": [
