@@ -181,6 +181,49 @@
       "timeSkippedOnFork": false,
       "selectionTimeoutBlocks": "7200",
       "refundedLateWords": "1"
+    },
+    "single-pull": {
+      "done": true,
+      "at": "2026-10-25T17:34:36.121Z",
+      "ids": [
+        "2"
+      ],
+      "requestId": "261033580198815560118571741680257357204030624022187115917134765671864906740",
+      "quote": {
+        "fee": "15763505914890470",
+        "sfee": "157635059148904",
+        "vrfFee": "13562500000000",
+        "total": "15934703474039374"
+      },
+      "requestTx": "0xef5c695aff2910e5309fee365d80465f660d4146bc948b0ae14da50609160b80",
+      "requestGas": "447089",
+      "requestBlock": 50132155,
+      "subBefore": "30011770160799132",
+      "fulfil": {
+        "hash": "0x753e427e9b8e33bd0603f0d145aa89081538a8323b54f09ede41c272e79debcf",
+        "payment": "7675958400868",
+        "success": true,
+        "gasUsed": "698196",
+        "effectiveGasPrice": "6000000",
+        "latencyBlocks": 6867,
+        "latencySec": 1374,
+        "latencyWallSec": 1370.109
+      },
+      "statuses": [
+        2
+      ],
+      "subscriptionDelta": "-14992324041599132",
+      "deliveries": [
+        {
+          "id": "2",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "8",
+          "notional": "11700000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        }
+      ]
     }
   },
   "txs": [
@@ -367,6 +410,28 @@
       "effectiveGasPrice": "6000000",
       "costWei": "2682534000000",
       "valueWei": "15938094099039374"
+    },
+    {
+      "label": "vrf fulfilment 261033580198815560118571741680257357204030624022187115917134765671864906740",
+      "hash": "0x753e427e9b8e33bd0603f0d145aa89081538a8323b54f09ede41c272e79debcf",
+      "payment": "7675958400868",
+      "success": true,
+      "gasUsed": "698196",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 6867,
+      "latencySec": 1374,
+      "latencyWallSec": 1370.109
+    },
+    {
+      "label": "acquireBatch(10)",
+      "hash": "0x2ba8b1c33bdb33b841ad4e7c2b2672da1ef08b41f5bbf184c0ddb46bcbad0e5f",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50139042,
+      "status": "success",
+      "gasUsed": "1986525",
+      "effectiveGasPrice": "6000000",
+      "costWei": "11919150000000",
+      "valueWei": "161322106776693810"
     }
   ],
   "findings": [
