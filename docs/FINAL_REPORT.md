@@ -40,6 +40,15 @@ Key reconciled numbers:
   NAV 2.06 → 3.44 ETH; 1.24 ETH releasable after genesis (0.05 ETH of it restores maintenance first),
   bought/burned in slices. Before/after report: docs/FOLLOWUP.md.
 
+## GRAIL availability and launch economics (docs/GRAIL_AVAILABILITY.md)
+
+- GRAIL decay liveness bug fixed (`stepDue()` now reports pending decay; decay clamps at the cap).
+- Recommended for approval: fee split 3.5 / 0.5 / 3 (GRAIL downtime −37 % at 300/day for ~7 % less
+  median buyback, lower shortfall risk) and a 0.501 ETH opening GRAIL from new capital. Code default
+  remains 4 / 0.5 / 2.
+- Keeper outages degrade gracefully (no shortfall up to a 24 h outage at 1,500/day; recovery in the
+  first keeper pass); run two independent keepers.
+
 ## Recommendations (docs/MARKET.md, docs/M2_RESULTS.md)
 
 - Launch liquidity 2 ETH + 10M ENGINE; **farm 25M** (not 50M); **total supply 35M**.

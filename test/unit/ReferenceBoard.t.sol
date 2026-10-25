@@ -125,6 +125,36 @@ contract ReferenceBoardTest is GameFixture {
         assertEq(engine.feeCreditOf(alice), 0);
         assertEq(engine.feeCreditOf(dev), sfee - sfee / 4);
     }
+
+    /// The 3.5 / 0.5 / 3 alternative (governance `setFeeSplit`, not the launch default): exact values.
+    function test_alternativeSplit_exactPrice() public {
+        controller.setFeeSplit(DrawController.FeeSplit({premiumBps: 350, maintenanceBps: 50, feedBps: 300}));
+        _openAndActivate();
+        assertEq(controller.rowNotional(0), 0.0117 ether);
+        assertEq(controller.rowNotional(1), 0.0234 ether);
+        assertEq(controller.rowNotional(2), 0.0351 ether);
+        assertEq(controller.rowNotional(3), 0.0545 ether);
+        assertEq(controller.rowNotional(4), 0.108 ether);
+        uint256 fee = engine.acquisitionFee();
+        assertEq(fee, 14_942_455_786_105_613, "acquisition fee");
+        assertEq(engine.settlementFeeFor(fee), 149_424_557_861_056, "settlement fee");
+        (,, uint256 vrf1, uint256 t10) = engine.quoteAcquisitionPrice(10);
+        assertGt(vrf1, 0);
+        assertEq(t10, 10 * (fee + fee / 100) + engine.vrfFeeFor(10));
+    }
+
+    /// A listed GRAIL raises the harmonic-mean fee for every pull (each listing adds equally to the
+    /// numerator, almost nothing to the weight): +0.96 % for a 0.5 ETH GRAIL at 0.4 ETH.
+    function test_listedGrailRaisesFeeForEveryPull() public {
+        _openAndActivate();
+        uint256 before = engine.acquisitionFee();
+        vault.fundGrail{value: 0.501 ether}();
+        vault.step();
+        uint256 withGrail = engine.acquisitionFee();
+        assertEq(before, 14_878_540_357_338_322);
+        assertEq(withGrail, 15_021_738_222_452_202, "fee with a listed 0.5 ETH GRAIL");
+        console2.log("fee uplift with a listed GRAIL (ppm)", (withGrail - before) * 1e6 / before);
+    }
 }
 
 interface IOwner {
