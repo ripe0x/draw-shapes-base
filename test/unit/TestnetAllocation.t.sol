@@ -29,6 +29,8 @@ contract TestnetAllocationTest is SystemFixture {
         assertEq(s.controller.rowNotional(0), 0.0117 ether);
         assertEq(s.controller.rowNotional(4), 0.108 ether);
         assertFalse(_isLaunchAllocation(s.alloc));
+        assertEq(s.buyback.minSpend(), 0.0005 ether, "minimum buy scaled with the market");
+        assertEq(s.buyback.maxBounty(), 0.000005 ether);
         _activate();
         assertTrue(s.engine.activated() && s.liquidity.launched());
         // the market opens at 0.2 ETH / 10M ENGINE

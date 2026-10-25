@@ -217,8 +217,10 @@ abstract contract Deployer is Script {
             1 hours,
             300,
             50,
-            0.005 ether, // minimum buy
-            0.00005 ether // bounty cap
+            // minimum buy and bounty cap scale with the market (launch: 0.005 / 0.00005 ETH for 2 ETH);
+            // a 3 % impact cap on a smaller testnet market allows proportionally smaller buys
+            0.005 ether * s.alloc.marketLiquidity / LaunchParams.MARKET_LIQUIDITY,
+            0.00005 ether * s.alloc.marketLiquidity / LaunchParams.MARKET_LIQUIDITY
         );
         s.hook.setRecipients(c.creator, address(s.treasury));
         s.hook.setFeeExempt(address(s.liquidity), true);
