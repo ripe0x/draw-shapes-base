@@ -72,8 +72,8 @@ abstract contract GameFixture is Test {
     /// @dev Funds the ordinary pool with the launch allocation and lists the whole board.
     function _openBoard() internal {
         controller.fundPool{value: LaunchParams.ORDINARY_POOL}();
-        for (uint256 i; i < 5 && controller.listedCount() < controller.boardItems(); ++i) {
-            controller.build(40);
+        for (uint256 i; i < 30 && controller.listedCount() < controller.boardItems(); ++i) {
+            controller.build(40); // lists at most MAX_LIST_PER_CALL per call
         }
     }
 
@@ -104,8 +104,8 @@ abstract contract GameFixture is Test {
         for (uint256 i; i < 50; ++i) {
             controller.settle(50);
             vault.step();
+            // booked and fully restocked (settle lists at most MAX_LIST_PER_CALL per call)
             if (controller.nextSequenceToBook() > engine.lastIssuedSequence() && controller.queueLength() == 0) break;
-            if (controller.nextSequenceToBook() > engine.lastIssuedSequence() && i > 3) break;
         }
     }
 

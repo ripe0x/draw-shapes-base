@@ -67,8 +67,10 @@ contract DrawController is ReentrancyGuard {
 
     uint256 internal constant BPS = 10_000;
     uint256 public constant MAX_FEE_SPLIT_BPS = 1_500;
-    uint256 public constant MAX_SETTLE_ITEMS = 50;
-    uint256 public constant MAX_LIST_PER_CALL = 40;
+    uint256 public constant MAX_SETTLE_ITEMS = 20;
+    /// @dev Listings per call: each mints and lists (0.86-1.36M gas with cold storage), so 8 keeps settle(50) and build
+    ///      the EIP-7825 per-transaction cap of 16,777,216 gas (Base Sepolia; coming to Base mainnet).
+    uint256 public constant MAX_LIST_PER_CALL = 6;
     uint256 public constant MAX_TIP = 0.001 ether;
     uint256 public constant MAX_RESTORE_K = 100;
     uint256 public constant MAX_BAND_BPS = 100_000;

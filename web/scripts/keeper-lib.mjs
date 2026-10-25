@@ -117,8 +117,10 @@ export async function act(ctx, s) {
   const t = (x) => x && done.push(x);
   // 1. settlement, booking and restocking (also processes acquisitions the callback left behind)
   if (g.nextToBook <= g.lastIssued || s.queue > 0n || g.unsettled > 0n) {
-    for (let i = 0; i < 10; i++) {
-      const r = await send(ctx, { address: dep.controller, abi: ops.controller, functionName: "settle", args: [50n], label: "settle" });
+    // settle in chunks of 20 (DrawController.MAX_SETTLE_ITEMS): each call stays far below the EIP-7825
+    // per-transaction gas cap; a drained 100-item board recovers in ~17 calls
+    for (let i = 0; i < 25; i++) {
+      const r = await send(ctx, { address: dep.controller, abi: ops.controller, functionName: "settle", args: [20n], label: "settle" });
       if (!r) break;
       t({ action: "settle", hash: r.transactionHash, gasUsed: r.gasUsed });
       const [q, b, li] = await Promise.all([
