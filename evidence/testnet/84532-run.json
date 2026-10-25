@@ -398,6 +398,377 @@
       "redeemed": 1,
       "ethReturnedWei": "9999999999999908",
       "notionalWei": "11700000000000000"
+    },
+    "grail-decay-and-selection": {
+      "done": true,
+      "at": "2026-10-25T18:22:55.578Z",
+      "before": {
+        "items": [
+          {
+            "tokenId": "39",
+            "backing": "50000000000000000",
+            "notional": "25000000000000000",
+            "listingId": "28",
+            "listedAtPull": "12"
+          }
+        ],
+        "oddsPpm": [
+          "22330"
+        ],
+        "status": [
+          1
+        ],
+        "funded": "2041502534953058",
+        "selectable": "1"
+      },
+      "after": {
+        "items": [
+          {
+            "tokenId": "39",
+            "backing": "50000000000000000",
+            "notional": "25000000000000000",
+            "listingId": "28",
+            "listedAtPull": "12"
+          }
+        ],
+        "oddsPpm": [
+          "22330"
+        ],
+        "status": [
+          1
+        ],
+        "funded": "2041502534953058",
+        "selectable": "1"
+      }
+    },
+    "testnet-vrf-float": {
+      "done": true,
+      "at": "2026-10-25T18:25:28.341Z",
+      "before": "90070782035201512",
+      "topUp": "59929217964798488",
+      "hash": "0xf11d8d6030eafe40c6ca7a24aa7f54bc4915784751537b489265de57c138a2c1"
+    },
+    "slippage-refund-probe": {
+      "done": true,
+      "at": "2026-10-25T18:25:37.015Z",
+      "ids": [
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25"
+      ],
+      "requestId": "15405078487804265200242313741158126532862249190140575074404946366961276447207",
+      "quote": {
+        "fee": "15631502017827977",
+        "sfee": "156315020178279",
+        "vrfFee": "28825000000000",
+        "total": "126331361304050048"
+      },
+      "requestTx": "0x9278833a28e09f2ade52d5bd64597df4377243ae8ce6b5c98f19789d66526fba",
+      "requestGas": "1644401",
+      "requestBlock": 50154304,
+      "subBefore": "150000000000000000",
+      "fulfil": {
+        "hash": "0x30881c9b756898855d71a256fa61988a46ca3833c5706b5f25bbc76bd4367a54",
+        "payment": "21790156800884",
+        "success": true,
+        "gasUsed": "1821521",
+        "effectiveGasPrice": "6000000",
+        "latencyBlocks": 12,
+        "latencySec": 3,
+        "latencyWallSec": 5.141
+      },
+      "statuses": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        5,
+        5
+      ],
+      "subscriptionDelta": "21790156800884",
+      "refunded": 0,
+      "refundCreditWei": "0",
+      "withdraw": null
+    },
+    "on-behalf-and-referral": {
+      "done": true,
+      "at": "2026-10-25T18:25:46.469Z",
+      "ids": [
+        "26"
+      ],
+      "requestId": "59663193646395356548906427505253721931753508864686696196338373383958955670878",
+      "quote": {
+        "fee": "16240045079400596",
+        "sfee": "162400450794005",
+        "vrfFee": "13562500000000",
+        "total": "16416008030194601"
+      },
+      "requestTx": "0x9dbe74e909f36f3412529a0354ffb5b3d2dcbfeef72656b5875e644da253388a",
+      "requestGas": "447101",
+      "requestBlock": 50154346,
+      "subBefore": "150007034843199116",
+      "fulfil": {
+        "hash": "0xb34057b990d466c616cf19f9b5ce8aaac32a50a2b94f2489d1b5ab26f784974c",
+        "payment": "7063910400884",
+        "success": true,
+        "gasUsed": "634441",
+        "effectiveGasPrice": "6000000",
+        "latencyBlocks": 14,
+        "latencySec": 2,
+        "latencyWallSec": 5.153
+      },
+      "statuses": [
+        2
+      ],
+      "subscriptionDelta": "7063910400884",
+      "deliveries": [
+        {
+          "id": "26",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "7",
+          "notional": "11700000000000000",
+          "deliveredTo": "0xEDca467537444d2dB370033203A71842a229b83E",
+          "toBeneficiary": true
+        }
+      ],
+      "referrerCreditWei": "704077610287564",
+      "referrerWithdraw": "0x3bc8fb03647d19196d99900eff2cd502fa22a34dc22eb26f3f6e1084fa761ae6",
+      "tokenWorksCreditWei": "866478061081577"
+    },
+    "engine-trading-and-fees": {
+      "done": true,
+      "at": "2026-10-25T18:25:51.824Z",
+      "swapper": "0x6cb052355170e52e8e988685dac140786f8061cf",
+      "engineBought": "467111534795042897998082",
+      "hookFeesWei": "300343582235236",
+      "volumeWei": "15017179111761835",
+      "feeBpsOfVolume": 199,
+      "operatorAccruedWei": "37542947779404",
+      "treasuryAccruedWei": "262800634455832",
+      "treasuryReceivedWei": "262800634455832",
+      "vaultFundAfter": "8232811414599276",
+      "polPending": "26280063445584"
+    },
+    "genesis-ledger": {
+      "done": true,
+      "at": "2026-10-25T18:25:51.902Z",
+      "epoch": "0",
+      "accepted": "26",
+      "resolved": "26",
+      "units": "10",
+      "bonus": "10",
+      "playerUnits": "9",
+      "playerBonus": "9",
+      "epoch0ClosesAt": "1793032714",
+      "note": "Claims open once epoch 0 has ended and resolved (24 h of real time); rerun to claim."
+    },
+    "outage-and-recovery": {
+      "done": true,
+      "at": "2026-10-25T18:26:31.429Z",
+      "activeBefore": "28",
+      "activeDuring": "19",
+      "unbookedDuring": "9",
+      "queueDuring": "0",
+      "activeAfter": "28",
+      "booked": true,
+      "keeper1": {
+        "actions": [
+          {
+            "action": "settle",
+            "hash": "0xecd8d373a1d436c0fdc391d5595176dc7d8ea17faf57115c165d6f4f3f41d455",
+            "gasUsed": "6059804"
+          },
+          {
+            "action": "deploy-pol",
+            "hash": "0x50a55a384eda7b62ecc2a3aed49ed2416c1fda3e93df55ede7a04a8ad819ca3c",
+            "gasUsed": "171722"
+          }
+        ],
+        "alerts": [
+          {
+            "key": "vrf",
+            "msg": "VRF subscription 0.15005842087039558 ETH"
+          }
+        ],
+        "netCostWei": "-5735798999812"
+      },
+      "keeper2": {
+        "actions": [
+          {
+            "action": "settle",
+            "hash": "0x6e2b7d4185b14f8bc5e4dfae557bfccae5e43ccce9f8f169461ff252b0417199",
+            "gasUsed": "80714"
+          }
+        ],
+        "alerts": [
+          {
+            "key": "vrf",
+            "msg": "VRF subscription 0.15005842087039558 ETH"
+          }
+        ],
+        "netCostWei": "484284000094"
+      }
+    },
+    "in-time-batches": {
+      "done": true,
+      "at": "2026-10-25T18:30:24.606Z",
+      "ids": [
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42"
+      ],
+      "requestId": "66672454273205216479941305596011963094483456086258634409195679504991112547677",
+      "quote": {
+        "fee": "16240045079400596",
+        "sfee": "162400450794005",
+        "vrfFee": "28825000000000",
+        "total": "114845943711362207"
+      },
+      "requestTx": "0x0cd76ff99b41a71f2c807a0c8c6d498ae13ae93023ee16613a83f041903244c9",
+      "requestGas": "1473377",
+      "requestBlock": 50155743,
+      "subBefore": "150058420870395580",
+      "fulfil": {
+        "hash": "0xbaa3317c9fd0070cf82a3d498a87be2b2f91d8a77b35607d68770e633c8a5383",
+        "payment": "21573177600884",
+        "success": true,
+        "gasUsed": "1803449",
+        "effectiveGasPrice": "6000000",
+        "latencyBlocks": 13,
+        "latencySec": 3,
+        "latencyWallSec": 0.048
+      },
+      "statuses": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        5
+      ],
+      "subscriptionDelta": "21573177600884",
+      "recycled": {
+        "redeemed": 9,
+        "ethReturnedWei": "109999999999999154"
+      },
+      "deliveries": [
+        {
+          "id": "36",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "13",
+          "notional": "11700000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "37",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "5",
+          "notional": "11700000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "38",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "45",
+          "notional": "11700000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "39",
+          "status": 2,
+          "collection": "0x835C2447878Ca51329eDffFED95bb2977782E6C4",
+          "tokenId": "7",
+          "notional": "23400000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "40",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "41",
+          "notional": "54500000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "41",
+          "status": 2,
+          "collection": "0x835C2447878Ca51329eDffFED95bb2977782E6C4",
+          "tokenId": "2",
+          "notional": "23400000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        },
+        {
+          "id": "42",
+          "status": 2,
+          "collection": "0x062193A0F3Df55d88a7E37366D442CD2238CCeD0",
+          "tokenId": "62",
+          "notional": "11700000000000000",
+          "deliveredTo": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+          "toBeneficiary": true
+        }
+      ],
+      "grail": {
+        "before": {
+          "items": [
+            {
+              "tokenId": "39",
+              "backing": "50000000000000000",
+              "notional": "25000000000000000",
+              "listingId": "28",
+              "listedAtPull": "12"
+            }
+          ],
+          "oddsPpm": [
+            "23200"
+          ],
+          "status": [
+            1
+          ],
+          "funded": "18995286751389406",
+          "selectable": "1"
+        },
+        "after": {
+          "items": [
+            {
+              "tokenId": "39",
+              "backing": "50000000000000000",
+              "notional": "25000000000000000",
+              "listingId": "28",
+              "listedAtPull": "12"
+            }
+          ],
+          "oddsPpm": [
+            "22509"
+          ],
+          "status": [
+            1
+          ],
+          "funded": "25732487567761600",
+          "selectable": "1"
+        }
+      }
     }
   },
   "txs": [
@@ -661,6 +1032,495 @@
       "effectiveGasPrice": "6000017",
       "costWei": "6787711231794",
       "valueWei": "78975116440031280"
+    },
+    {
+      "label": "vrf fulfilment 17739670982657830849365232750453616445636606812539810658524866835761161884625",
+      "hash": "0x64cbe9f4db98fdd65e3cbed512cea76e1376c9c10a37c8242a6b2d30496e3701",
+      "payment": "1966857600884",
+      "success": true,
+      "gasUsed": "194798",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 7202,
+      "latencySec": 1440,
+      "latencyWallSec": 1441.863
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0x480b4f0970049600294c88f586ee2e95b55f02e1651f3dc139038ee208004542",
+      "status": "success",
+      "gasUsed": "256097",
+      "costWei": "1536582000000",
+      "block": "50153532"
+    },
+    {
+      "label": "withdrawAcquisitionRefund",
+      "hash": "0x351630e6b8d188da166c4563861262d51336da6c375e24fcdd229d9ef136bff7",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154292,
+      "status": "success",
+      "gasUsed": "36762",
+      "effectiveGasPrice": "6000000",
+      "costWei": "220572000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "fundSubscriptionWithNative (VRF float)",
+      "hash": "0xf11d8d6030eafe40c6ca7a24aa7f54bc4915784751537b489265de57c138a2c1",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154297,
+      "status": "success",
+      "gasUsed": "39025",
+      "effectiveGasPrice": "6000000",
+      "costWei": "234150000000",
+      "valueWei": "59929217964798488"
+    },
+    {
+      "label": "acquireBatch(8, maxNegativeSlippage 0)",
+      "hash": "0x9278833a28e09f2ade52d5bd64597df4377243ae8ce6b5c98f19789d66526fba",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154304,
+      "status": "success",
+      "gasUsed": "1644401",
+      "effectiveGasPrice": "6000000",
+      "costWei": "9866406000000",
+      "valueWei": "126338567554050048"
+    },
+    {
+      "label": "vrf fulfilment 15405078487804265200242313741158126532862249190140575074404946366961276447207",
+      "hash": "0x30881c9b756898855d71a256fa61988a46ca3833c5706b5f25bbc76bd4367a54",
+      "payment": "21790156800884",
+      "success": true,
+      "gasUsed": "1821521",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 12,
+      "latencySec": 3,
+      "latencyWallSec": 5.141
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0xf739d82bd69a861bc71492a92c671e21f09a8c925daa05e89c014d7c4861e77f",
+      "status": "success",
+      "gasUsed": "6003354",
+      "costWei": "36020124000000",
+      "block": "50154340"
+    },
+    {
+      "label": "acquireBatch(1) paid by player for referrer",
+      "hash": "0x9dbe74e909f36f3412529a0354ffb5b3d2dcbfeef72656b5875e644da253388a",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154346,
+      "status": "success",
+      "gasUsed": "447101",
+      "effectiveGasPrice": "6000000",
+      "costWei": "2682606000000",
+      "valueWei": "16419398655194601"
+    },
+    {
+      "label": "vrf fulfilment 59663193646395356548906427505253721931753508864686696196338373383958955670878",
+      "hash": "0xb34057b990d466c616cf19f9b5ce8aaac32a50a2b94f2489d1b5ab26f784974c",
+      "payment": "7063910400884",
+      "success": true,
+      "gasUsed": "634441",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 14,
+      "latencySec": 2,
+      "latencyWallSec": 5.153
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0xa338b3f91f5a10ab607986aa16f12a47f7dec78b8a4ac0e20d8cea726633bfa2",
+      "status": "success",
+      "gasUsed": "1007061",
+      "costWei": "6042366000000",
+      "block": "50154379"
+    },
+    {
+      "label": "withdrawFeeCredit(referrer)",
+      "hash": "0x3bc8fb03647d19196d99900eff2cd502fa22a34dc22eb26f3f6e1084fa761ae6",
+      "from": "0xEDca467537444d2dB370033203A71842a229b83E",
+      "block": 50154386,
+      "status": "success",
+      "gasUsed": "38216",
+      "effectiveGasPrice": "6000000",
+      "costWei": "229296000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "deploy Swapper (test router)",
+      "hash": "0x6fe66896d82327968e83193b74bac8ba0215409241ae4dd682d4b9ccf7150021",
+      "gasUsed": "726205"
+    },
+    {
+      "label": "swap: buy ENGINE with 0.01 ETH",
+      "hash": "0x591b620c6a654d00c902b5474864a46c92cf88654db0ed31f738a752f4f067ae",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154397,
+      "status": "success",
+      "gasUsed": "213776",
+      "effectiveGasPrice": "6000000",
+      "costWei": "1282656000000",
+      "valueWei": "10000000000000000"
+    },
+    {
+      "label": "approve router",
+      "hash": "0x56dc262696205cc3c92d58c807d603a5eedb98ff6e409490cd52585df298d504",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154402,
+      "status": "success",
+      "gasUsed": "45970",
+      "effectiveGasPrice": "6000000",
+      "costWei": "275820000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "swap: sell half the ENGINE",
+      "hash": "0x3ef53635f801bf7d25ee28f498e1298ba16f1ceaae31aa2bf9758c4031b8f43c",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154407,
+      "status": "success",
+      "gasUsed": "137105",
+      "effectiveGasPrice": "6000000",
+      "costWei": "822630000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "hook.distribute",
+      "hash": "0x667ea842c57cc359f8d5163a57697d40fc984bb2a9f7fd79a831ae8c78f9e0c0",
+      "from": "0x41846cde902AF0d4Ad7E51Eb0B1b6d6335FdFd25",
+      "block": 50154414,
+      "status": "success",
+      "gasUsed": "213945",
+      "effectiveGasPrice": "6000000",
+      "costWei": "1283670000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #15 (slippage scenario)",
+      "hash": "0xe0a36fffa00bd1fee9fd9f34619deae1d71ee2d2ebbe11a59b217c8e8160fee1",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154428,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #16 (slippage scenario)",
+      "hash": "0xacb6cc3101462eb3d338de72344694cff3936fbe0b0be18cc17a18d4ea3a4fa4",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154452,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #10 (slippage scenario)",
+      "hash": "0x0a0d45920f42d9c643c0dc78a4e13ccb2bf54053e3937f9c773077382ec15ad7",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154458,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #5 (slippage scenario)",
+      "hash": "0x16587b9ff5f4b33c7b93565be58534fed2c78ff450b758fc7a8b1338cbd24090",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154465,
+      "status": "success",
+      "gasUsed": "153912",
+      "effectiveGasPrice": "6000000",
+      "costWei": "923472000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #1 (slippage scenario)",
+      "hash": "0x3f26607b247aa89dadf2c116d7a7917824aecb3d163eea1016357727655c89ed",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154471,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #8 (slippage scenario)",
+      "hash": "0xb3d915a44230ebfb98459facbcbb8f444a5490c7dcafab9857768fae4b47d530",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154477,
+      "status": "success",
+      "gasUsed": "183328",
+      "effectiveGasPrice": "6000000",
+      "costWei": "1099968000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #6 (slippage scenario)",
+      "hash": "0xa590ae1d6d49496924ce504e7e90bdf3b9525f57dcfb00cd7b63d6ea5374b460",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154483,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #12 (slippage scenario)",
+      "hash": "0x765488f673722f8386d39988d8e45d87d139f2b25dc2a6de5e4d389df96f794e",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154489,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "outage acquireBatch(3) #1",
+      "hash": "0x9b688562309ac6bd4f05df8ce8dbfc305a07834bd574dc35f7c34856b4a1f3d2",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154496,
+      "status": "success",
+      "gasUsed": "789181",
+      "effectiveGasPrice": "6000000",
+      "costWei": "4735086000000",
+      "valueWei": "49241633465583803"
+    },
+    {
+      "label": "vrf fulfilment 100009701841889224925893199765864705827683608251486410761247391586928620170079",
+      "hash": "0xeb4f77357a8c05d2aa66b62ef880ebd51073f8b4a6916050681bf5f23ff57c37",
+      "payment": "12843043200884",
+      "success": true,
+      "gasUsed": "1075928",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 12,
+      "latencySec": 2,
+      "latencyWallSec": 5.181
+    },
+    {
+      "label": "outage acquireBatch(3) #2",
+      "hash": "0x47ce9c3d135ab5b5008ff2631f8c85bce9b1459214c02e115b7b2b4ef7b3e538",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154531,
+      "status": "success",
+      "gasUsed": "789181",
+      "effectiveGasPrice": "6000000",
+      "costWei": "4735086000000",
+      "valueWei": "51644856730368158"
+    },
+    {
+      "label": "vrf fulfilment 24273584807571514069978513091068955535563965592444750299400144216071489281570",
+      "hash": "0x168b7d830af795eb5e23e73098d667d54a9f9738574fe486bb5a1fe1eb60d006",
+      "payment": "12440976000884",
+      "success": true,
+      "gasUsed": "1042452",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 8,
+      "latencySec": 1,
+      "latencyWallSec": 0.06
+    },
+    {
+      "label": "outage acquireBatch(3) #3",
+      "hash": "0x4902ffd443fa162428fbeba3d0f21f87d1c95ff40723881462561d70dc464a84",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50154558,
+      "status": "success",
+      "gasUsed": "789181",
+      "effectiveGasPrice": "6000000",
+      "costWei": "4735086000000",
+      "valueWei": "51438436585857560"
+    },
+    {
+      "label": "vrf fulfilment 28891581271209689860260874116276600112806947623091524899117845450719335455179",
+      "hash": "0xd92a15e44b81263f278f7851d850d6064f6d8201e9777df5ed55181637320391",
+      "payment": "12141043200884",
+      "success": true,
+      "gasUsed": "1017438",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 11,
+      "latencySec": 2,
+      "latencyWallSec": 5.139
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0xecd8d373a1d436c0fdc391d5595176dc7d8ea17faf57115c165d6f4f3f41d455",
+      "status": "success",
+      "gasUsed": "6059804",
+      "costWei": "36358824000000",
+      "block": "50154592"
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "deploy-pol",
+      "hash": "0x50a55a384eda7b62ecc2a3aed49ed2416c1fda3e93df55ede7a04a8ad819ca3c",
+      "status": "success",
+      "gasUsed": "171722",
+      "costWei": "1030332000000",
+      "block": "50154598"
+    },
+    {
+      "keeper": "0x41846cde902AF0d4Ad7E51Eb0B1b6d6335FdFd25",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0x6e2b7d4185b14f8bc5e4dfae557bfccae5e43ccce9f8f169461ff252b0417199",
+      "status": "success",
+      "gasUsed": "80714",
+      "costWei": "484284000000",
+      "block": "50154593"
+    },
+    {
+      "label": "redeem Shape #3 (recycle before in-time batches)",
+      "hash": "0x2a04d037acf2bb412fc77e840afd847a8190b112d67833585925b1fa508136ee",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155651,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #43 (recycle before in-time batches)",
+      "hash": "0xf20d7099fe2b53d55ba0ca6171010541c0f92b5a2c1e9ccda1ef2e7339bf48c6",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155676,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #9 (recycle before in-time batches)",
+      "hash": "0xf440d3a9bbd6ad8f5e870cc96669b433403bd277ed86bda1c610d1ae7b973286",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155682,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #11 (recycle before in-time batches)",
+      "hash": "0xbf279ef1c219abfefd42c4dff5c919682dd98b4645817994cc6ed0d0ee47b9ac",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155707,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #3 (recycle before in-time batches)",
+      "hash": "0x21476b9f00e464a1c2b719a78fab0f9d70b1ee2151f2234835b10462ebc514dc",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155713,
+      "status": "success",
+      "gasUsed": "153912",
+      "effectiveGasPrice": "6000000",
+      "costWei": "923472000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Draw Pack #11 (recycle before in-time batches)",
+      "hash": "0x5d3bda432720bb45fb76d173c8ceae355f77e26e49858d8015fcc36d22d87c3a",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155719,
+      "status": "success",
+      "gasUsed": "153912",
+      "effectiveGasPrice": "6000000",
+      "costWei": "923472000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #40 (recycle before in-time batches)",
+      "hash": "0x2e82f77ffb5299bf09fbbf7a0fd6ec989c486b727a55bc9b2c4514ec804d3b1b",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155725,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #14 (recycle before in-time batches)",
+      "hash": "0x4c8da3c823e0017c72e8982793a988279c6ee1cee754bbd7fcf8a67091fddc6b",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155730,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "redeem Shape #2 (recycle before in-time batches)",
+      "hash": "0x1a6c34a3f58fe2cf8e3b122ceb6a21ff4fa314df467ef993cdf13ce04cfa86c7",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155736,
+      "status": "success",
+      "gasUsed": "61989",
+      "effectiveGasPrice": "6000000",
+      "costWei": "371934000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "acquireBatch(7) with the VRF float",
+      "hash": "0x0cd76ff99b41a71f2c807a0c8c6d498ae13ae93023ee16613a83f041903244c9",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50155743,
+      "status": "success",
+      "gasUsed": "1473377",
+      "effectiveGasPrice": "6000000",
+      "costWei": "8840262000000",
+      "valueWei": "114853149961362207"
+    },
+    {
+      "label": "vrf fulfilment 66672454273205216479941305596011963094483456086258634409195679504991112547677",
+      "hash": "0xbaa3317c9fd0070cf82a3d498a87be2b2f91d8a77b35607d68770e633c8a5383",
+      "payment": "21573177600884",
+      "success": true,
+      "gasUsed": "1803449",
+      "effectiveGasPrice": "6000000",
+      "latencyBlocks": 13,
+      "latencySec": 3,
+      "latencyWallSec": 0.048
+    },
+    {
+      "keeper": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "level": "info",
+      "event": "tx",
+      "label": "settle",
+      "hash": "0x3f96cda34014b1e8b5166afb7c4800f1337ff289589be0c0b833bae0af797bd7",
+      "status": "success",
+      "gasUsed": "5370780",
+      "costWei": "32224680000000",
+      "block": "50155772"
     }
   ],
   "findings": [
@@ -677,7 +1537,19 @@
       "gasPriceWei": 6000000,
       "quotedVrfFeeWei": "25125000000000",
       "outcome": "TimedOut (word after the 1,800-block deadline), refunded fee + settlement fee; VRF fee kept (it paid the request)",
-      "cause": "Base Sepolia produces blocks every 0.2 s (Base mainnet 2 s); the 1,800-block deadline is ~6 min there. Testnet window raised to 7,200 blocks through the timelock."
+      "cause": "Base Sepolia produces blocks every 0.2 s (Base mainnet 2 s), so the 1,800-block deadline is ~6 min there; the testnet window was raised to 7,200 blocks through the timelock. The word itself was held back by the VRF float (next finding): it arrived just after the deadline, when the cheap timed-out callback fitted the subscription balance."
+    },
+    {
+      "title": "VRF words waited for the subscription balance (Chainlink Max Cost at the lane max gas price)",
+      "cause": "The node fulfils only once the subscription covers the fulfilment at the key lane max gas price (30 gwei on Base Sepolia) x 1.6, the Max Cost in Chainlink billing docs; actual gas was 0.006 gwei. At 0.03-0.045 ETH every in-time multi-pull callback was above it, so words arrived only after the deadline (1,808 and 7,205 blocks: cheap timed-out callbacks). The single pull went through ~1 min after a top-up to 0.045 ETH (tx 0x65d836940dd92b4b0bc430758657901f1433c1b99eaa6f439709ab2d2c504717).",
+      "outcome": "After raising the float to 0.15 ETH (tx 0xf11d8d6030eafe40c6ca7a24aa7f54bc4915784751537b489265de57c138a2c1), words arrived in 12-14 blocks (2-3 s) for 1-, 7- and 8-pull batches. Mainnet 2 gwei lane needs ~0.0086 ETH; the preflight and keeper alert enforce 0.02 ETH."
     }
+  ],
+  "grailPullIds": [
+    "13",
+    "14",
+    "15",
+    "16",
+    "17"
   ]
 }

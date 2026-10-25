@@ -250,6 +250,10 @@ await step("fund-accounts", async () => {
 });
 const vrfAbiEvents = coordinatorAbi;
 async function pull(label, count, { ref = referrer.address, negSlippage = 1000n, payer = player, beneficiary = player.address } = {}) {
+  // refunds (late words, slippage) are credited, not pushed: recycle them before paying again
+  if ((await rd(A.engine, ops.engine, "acquisitionRefundCredit", [payer.address])) > 0n) {
+    await tx("withdrawAcquisitionRefund", payer, { address: A.engine, abi: ops.engine, functionName: "withdrawAcquisitionRefund" });
+  }
   const [fee, sfee, vrfFee, total] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [BigInt(count)]);
   const subBefore = await rd(base.vrfCoordinator, coordinatorAbi, "getSubscription", [BigInt(vrf.subId)]);
   const block = await pub.getBlock();
@@ -309,8 +313,9 @@ async function deliveries(ids) {
     const st = Number(a[4]);
     if (st !== 2) { out.push({ id, status: st }); continue; }
     const l = await rd(A.engine, ops.engine, "listings", [a[3]]);
-    const owner = await rd(l[0], ownerAbi, "ownerOf", [l[3]]);
-    out.push({ id, status: st, collection: l[0], tokenId: l[3], notional: l[5], deliveredTo: owner, toBeneficiary: owner.toLowerCase() === a[0].toLowerCase() });
+    // a redeemed prize is burned: ownerOf reverts
+    const owner = await rd(l[0], ownerAbi, "ownerOf", [l[3]]).catch(() => null);
+    out.push({ id, status: st, collection: l[0], tokenId: l[3], notional: l[5], deliveredTo: owner ?? "redeemed (burned)", toBeneficiary: !!owner && owner.toLowerCase() === a[0].toLowerCase() });
   }
   return out;
 }
@@ -342,6 +347,20 @@ async function keeperTick(acct) {
 }
 
 // ------------------------------------------------------------------ 5. scenarios
+// Chainlink fulfils only while the subscription covers the fulfilment at the lane's MAX gas price (30 gwei on
+// Base Sepolia: about 0.13 ETH for a full batch); below that, words wait until the deadline (docs/RUNBOOK.md)
+if (!FORK) await step("testnet-vrf-float", async () => {
+  const need = parseEther(process.env.VRF_FLOAT_ETH ?? "0.15");
+  const credit = await rd(A.engine, ops.engine, "acquisitionRefundCredit", [player.address]);
+  if (credit > 0n) await tx("withdrawAcquisitionRefund", player, { address: A.engine, abi: ops.engine, functionName: "withdrawAcquisitionRefund" });
+  const before = (await rd(base.vrfCoordinator, coordinatorAbi, "getSubscription", [BigInt(vrf.subId)]))[1];
+  if (before >= need) return { before, topUp: 0n };
+  const topUp = need - before;
+  const r = await tx("fundSubscriptionWithNative (VRF float)", player, { address: base.vrfCoordinator,
+    abi: [{ type: "function", name: "fundSubscriptionWithNative", stateMutability: "payable", inputs: [{ type: "uint256" }], outputs: [] }],
+    functionName: "fundSubscriptionWithNative", args: [BigInt(vrf.subId)], value: topUp });
+  return { before, topUp, hash: r.transactionHash };
+});
 await step("single-pull", async () => {
   const p = await pull("acquireBatch(1) with referrer", 1);
   const f = await awaitFulfilment(p);
@@ -453,6 +472,28 @@ if (FORK) {
     return { skippedSec: Number(closes - now) + 60, isFinal0: await rd(A.farm, ops.farm, "isFinal", [0n]), keeper: k.actions.map((a) => a.action) };
   });
 }
+// Re-run the multi-pull scenarios with the VRF float in place (testnet-vrf-float): the earlier batch and
+// GRAIL pulls waited for their word until the deadline because the subscription was below the lane minimum.
+if (!FORK) await step("in-time-batches", async () => {
+  const last = await rd(A.engine, ops.engine, "lastIssuedSequence");
+  const all = Array.from({ length: Number(last) }, (_, i) => BigInt(i + 1));
+  const recycled = await recycle(all, "recycle before in-time batches");
+  const [fee, sfee, vrfFee] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [1n]);
+  const bal = await pub.getBalance({ address: player.address });
+  const afford = Number((bal - parseEther("0.005")) / (fee + sfee + vrfFee / 2n + fee / 50n));
+  const n = Math.min(10, afford);
+  if (n < 3) throw new Error(`player has ${formatEther(bal)} ETH: not enough for an in-time batch`);
+  const g0 = await rd(A.lens, ops.lens, "grail");
+  const p = await pull(`acquireBatch(${n}) with the VRF float`, n);
+  const f = await awaitFulfilment(p);
+  await keeperTick(deployer);
+  if (await rd(A.grailVault, ops.vault, "stepDue")) await keeperTick(deployer);
+  const g1 = await rd(A.lens, ops.lens, "grail");
+  const d = await deliveries(p.ids);
+  return { ...p, ...f, recycled, deliveries: d,
+    grail: { before: { items: g0.items, oddsPpm: g0.oddsPpm, status: g0.status, funded: g0.funded, selectable: g0.selectable },
+      after: { items: g1.items, oddsPpm: g1.oddsPpm, status: g1.status, funded: g1.funded, selectable: g1.selectable } } };
+});
 await step("claims", async () => {
   const closes = BigInt(state.steps["genesis-ledger"].epoch0ClosesAt);
   const now = (await pub.getBlock()).timestamp;

@@ -41,16 +41,21 @@ if (S["opening-grail"]) {
   p("## Opening GRAIL (funded at launch with test ETH)", "", `Backing ${eth(o.backing, 3)} ETH, listed at ${eth(o.notional, 3)} ETH (listing ${o.listingId}, Shape #${o.tokenId}) before activation.`, "");
 }
 p("## Pulls and VRF", "", "| Scenario | Quote: fee / settlement / VRF (ETH) | Request tx | Fulfilment tx | Fulfilment gas | Oracle charge (ETH) | VRF fee − charge (ETH) | Latency | Outcome |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
-for (const [name, k] of [["Single pull (referred)", "single-pull"], ["Batch of ten", "batch-of-ten"], ["Batch of ten, zero negative slippage", "slippage-refund-probe"], ["On behalf of another wallet", "on-behalf-and-referral"]]) {
+for (const [name, k] of [["Single pull (referred)", "single-pull"], ["Batch of ten", "batch-of-ten"], ["Batch of eight, zero negative slippage", "slippage-refund-probe"], ["On behalf of another wallet", "on-behalf-and-referral"], ["Batch with the VRF float (rerun)", "in-time-batches"]]) {
   const x = S[k];
   if (!x) continue;
   const q = x.quote ?? S[k].quote;
   const f = x.fulfil ?? {};
-  p(`| ${name} | ${q ? `${eth(q.fee)} / ${eth(q.sfee)} / ${eth(q.vrfFee, 7)}` : "—"} | ${x.requestTx ? scan(x.requestTx) : "—"} | ${f.hash ? scan(f.hash) : "—"} | ${f.gasUsed ?? "—"} | ${f.payment ? eth(f.payment, 7) : live ? "—" : "n/a (fork)"} | ${f.payment && q ? eth(BigInt(q.vrfFee) - BigInt(f.payment), 7) : "—"} | ${f.latencySec !== undefined ? `${f.latencySec} s` : "—"} | ${fmtSt(x.statuses)} |`);
+  p(`| ${name}${x.ids ? ` (${x.ids.length})` : ""} | ${q ? `${eth(q.fee)} / ${eth(q.sfee)} / ${eth(q.vrfFee, 7)}` : "—"} | ${x.requestTx ? scan(x.requestTx) : "—"} | ${f.hash ? scan(f.hash) : "—"} | ${f.gasUsed ?? "—"} | ${f.payment ? eth(f.payment, 7) : live ? "—" : "n/a (fork)"} | ${f.payment && q ? eth(BigInt(q.vrfFee) - BigInt(f.payment), 7) : "—"} | ${f.latencySec !== undefined ? `${f.latencySec} s` : "—"} | ${fmtSt(x.statuses)} |`);
 }
 p("");
 const b = S["batch-of-ten"];
-if (b) p(`Settled inside the VRF callback: ${b.settledInCallback} of 10 (the rest by the keeper).`, "");
+if (b) p(`Batch of ten: ${b.settledInCallback} of 10 resolved in the callback (the word was late, so they timed out and were refunded).`, "");
+if (live && r.findings?.length) {
+  p("### Why words were late before the VRF float", "");
+  for (const x of r.findings) p(`- **${x.title}.** ${x.cause ?? ""} ${x.outcome ?? ""}`.trim());
+  p("");
+}
 const del = (S["keeper-booking-restock"]?.deliveries ?? []).filter((x) => x.status === 2);
 if (del.length) {
   p("### Deliveries (batch of ten)", "", "| Acquisition | Prize | Notional (ETH) | Delivered to purchaser |", "| --- | --- | --- | --- |");
@@ -71,7 +76,9 @@ if (g) {
   const row = (lbl, v) => v.items.forEach((it, i) => p(`| ${lbl} | ${eth(it.backing, 3)} | ${eth(it.notional, 4)} | ${["awaiting relist", "Active (selectable)"][v.status[i]] ?? v.status[i]} | ${v.oddsPpm[i] ? `1 in ${Math.round(1e6 / Number(v.oddsPpm[i]))}` : "—"} |`));
   row("before", g.before);
   row("after pulls + keeper step", g.after);
-  p("", "Decay is accelerated on testnet only (0.002 ETH per pull, set through the timelock); selection of a GRAIL by the live VRF is a matter of chance at these odds.", "");
+  const it = S["in-time-batches"]?.grail;
+  if (it) { row("before the in-time rerun", it.before); row("after the in-time rerun + keeper step", it.after); }
+  p("", "Decay is accelerated on testnet only (0.002 ETH per pull, set through the timelock); selection of a GRAIL by the live VRF is a matter of chance at these odds. The first GRAIL pull's word was late (below the VRF float), so its pulls were refunded. By the rerun the GRAIL was already at its floor notional (50 % of backing), so its notional held; its odds move only with the rest of the board (restocking). Decay above the floor is covered by GrailReprice.t.sol and the fork rehearsal.", "");
 }
 const sl = S["slippage-refund-probe"];
 if (sl) p("## Refunds", "", `Batch with zero negative slippage tolerance: ${fmtSt(sl.statuses)}; refund credit ${eth(sl.refundCreditWei)} ETH, withdrawn in ${sl.withdraw ? scan(sl.withdraw) : "—"}. Expiry (no VRF word within 1,800 blocks) cannot be forced on a live coordinator; it is covered by Engine.t.sol.`, "");
@@ -87,7 +94,11 @@ if (o) {
     `Two keepers then ran at the same moment: keeper 1 [${o.keeper1.actions.map((x) => x.action).join(", ")}], keeper 2 [${o.keeper2.actions.map((x) => x.action).join(", ") || "nothing left to do"}]; listings back to ${o.activeAfter}, books level: ${o.booked}.`, "");
 }
 const rp = S["redeem-prize-for-backing"];
-if (rp) p("## Prize redemption", "", `Redeemed ${rp.collection} #${rp.tokenId} (notional ${eth(rp.notional, 5)} ETH): ${eth(rp.ethReturnedWei, 5)} ETH of backing returned to the winner.`, "");
+if (rp) {
+  const rc = S["in-time-batches"]?.recycled;
+  p("## Prize redemption", "", `Redeemed ${rp.redeemed} prize (notional ${eth(rp.notionalWei, 5)} ETH): ${eth(rp.ethReturnedWei, 5)} ETH of backing returned to the winner.` +
+    (rc ? ` Before the rerun, ${rc.redeemed} more prizes returned ${eth(rc.ethReturnedWei, 5)} ETH.` : ""), "");
+}
 const ge = S["fork-time-skip-genesis-end"];
 if (ge) p("## Genesis end (fork only, time skipped)", "", `Keeper actions: ${ge.keeperActions.join(", ")}. Unearned allocation retired ${eth(ge.retiredUnearned, 0)} ENGINE; buyback spent ${eth(ge.buybackEthSpentWei)} ETH and burned ${eth(ge.engineBurnedByBuyback, 0)} ENGINE; supply ${eth(ge.supplyBefore, 0)} → ${eth(ge.supplyAfter, 0)}.`, "");
 p("## All transactions", "", "| Label | Tx | Status | Gas | Cost (ETH) |", "| --- | --- | --- | --- | --- |");
