@@ -55,7 +55,9 @@ contract FollowupTest is GameFixture {
         uint256 f10 = engine.vrfFeeFor(10);
         uint256 f20 = engine.vrfFeeFor(20);
         assertLt(f10 / 10, f1, "10-pull batch shares overhead");
-        assertLt(f20 / 20, f10 / 10, "20-pull batch shares more");
+        // one request per 5 acquisitions: the per-pull VRF cost is flat from 5 pulls up
+        assertEq(f10, 2 * engine.vrfFeeFor(5), "two requests");
+        assertEq(f20, 4 * engine.vrfFeeFor(5), "four requests");
         console2.log("VRF fee 1 / 10 / 20 pulls at 0.01 gwei", f1, f10, f20);
         // the basefee floor applies when the chain is quieter than the floor
         vm.fee(0);
@@ -135,13 +137,17 @@ contract FollowupTest is GameFixture {
         DrawEngine.VrfFeeConfig memory c = LaunchParams.vrfFee();
         uint256 max = engine.MAX_VRF_FEE_PER_BATCH();
         // high basefee: forwarded share alone exceeds the cap, so the margin is zero
+        // the cap applies per VRF request (5 acquisitions)
         vm.fee(5 gwei);
-        (uint256 fwd, uint256 margin) = engine.vrfFeeParts(20);
+        (uint256 fwd, uint256 margin) = engine.vrfFeeParts(5);
         assertEq(fwd, max);
         assertEq(margin, 0, "the subscription is never shorted for the margin");
+        (uint256 fwd20, uint256 margin20) = engine.vrfFeeParts(20);
+        assertEq(fwd20, 4 * max, "a 20-pull batch is four capped requests");
+        assertEq(margin20, 0);
         // in between: the margin fills only the room left under the cap
         vm.fee(0.35 gwei);
-        (fwd, margin) = engine.vrfFeeParts(20);
+        (fwd, margin) = engine.vrfFeeParts(5);
         assertLt(fwd, max);
         assertEq(fwd + margin, max, "margin trimmed to the room under the cap");
         assertLt(margin, (fwd - c.flatWei) * c.marginBps / (10_000 + c.premiumBps + c.bufferBps), "margin trimmed");
@@ -339,7 +345,7 @@ contract FollowupTest is GameFixture {
             (, uint256 vrfId) = _pull(alice, sizes[j]);
             vm.roll(vm.getBlockNumber() + 3);
             uint256 g = gasleft();
-            vrf.fulfill(vrfId, uint256(keccak256(abi.encode("cb", j))));
+            vrf.fulfillGroup(vrfId, uint256(keccak256(abi.encode("cb", j))));
             uint256 used = g - gasleft();
             uint256 settled = engine.nextSequenceToProcess() - headBefore;
             console2.log("batch / settled in callback / callback gas", sizes[j], settled, used);

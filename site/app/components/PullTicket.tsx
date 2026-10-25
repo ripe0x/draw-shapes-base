@@ -19,7 +19,7 @@ export function PullTicket({ count }: { count: number }) {
       <h3 className="vault-h2">Price</h3>
       <Kv label="Ticket per pull" value={<Eth wei={q.fee} digits={5} />} strong />
       <Kv label={`Settlement fee per pull (${percent(pool.params.settlementFeeBps, 0)} of the ticket)`} value={<Eth wei={q.settlementFee} digits={6} />} />
-      <Kv label={`VRF fee, once for the batch of ${count}`} value={<Eth wei={q.vrf} digits={6} />} />
+      <Kv label={`VRF fee for ${count} (one request per 5 pulls)`} value={<Eth wei={q.vrf} digits={6} />} />
       <Kv label={`Total for ${count}`} value={<Eth wei={q.total} digits={5} />} strong />
       <Kv label="Sent with the pull, excess refunded" value={<Eth wei={sendValue(q)} digits={5} />} />
 

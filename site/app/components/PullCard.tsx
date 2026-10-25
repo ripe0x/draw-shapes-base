@@ -165,7 +165,7 @@ export function PullCard({
         <div className="pull-price">
           <p className="vault-note">
             <strong>{eth(q.total, 5)} ETH</strong> for {count} {count === 1 ? "pull" : "pulls"}: a <Eth wei={q.fee} digits={5} /> ticket and a{" "}
-            <Eth wei={q.settlementFee} digits={6} /> settlement fee per pull, plus one <Eth wei={q.vrf} digits={6} /> VRF fee for the batch. The
+            <Eth wei={q.settlementFee} digits={6} /> settlement fee per pull, plus a <Eth wei={q.vrf} digits={6} /> VRF fee (one Chainlink request per 5 pulls). The
             wallet sends 10% more and the engine refunds the excess in the same transaction.
           </p>
         </div>

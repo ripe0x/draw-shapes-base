@@ -92,11 +92,12 @@ abstract contract GameFixture is Test {
         uint256 any = engine.ANY_INVENTORY_VERSION();
         vm.prank(who);
         ids = engine.acquireBatch{value: total}(who, ref, count, 0, 0, 1_000, any, block.timestamp);
+        vrf.markGroup(vrfId, vrf.nextRequestId());
     }
 
     function _fulfill(uint256 vrfId, uint256 word) internal {
         vm.roll(vm.getBlockNumber() + 3);
-        vrf.fulfill(vrfId, word);
+        vrf.fulfillGroup(vrfId, word);
     }
 
     /// @dev Processes and books everything outstanding.

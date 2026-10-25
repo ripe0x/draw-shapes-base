@@ -37,7 +37,7 @@ contract GameTest is GameFixture {
         vm.roll(vm.getBlockNumber() + 3);
         uint256[5] memory order = [uint256(3), 1, 4, 0, 2];
         for (uint256 i; i < 5; ++i) {
-            vrf.fulfill(vrfIds[order[i]], uint256(keccak256(abi.encode("w", i))));
+            vrf.fulfillGroup(vrfIds[order[i]], uint256(keccak256(abi.encode("w", i))));
         }
         _settleAll();
         assertEq(engine.unsettledAcquisitionCount(), 0);
@@ -157,7 +157,7 @@ contract GameTest is GameFixture {
         GrailVault.GrailItem memory it = vault.items()[0];
         for (uint256 round; round < 10; ++round) {
             (, uint256 vrfId) = _pull(alice, 20);
-            _fulfill(vrfId, uint256(keccak256(abi.encode("decay", round))));
+            _fulfill(vrfId, uint256(keccak256(abi.encode("decay2", round))));
             _settleAll();
         }
         vault.step();

@@ -177,6 +177,9 @@ contract DrawEngine is ReentrancyGuard {
     uint256 public constant MAX_VRF_MARGIN_BPS = 10_000;
     uint256 public constant MAX_ACQUISITIONS_PER_TX_CAP = 50;
     uint256 public constant MAX_UNSETTLED_CAP = 1_000;
+    /// @notice Acquisitions per VRF request. A batch is split into requests of at most this many, so
+    ///         each callback has the gas (Chainlink's 2.5M cap) to deliver every acquisition it covers.
+    uint256 public constant ACQUISITIONS_PER_VRF_REQUEST = 5;
 
     uint32 internal constant NUM_WORDS = 1;
     uint32 public constant MIN_CALLBACK_GAS_LIMIT = 150_000;
@@ -902,16 +905,31 @@ contract DrawEngine is ReentrancyGuard {
         if (gas > MAX_CALLBACK_GAS_LIMIT) gas = MAX_CALLBACK_GAS_LIMIT;
     }
 
-    /// @notice Purchaser VRF charge for one batch of `count` acquisitions at the current base fee.
-    ///         Not refundable: Chainlink bills the request whether the acquisition later settles or not.
+    /// @notice Purchaser VRF charge for one batch of `count` acquisitions at the current base fee: one
+    ///         request per `ACQUISITIONS_PER_VRF_REQUEST` acquisitions. Not refundable: Chainlink bills
+    ///         each request whether its acquisitions later settle or not.
     function vrfFeeFor(uint256 count) public view returns (uint256 fee) {
         (uint256 forwarded, uint256 margin) = vrfFeeParts(count);
         fee = forwarded + margin;
     }
 
     /// @notice The batch VRF charge split into the part forwarded to the subscription and the
-    ///         protocol margin. Their sum is at most `MAX_VRF_FEE_PER_BATCH`.
+    ///         protocol margin, summed over the batch's requests.
     function vrfFeeParts(uint256 count) public view returns (uint256 forwarded, uint256 margin) {
+        uint256 full = count / ACQUISITIONS_PER_VRF_REQUEST;
+        (forwarded, margin) = _vrfRequestFee(ACQUISITIONS_PER_VRF_REQUEST);
+        forwarded *= full;
+        margin *= full;
+        uint256 rest = count % ACQUISITIONS_PER_VRF_REQUEST;
+        if (rest != 0) {
+            (uint256 f, uint256 m) = _vrfRequestFee(rest);
+            forwarded += f;
+            margin += m;
+        }
+    }
+
+    /// @dev One request's charge. Forwarded part plus margin is at most `MAX_VRF_FEE_PER_BATCH`.
+    function _vrfRequestFee(uint256 count) internal view returns (uint256 forwarded, uint256 margin) {
         VrfFeeConfig memory c = vrfFeeConfig;
         uint256 price = block.basefee > c.minGasPrice ? block.basefee : c.minGasPrice;
         uint256 gasCost = (uint256(c.overheadGas) + callbackGasLimitFor(count)) * price;
@@ -925,7 +943,8 @@ contract DrawEngine is ReentrancyGuard {
                              REQUEST ACQUISITIONS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Pay for and request `count` acquisitions with one VRF request. Send at least
+    /// @notice Pay for and request `count` acquisitions, one VRF request per
+    ///         `ACQUISITIONS_PER_VRF_REQUEST`. Send at least
     ///         `quoteAcquisitionPrice(count).total`; any excess is refunded to the caller.
     /// @param purchaser Recipient of every acquisition, its NFT, participation units and refund rights.
     /// @param referrer Referrer credited with the referral share of each fulfilled acquisition's
@@ -987,7 +1006,10 @@ contract DrawEngine is ReentrancyGuard {
             feeCreditTotal += vrfMargin;
         }
         emit VrfFeeCollected(firstSequence, count, vrfFee, vrfMargin);
-        _requestRandomness(firstSequence, count);
+        for (uint256 done; done < count; done += ACQUISITIONS_PER_VRF_REQUEST) {
+            uint256 n = count - done < ACQUISITIONS_PER_VRF_REQUEST ? count - done : ACQUISITIONS_PER_VRF_REQUEST;
+            _requestRandomness(firstSequence + uint64(done), n);
+        }
 
         uint256 excess = msg.value - cost;
         if (excess != 0) SafeTransferLib.forceSafeTransferETH(msg.sender, excess);
@@ -1164,7 +1186,9 @@ contract DrawEngine is ReentrancyGuard {
             emit RandomnessCached(requestId, meta.sequence, derived);
         }
 
-        _tryProcessCallbackHead(count);
+        // The head may include an earlier request's acquisitions when words arrive out of order, so
+        // the fast path runs while gas allows rather than for this request's count only.
+        _tryProcessCallbackHead(2 * ACQUISITIONS_PER_VRF_REQUEST);
     }
 
     /// @dev Best-effort fast path: up to `maxItems` single-item self-calls into the guarded processor,

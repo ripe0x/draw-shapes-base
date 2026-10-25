@@ -14,7 +14,7 @@ const FAQS = [
   {
     question: "What happens when someone pulls?",
     answer:
-      "The pull pays the ticket, a 1 % settlement fee and one VRF fee for the batch to the engine, a protocol-owned fork of FWA's custom pool. Chainlink VRF returns a random word, the engine selects one listing per pull by weight 1e36 divided by list price and sends it to the purchaser, usually inside the VRF callback. A later settle books the capture on the controller, splits the margin and queues a replacement.",
+      "The pull pays the ticket, a 1 % settlement fee and the batch's VRF fee to the engine, a protocol-owned fork of FWA's custom pool. The engine makes one Chainlink VRF request per 5 pulls, so every callback has the gas to deliver all of its pulls; each selects one listing per pull by weight 1e36 divided by list price and sends it to the purchaser. A later settle books the capture on the controller, splits the margin and queues a replacement.",
   },
   {
     question: "Where does a ticket go?",
@@ -24,7 +24,7 @@ const FAQS = [
   {
     question: "What does the VRF fee pay for?",
     answer:
-      "Chainlink's charge for the batch's random word, priced at the block basefee with Chainlink's 60 % premium and a buffer, forwarded to the subscription in the purchase. The mainnet build adds a 30 % service margin on the same gas cost, credited to development (FWA V2's model); the Base Sepolia test deployment predates it. It is one fee per batch, so it falls per pull as the batch grows, and it is not refunded.",
+      "Chainlink's charge for the batch's random word, priced at the block basefee with Chainlink's 60 % premium and a buffer, forwarded to the subscription in the purchase. The mainnet build adds a 30 % service margin on the same gas cost, credited to development (FWA V2's model); the Base Sepolia test deployment predates it. It is charged once per Chainlink request (one request per 5 pulls) and it is not refunded.",
   },
   {
     question: "Why can a pull be refunded?",
@@ -163,7 +163,7 @@ export function ProtocolPage() {
         <div className="protocol-flow">
           <article>
             <strong>Quote</strong>
-            <p>The Lens quotes the ticket, the settlement fee and one VRF fee for the batch.</p>
+            <p>The Lens quotes the ticket, the settlement fee and the VRF fee (one request per 5 pulls).</p>
           </article>
           <article>
             <strong>Acquire</strong>

@@ -68,6 +68,23 @@ contract BaseVrfForkTest is Test {
         engine.activate();
     }
 
+    /// @dev Fulfils the real request covering `firstId` (k acquisitions) as the coordinator would.
+    function _fulfilRequest(uint256 firstId, uint256 k, uint256 word) internal returns (uint256 used) {
+        uint256 vrfId = engine.vrfRequestOf(firstId);
+        (uint64 first, uint32 count,) = engine.vrfBatches(vrfId);
+        assertEq(count, k);
+        assertEq(first, firstId);
+        uint256 gasLimit = LaunchParams.vrf(address(0), 0, 0).callbackGasBase + k * LaunchParams.vrf(address(0), 0, 0).callbackGasPerAcquisition;
+        if (gasLimit > 2_500_000) gasLimit = 2_500_000;
+        uint256[] memory words = new uint256[](1);
+        words[0] = word;
+        vm.prank(COORDINATOR);
+        uint256 g = gasleft();
+        (bool ok,) = address(engine).call{gas: gasLimit}(abi.encodeCall(engine.rawFulfillRandomWords, (vrfId, words)));
+        used = g - gasleft();
+        assertTrue(ok, "callback within the requested gas limit");
+    }
+
     function test_fork_realCoordinatorRequestAndCallbackGas() public {
         if (!forked) return;
         address alice = makeAddr("alice");
@@ -77,36 +94,28 @@ contract BaseVrfForkTest is Test {
             vm.recordLogs();
             vm.prank(alice);
             uint256[] memory ids = engine.acquireBatch{value: total}(alice, address(0), n, 0, 0, 1_000, type(uint256).max, block.timestamp);
-            uint256 vrfId = engine.vrfRequestOf(ids[0]);
             assertTrue(IVRFCoordinatorV2Plus(COORDINATOR).pendingRequestExists(subId), "real request pending");
-            (uint64 first, uint32 count,) = engine.vrfBatches(vrfId);
-            assertEq(count, n);
-            assertEq(first, ids[0]);
-            uint32 gasLimit = uint32(LaunchParams.vrf(address(0), 0, 0).callbackGasBase + n * LaunchParams.vrf(address(0), 0, 0).callbackGasPerAcquisition);
-            if (gasLimit > 2_500_000) gasLimit = 2_500_000;
+            // one real request per ACQUISITIONS_PER_VRF_REQUEST acquisitions, each fulfilled by its own callback
+            uint256 per = engine.ACQUISITIONS_PER_VRF_REQUEST();
+            uint256 billedGas;
             vm.roll(vm.getBlockNumber() + 3);
-            uint256[] memory words = new uint256[](1);
-            words[0] = uint256(keccak256(abi.encode(n)));
-            vm.prank(COORDINATOR);
-            uint256 g = gasleft();
-            (bool ok,) = address(engine).call{gas: gasLimit}(abi.encodeCall(engine.rawFulfillRandomWords, (vrfId, words)));
-            uint256 used = g - gasleft();
-            assertTrue(ok, "callback within the requested gas limit");
-            uint256 settledInCallback = engine.nextSequenceToProcess() - first;
-            // Chainlink v2.5 bills (callback gas + verification + gasAfterPaymentCalculation 42,500) x gas
-            // price x (1 + 60% native premium) plus the L1 data fee. Verification overhead measured
-            // from live Base fulfilments is about 400k gas total for a minimal callback (evidence/vrf).
-            uint256 billedGas = used + 300_000 + 42_500;
+            for (uint256 off; off < n; off += per) {
+                uint256 k = n - off < per ? n - off : per;
+                uint256 used = _fulfilRequest(ids[off], k, uint256(keccak256(abi.encode(n, off))));
+                // Chainlink v2.5 bills (callback gas + verification + gasAfterPaymentCalculation 42,500) x gas
+                // price x (1 + 60% native premium) plus the L1 data fee. Verification overhead measured
+                // from live Base fulfilments is about 400k gas total for a minimal callback (evidence/vrf).
+                billedGas += used + 300_000 + 42_500;
+                console2.log("batch / request acquisitions / callback gas used", n, k, used);
+            }
+            uint256 settledInCallback = engine.nextSequenceToProcess() - ids[0];
             uint256 estimate = billedGas * 0.00615 gwei * 160 / 100;
-            console2.log("batch", n);
-            console2.log("  callback gas used", used);
-            console2.log("  settled inside callback", settledInCallback);
+            console2.log("  settled inside callbacks", settledInCallback);
             console2.log("  estimated VRF charge at 0.00615 gwei (wei)", estimate);
-            console2.log("  estimated VRF charge per acquisition (wei)", estimate / n);
+            assertEq(settledInCallback, n, "every acquisition settles inside its request's callback");
             // the purchaser's VRF fee, quoted at the fork's basefee, covers the estimated bill
             uint256 quoted = engine.vrfFeeFor(n);
             uint256 priced = block.basefee > 0.00615 gwei ? block.basefee : 0.00615 gwei;
-            console2.log("  fork basefee (wei)", block.basefee);
             console2.log("  purchaser VRF fee quoted (wei)", quoted);
             assertGe(quoted, billedGas * priced * 160 / 100, "VRF fee covers the bill at the fork gas price");
             engine.processAcquisitions(20);

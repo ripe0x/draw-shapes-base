@@ -93,8 +93,9 @@ abstract contract SystemFixture is Test, Deployer {
         uint256 any = s.engine.ANY_INVENTORY_VERSION();
         vm.prank(who);
         ids = s.engine.acquireBatch{value: total}(who, address(0), n, 0, 0, 1_000, any, block.timestamp);
+        vrf.markGroup(vrfId, vrf.nextRequestId());
         vm.roll(vm.getBlockNumber() + 3);
-        vrf.fulfill(vrfId, word);
+        vrf.fulfillGroup(vrfId, word);
     }
 
     function _settle() internal {

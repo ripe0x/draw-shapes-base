@@ -79,7 +79,7 @@ it is a mild effect.
 | Notionals | 0.01165 / 0.0233 / 0.03495 / 0.05425 / 0.1075 | 0.0117 / 0.0234 / 0.0351 / 0.0545 / 0.108 |
 | Acquisition fee (wei) | 14,878,540,357,338,322 | 14,942,455,786,105,613 |
 | Fee + settlement | 0.015027326 ETH | 0.015091880 ETH (+0.43 %) |
-| Player payment incl. 10-pull VRF share (0.01 gwei) | 0.0150329 | 0.0150974 (0.0150983 with the later 30 % VRF service margin) |
+| Player payment incl. 10-pull VRF share (0.01 gwei) | 0.0150329 | 0.0150974 (0.0151048 with the later 30 % VRF service margin and one request per 5 pulls) |
 | Ordinary RTP (backing / fee + settlement) | 85.31 % | 84.94 % |
 | Per pull: premium / GRAIL feed | 0.000513 / 0.000256 | 0.000449 / 0.000385 (+50 %) |
 

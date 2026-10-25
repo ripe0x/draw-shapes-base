@@ -18,14 +18,20 @@ contract BaseSepoliaForkTest is Test, Deployer {
     bytes32 constant KEY_HASH = 0x9e1344a1247c8a1785d0a4681a27152bffdb43666ae5bf7d14d24a5efd44bf71;
 
     function _fulfilAsCoordinator(System memory s, uint256 firstId, uint256 count, uint256 word) internal returns (uint256 settled) {
-        uint256 vrfId = s.engine.vrfRequestOf(firstId);
-        uint256 limit = s.engine.callbackGasLimitFor(count);
+        // one VRF request per ACQUISITIONS_PER_VRF_REQUEST acquisitions, each its own callback (and,
+        // under the fork profile's isolation, its own transaction with cold storage)
+        uint256 per = s.engine.ACQUISITIONS_PER_VRF_REQUEST();
         uint256[] memory words = new uint256[](1);
-        words[0] = word;
         vm.roll(vm.getBlockNumber() + 3);
-        vm.prank(COORDINATOR);
-        (bool ok,) = address(s.engine).call{gas: limit}(abi.encodeCall(DrawEngine.rawFulfillRandomWords, (vrfId, words)));
-        assertTrue(ok, "callback within the coordinator gas limit");
+        for (uint256 off; off < count; off += per) {
+            uint256 n = count - off < per ? count - off : per;
+            uint256 vrfId = s.engine.vrfRequestOf(firstId + off);
+            words[0] = uint256(keccak256(abi.encode(word, off)));
+            uint256 limit = s.engine.callbackGasLimitFor(n);
+            vm.prank(COORDINATOR);
+            (bool ok,) = address(s.engine).call{gas: limit}(abi.encodeCall(DrawEngine.rawFulfillRandomWords, (vrfId, words)));
+            assertTrue(ok, "callback within the coordinator gas limit");
+        }
         for (uint256 i; i < count; ++i) {
             (,,,, DrawEngine.AcquisitionStatus st) = s.engine.acquisitions(firstId + i);
             if (st != DrawEngine.AcquisitionStatus.Ready && st != DrawEngine.AcquisitionStatus.Pending) ++settled;
@@ -74,7 +80,7 @@ contract BaseSepoliaForkTest is Test, Deployer {
         vm.prank(p);
         ids = s.engine.acquireBatch{value: total}(p, address(0), 10, 0, 0, 1_000, type(uint256).max, block.timestamp);
         uint256 settled = _fulfilAsCoordinator(s, ids[0], 10, 8);
-        console2.log("10-pull batch settled inside the callback", settled);
-        assertGe(settled, 5, "most of a batch settles inside the callback");
+        console2.log("10-pull batch settled inside its callbacks", settled);
+        assertEq(settled, 10, "a 10-pull batch settles entirely inside its two callbacks");
     }
 }

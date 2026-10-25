@@ -22,6 +22,7 @@ contract KeeperOutageTest is GameFixture {
         vm.prank(who);
         try engine.acquireBatch{value: total}(who, address(0), k, 0, 0, 1_000, any, block.timestamp) {
             ok = true;
+            vrf.markGroup(vrfId, vrf.nextRequestId());
         } catch {}
     }
 
@@ -41,9 +42,9 @@ contract KeeperOutageTest is GameFixture {
             (bool ok3, uint256 v3) = _try(alice, 5);
             vm.roll(vm.getBlockNumber() + 3);
             // callbacks arrive newest first: ordered processing still settles oldest first
-            if (ok3) vrf.fulfill(v3, uint256(keccak256(abi.encode("c", round))));
-            if (ok2) vrf.fulfill(v2, uint256(keccak256(abi.encode("b", round))));
-            if (ok1) vrf.fulfill(v1, uint256(keccak256(abi.encode("a", round))));
+            if (ok3) vrf.fulfillGroup(v3, uint256(keccak256(abi.encode("c", round))));
+            if (ok2) vrf.fulfillGroup(v2, uint256(keccak256(abi.encode("b", round))));
+            if (ok1) vrf.fulfillGroup(v1, uint256(keccak256(abi.encode("a", round))));
             accepted += (ok1 ? 10 : 0) + (ok2 ? 10 : 0) + (ok3 ? 5 : 0);
             reverted += (ok1 ? 0 : 1) + (ok2 ? 0 : 1) + (ok3 ? 0 : 1);
             _assertSolvent();

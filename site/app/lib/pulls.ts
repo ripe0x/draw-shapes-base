@@ -45,7 +45,8 @@ export interface Card {
   item?: Item;
 }
 export interface Batch {
-  /** VRF request shared by the batch: one request per batch. */
+  /** One purchase: its request block and first acquisition id. (A purchase makes one VRF request
+   *  per 5 acquisitions, so the VRF request id does not identify it.) */
   key: string;
   block: bigint;
   count: bigint;
@@ -102,7 +103,6 @@ async function load(client: PublicClient, dep: Deployment, owner: Address, prior
     : [];
 
   const batches = (base?.batches ?? []).map((b) => ({ ...b }));
-  const byKey = new Map(batches.map((b) => [b.key, b]));
   const blockOf = new Map(mine.map((m) => [m.id, m.block]));
   const delivered: { id: bigint; collection: Address; tokenId: bigint; grail: boolean; booked: boolean }[] = [];
   reread.forEach((id, i) => {
@@ -110,15 +110,14 @@ async function load(client: PublicClient, dep: Deployment, owner: Address, prior
     const k = id.toString();
     if (!cards[k]) {
       cards[k] = { id, status: r.status, ticket: r.acquisitionFee };
-      const key = r.vrfRequestId.toString();
-      const b = byKey.get(key);
+      // A purchase's acquisitions are consecutive ids from one request block.
+      const block = blockOf.get(id) ?? 0n;
+      const b = batches.find((x) => x.block === block && x.ids[x.ids.length - 1] === id - 1n);
       if (b) {
         b.ids = [...b.ids, id];
         b.count += 1n;
       } else {
-        const nb: Batch = { key, block: blockOf.get(id) ?? 0n, count: 1n, fee: r.acquisitionFee, ids: [id] };
-        byKey.set(key, nb);
-        batches.push(nb);
+        batches.push({ key: `${block}-${id}`, block, count: 1n, fee: r.acquisitionFee, ids: [id] });
       }
     }
     const c = cards[k];

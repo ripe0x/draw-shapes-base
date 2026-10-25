@@ -29,7 +29,7 @@ contract GrailRepriceTest is GameFixture {
         while (n != 0) {
             uint256 k = n > 20 ? 20 : n;
             (, uint256 vrfId) = _pull(alice, k);
-            _fulfill(vrfId, uint256(keccak256(abi.encode("rp", ++salt))));
+            _fulfill(vrfId, uint256(keccak256(abi.encode("rp2", ++salt))));
             for (uint256 i; i < 30 && (controller.nextSequenceToBook() <= engine.lastIssuedSequence() || controller.queueLength() != 0); ++i) {
                 controller.settle(50);
             }

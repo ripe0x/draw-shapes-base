@@ -40,7 +40,8 @@ contract GameHandler is Test {
         vm.prank(p);
         engine.acquireBatch{value: total}(p, ref, count, 0, 0, 10_000, any, block.timestamp);
         paidIn += total;
-        open.push(vrfId);
+        // one request per ACQUISITIONS_PER_VRF_REQUEST: each is fulfilled independently, in any order
+        for (uint256 id = vrfId; id < vrf.nextRequestId(); ++id) open.push(id);
     }
 
     function fulfill(uint256 index, uint256 word) external {

@@ -90,6 +90,25 @@ contract MockVRFCoordinator {
         emit Fulfilled(id, success, used);
     }
 
+    /// @notice A batch's requests [start, end): the engine makes one request per
+    ///         `ACQUISITIONS_PER_VRF_REQUEST` acquisitions. Test helpers record each purchase's range.
+    mapping(uint256 start => uint256 end) public groupEnd;
+
+    function markGroup(uint256 start, uint256 end) external {
+        if (end > start + 1) groupEnd[start] = end;
+    }
+
+    /// @notice Fulfils every open request of the batch starting at `id`: the first with `word`, the
+    ///         rest with words derived from it. A request without a recorded group is fulfilled alone.
+    function fulfillGroup(uint256 id, uint256 word) public returns (bool success) {
+        uint256 end = groupEnd[id] == 0 ? id + 1 : groupEnd[id];
+        success = true;
+        for (uint256 j = id; j < end; ++j) {
+            if (requests[j].done) continue;
+            if (!fulfill(j, j == id ? word : uint256(keccak256(abi.encode(word, j))))) success = false;
+        }
+    }
+
     function setBilling(uint256 gasPrice, uint256 overheadGas, uint256 l1Wei) external {
         (billGasPrice, billOverheadGas, billL1Wei) = (gasPrice, overheadGas, l1Wei);
     }

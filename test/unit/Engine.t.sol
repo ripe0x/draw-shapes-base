@@ -61,6 +61,7 @@ contract EngineTest is Test {
         uint256 any = engine.ANY_INVENTORY_VERSION();
         vm.prank(who);
         ids = engine.acquireBatch{value: total}(who, ref, count, 0, 0, 10_000, any, block.timestamp);
+        vrf.markGroup(vrfId, vrf.nextRequestId());
     }
 
     function _roll(uint256 n) internal {
@@ -85,27 +86,51 @@ contract EngineTest is Test {
         engine.acquireBatch{value: 1 ether}(alice, address(0), 1, 0, 0, 0, any, block.timestamp);
     }
 
-    function test_batchUsesOneVrfRequestAndIndependentWords() public {
+    /// @notice A batch is split into VRF requests of ACQUISITIONS_PER_VRF_REQUEST, each with its own
+    ///         word, and every acquisition is delivered inside the callbacks with no keeper.
+    function test_batchSplitsVrfRequests_allDeliveredInCallbacks() public {
         _list(30, 0.01 ether);
         engine.activate();
         (uint256[] memory ids, uint256 vrfId) = _buy(alice, 10);
-        assertEq(vrf.openCount(), 1, "one request for the batch");
-        assertEq(engine.unfulfilledVrfCount(), 1);
+        assertEq(engine.ACQUISITIONS_PER_VRF_REQUEST(), 5);
+        assertEq(vrf.openCount(), 2, "two requests for a 10-pull batch");
+        assertEq(engine.unfulfilledVrfCount(), 2);
         _roll(3);
-        vrf.fulfill(vrfId, 123);
+        vrf.fulfillGroup(vrfId, 123);
         uint256 prev;
         for (uint256 i; i < ids.length; ++i) {
             (,,,,, uint256 w) = engine.acquisitionMeta(ids[i]);
-            assertEq(w, uint256(keccak256(abi.encode(uint256(123), i))), "derived word");
+            // request k carries its own word; each acquisition derives from it by its index in the request
+            uint256 word = i < 5 ? 123 : uint256(keccak256(abi.encode(uint256(123), vrfId + 1)));
+            assertEq(w, uint256(keccak256(abi.encode(word, i % 5))), "derived word");
             assertTrue(w != prev);
             prev = w;
-        }
-        engine.processAcquisitions(20);
-        for (uint256 i; i < ids.length; ++i) {
-            assertEq(uint256(_status(ids[i])), uint256(DrawEngine.AcquisitionStatus.Fulfilled));
+            assertEq(uint256(_status(ids[i])), uint256(DrawEngine.AcquisitionStatus.Fulfilled), "delivered in the callback");
         }
         assertEq(nft.balanceOf(alice), 10);
-        assertEq(engine.unsettledAcquisitionCount(), 0);
+        assertEq(engine.unsettledAcquisitionCount(), 0, "nothing left for a keeper");
+        assertEq(engine.unfulfilledVrfCount(), 0);
+        _assertSolvent();
+    }
+
+    /// @notice Words arriving out of order: the later request's acquisitions wait behind the head, then
+    ///         the earlier request's callback delivers its own and continues into the waiting ones.
+    function test_batchSplit_outOfOrderWords_secondCallbackFinishesHead() public {
+        _list(30, 0.01 ether);
+        engine.activate();
+        (uint256[] memory ids, uint256 vrfId) = _buy(alice, 10);
+        _roll(3);
+        vrf.fulfill(vrfId + 1, 7); // second request first: its acquisitions are Ready behind a pending head
+        assertEq(uint256(_status(ids[5])), uint256(DrawEngine.AcquisitionStatus.Ready));
+        assertEq(engine.nextSequenceToProcess(), ids[0], "head still pending");
+        vrf.fulfill(vrfId, 9);
+        uint256 delivered;
+        for (uint256 i; i < ids.length; ++i) {
+            if (_status(ids[i]) == DrawEngine.AcquisitionStatus.Fulfilled) ++delivered;
+        }
+        assertGt(delivered, 5, "the head callback continued into the earlier-arrived request");
+        engine.processAcquisitions(20); // whatever gas left over, anyone finishes
+        assertEq(nft.balanceOf(alice), 10);
         _assertSolvent();
     }
 
@@ -121,11 +146,11 @@ contract EngineTest is Test {
         (, uint256 v3) = _buy(alice, 20);
         assertEq(engine.unsettledAcquisitionCount(), 60);
         _roll(3);
-        vrf.fulfill(v3, 3);
-        vrf.fulfill(v2, 2);
+        vrf.fulfillGroup(v3, 3);
+        vrf.fulfillGroup(v2, 2);
         // nothing processes past the pending head
         assertEq(engine.processAcquisitions(60), 0, "head pending blocks the queue");
-        vrf.fulfill(v1, 1);
+        vrf.fulfillGroup(v1, 1);
         uint256 processed;
         for (uint256 i; i < 10 && engine.unsettledAcquisitionCount() != 0; ++i) {
             processed += engine.processAcquisitions(20);
@@ -170,7 +195,7 @@ contract EngineTest is Test {
         engine.activate();
         (uint256[] memory ids, uint256 vrfId) = _buy(alice, 1);
         _roll(engine.selectionTimeoutBlocks() + 1);
-        vrf.fulfill(vrfId, 9);
+        vrf.fulfillGroup(vrfId, 9);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.TimedOut));
         engine.processAcquisitions(1);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.Expired));
@@ -184,7 +209,7 @@ contract EngineTest is Test {
         vm.expectRevert(DrawEngine.OnlyCoordinator.selector);
         engine.rawFulfillRandomWords(vrfId, words);
         _roll(3);
-        vrf.fulfill(vrfId, 5);
+        vrf.fulfillGroup(vrfId, 5);
         (,,,,, uint256 w1) = engine.acquisitionMeta(1);
         // a second callback for the same request cannot overwrite the word (no reroll)
         vm.prank(address(vrf));
@@ -202,7 +227,7 @@ contract EngineTest is Test {
         (uint256 f, uint256 sf,,) = engine.quoteAcquisitionPrice(1);
         uint256 total = f + sf;
         _roll(3);
-        vrf.fulfill(vrfId, 1);
+        vrf.fulfillGroup(vrfId, 1);
         engine.processAcquisitions(1);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.DeliveryPending));
         assertEq(engine.dayOpen(0), 1, "pending delivery keeps its day open");
@@ -229,7 +254,7 @@ contract EngineTest is Test {
         nft.setBlocked(alice, true);
         (uint256[] memory ids, uint256 vrfId) = _buy(alice, 1);
         _roll(3);
-        vrf.fulfill(vrfId, 1);
+        vrf.fulfillGroup(vrfId, 1);
         engine.processAcquisitions(1);
         (,,, uint256 listingId,) = engine.acquisitions(ids[0]);
         nft.setBlocked(alice, false);
@@ -247,7 +272,7 @@ contract EngineTest is Test {
         (uint256[] memory ids, uint256 vrfId) = _buy(alice, 2);
         (uint256 fee, uint256 sfee,,) = engine.quoteAcquisitionPrice(1);
         _roll(3);
-        vrf.fulfill(vrfId, 0); // word 0 selects slot 1, the 0.01 listing
+        vrf.fulfillGroup(vrfId, 0); // word 0 selects slot 1, the 0.01 listing
         engine.processAcquisitions(2);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.Fulfilled));
         // only the 1 ETH listing remains: the live fee rose far beyond the 10% tolerance
@@ -269,8 +294,8 @@ contract EngineTest is Test {
         assertEq(engine.reservedListingCount(uint64(ids2[0])), 2, "later request reserves the staged batch");
         assertTrue(total > 0);
         _roll(3);
-        vrf.fulfill(v2, 2);
-        vrf.fulfill(v1, 1);
+        vrf.fulfillGroup(v2, 2);
+        vrf.fulfillGroup(v1, 1);
         engine.processAcquisitions(5);
         assertEq(engine.activeListingCount(), 5);
         assertEq(engine.stagedCount(), 0);
@@ -300,7 +325,7 @@ contract EngineTest is Test {
         vm.prank(alice);
         engine.acquireBatch{value: 1 ether}(alice, address(0), 1, 0, 0, 0, any, block.timestamp);
         _roll(3);
-        vrf.fulfill(vrfId, 3);
+        vrf.fulfillGroup(vrfId, 3);
         engine.processAcquisitions(1);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.Fulfilled));
         engine.withdrawProceeds();
@@ -335,7 +360,7 @@ contract EngineTest is Test {
         (, uint256 vrfId) = _buy(alice, 1);
         engine.setFeePolicy(100, 0, 0); // later requests: everything to dev
         _roll(3);
-        vrf.fulfill(vrfId, 3);
+        vrf.fulfillGroup(vrfId, 3);
         assertEq(engine.feeCreditOf(ref), sfee / 2, "old policy applies to the old request");
     }
 
@@ -355,7 +380,7 @@ contract EngineTest is Test {
         vm.expectRevert(DrawEngine.WithdrawLocked.selector);
         engine.transferListings(ids, address(this));
         _roll(3);
-        vrf.fulfill(vrfId, 3);
+        vrf.fulfillGroup(vrfId, 3);
         assertGt(engine.proceedsOf(address(next)), 0);
         assertEq(engine.proceedsOf(address(this)), 0);
     }

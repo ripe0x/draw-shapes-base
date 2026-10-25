@@ -9,7 +9,7 @@ contract GasProbeTest is GameFixture {
             (, uint256 vrfId) = _pull(alice, n);
             vm.roll(vm.getBlockNumber() + 3);
             uint256 g = gasleft();
-            vrf.fulfill(vrfId, uint256(keccak256(abi.encode(n))));
+            vrf.fulfillGroup(vrfId, uint256(keccak256(abi.encode(n))));
             console2.log("batch", n, "callback total gas (fast path may not run)", g - gasleft());
             g = gasleft();
             engine.processAcquisitions(n);

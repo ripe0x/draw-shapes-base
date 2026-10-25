@@ -122,7 +122,7 @@ contract GenesisRehearsalTest is Test, Deployer {
         vm.prank(who);
         s.engine.acquireBatch{value: total}(who, ref, n, 0, 0, 1_000, any, block.timestamp);
         paidIn += total;
-        openVrf.push(vrfId);
+        for (uint256 id = vrfId; id < vrf.nextRequestId(); ++id) openVrf.push(id);
     }
 
     function _fulfillAll(uint256 salt) internal {
