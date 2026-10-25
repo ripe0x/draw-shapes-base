@@ -247,13 +247,13 @@ farmers spend it on pulls.
 
 ## 6. Tests
 
-Complete suite with `BASE_RPC_URL`: **89 passed, 0 failed, 18 suites**, including:
+Complete suite with `BASE_RPC_URL`: **91 passed, 0 failed, 18 suites**, including:
 - 6 invariants × 4,096 calls;
 - both Base mainnet fork suites;
 - the 14-day rehearsal.
 
-Results are in `evidence/grail-followup-tests.txt`. `ReferenceBoard.t.sol` adds the alternative's
-exact prices and the GRAIL fee uplift, bringing the total to 91.
+Results are in `evidence/grail-followup-tests.txt`. `ReferenceBoard.t.sol` now also pins the
+alternative's exact prices and the GRAIL fee uplift.
 
 ## 7. Decisions requiring approval
 
