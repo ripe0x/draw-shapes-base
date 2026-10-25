@@ -62,18 +62,38 @@ After the script: add the engine as VRF consumer (Safe), verify sources, publish
 | Task | Call | Cadence |
 | --- | --- | --- |
 | Settle and restock | `DrawController.settle(50)` | every block with new processed acquisitions; at least every 5 minutes |
-| GRAIL | `GrailVault.step()` when `stepDue()` | every few minutes |
+| GRAIL | `GrailVault.step()` when `stepDue()` (true for a pending mint, relist, harvest **or decay**; never stays true when nothing can change) | every few minutes |
 | Trading fees | `EngineHook.distribute()` | hourly |
 | VRF | none: purchasers fund the subscription at purchase (`DrawEngine.vrfFeeFor`); watch `Lens.vrf()` (collected vs subscription balance) | daily |
 | Buyback | `Buyback.buyAndBurn()` (anyone; bounty ≤ 0.5 % of ETH spent, capped at 0.00005 ETH; reverts below 0.005 ETH) | hourly after genesis |
 | POL | `Treasury.deployPol(minSqrtPrice)` (keeper) | daily, price limit 3 % below spot |
 | Backstop | `Treasury.backstop()` when restock waits | on alert |
 | Farm | `GenesisFarm.retireUnearned()` | once after day 14 resolves |
-| Buyback | `Buyback.buyAndBurn()` | hourly after genesis |
+
+Run **two independent keepers** (different hosts and RPC providers); `settle` refunds its gas plus a
+0.00001 ETH tip from maintenance whenever it lists, so any third party can also keep the game live
+at no cost to itself. Calls are idempotent (re-running settle / step / process is a no-op).
 
 Alerts: engine `unsettledAcquisitionCount` > 100 or head pending > 10 min; controller
-`queueLength() > 0` for > 15 min; `cash` < 0.15 ETH; VRF subscription < 0.01 ETH; any
-`AcquisitionRefundedSlippage` spike; `HarvestShortfall` event.
+`queueLength() > 0` for > 15 min; **selectable ordinary listings < 70** (`Lens.game().activeListings`);
+no `settle` transaction for 15 min; `cash` < 0.15 ETH; VRF subscription < 0.01 ETH; any
+`AcquisitionRefundedSlippage` spike; `HarvestShortfall` event; `GrailVault.stepDue()` true for > 15 min.
+
+### Keeper outage: what happens and how to recover (sim/results/grail-outage.md, KeeperOutage.t.sol)
+
+Pulls keep settling inside the VRF callback during an outage; only booking, restocking and GRAIL
+steps stop, so the board drains. Escrow and committed backing are never at risk.
+
+| Outage at 1,500 pulls/day | Board | Refunded (fee + settlement returned) | Purchases reverted (empty board) |
+| --- | --- | --- | --- |
+| 15 min / 1 h | ≥ 29 of 100 | ≤ 0.24 % | 0 |
+| 6 h | down to ~2 | ~3 % | 0 |
+| 24 h | empty | ~7 % | ~7 % |
+
+Recovery: any account calls `DrawController.settle(50)` repeatedly (3–9 calls, ≈ 0.0004–0.017 ETH
+of gas at 0.002–0.1 gwei, refunded from maintenance) until `queueLength() == 0` and the board is
+full, then `GrailVault.step()` if `stepDue()`. No pause is needed; pause acquisitions only if
+cash cannot restock and the reserve is spent.
 
 ## 6. Emergencies
 
