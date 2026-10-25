@@ -3,12 +3,12 @@
 
 Faithful to the contracts where it matters for solvency (src/game/DrawController.sol,
 src/engine/DrawEngine.sol, src/game/PricingLib.sol):
-- notional p = b * 1.08 + mintFee * rungs; weight = 1e36 // p; fee = harmonic mean of active listings
+- notional p = b * 1.065 + mintFee * rungs; weight = 1e36 // p; fee = harmonic mean of active listings
   (GRAILs included) at request time; settlement fee is outside the pool.
 - requests within a settle window are priced at request time and settle in order against the live
   board (captured items leave immediately, replacements wait for the keeper's settle);
 - at each settle: proceeds become cash, margin = proceeds - value (netted, negative carries), mint
-  line repaid first, rest split premium:maintenance:feed = 3:1:4 (maintenance and feed leave the
+  line repaid first, rest split premium:maintenance:feed = 4:0.5:2 (maintenance and feed leave the
   pool), replacement rows from Draw Shapes' deficit / surprise / band draw, minted from cash only;
 - GRAIL vault: feed + trading-fee share; a GRAIL (0.5, 1, 5 ETH ladder) is listed only when fully
   funded, at 80 % of backing decaying 0.00002 ETH per pull to 50 %; its capture never touches the
@@ -24,8 +24,8 @@ FEE = 0.001
 ROWS = [  # rungs (backings), share bps
     ([0.01], 6200), ([0.01, 0.01], 2600), ([0.01, 0.01, 0.01], 700), ([0.05], 400), ([0.1], 100)]
 BOARD = 100
-MARKUP = 1 + (300 + 100 + 400) / BPS
-SPLIT = (300, 100, 400)
+MARKUP = 1 + (400 + 50 + 200) / BPS  # premium 4 %, maintenance 0.5 %, GRAIL feed 2 % (follow-up)
+SPLIT = (400, 50, 200)
 SURPRISE_BPS, RESTORE_K, BAND_BPS = 200, 8, 3000
 LADDER = [0.5, 1.0, 5.0]
 GRAIL_LIST, GRAIL_FLOOR, GRAIL_DECAY, PROB_CAP = 0.8, 0.5, 0.00002, 0.05

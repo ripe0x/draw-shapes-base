@@ -79,7 +79,9 @@ contract GameTest is GameFixture {
         uint256 refunds = engine.acquisitionRefundCredit(alice);
         uint256 fees = engine.feeCreditOf(referrer) + engine.feeCreditOf(tokenWorks) + engine.feeCreditOf(dev);
         uint256 proceeds = controller.totalProceedsBooked();
-        assertEq(paidIn, proceeds + fees + refunds, "paid = proceeds + settlement fees + refunds");
+        uint256 vrfFees = engine.vrfFeesCollected();
+        assertEq(paidIn, proceeds + fees + refunds + vrfFees, "paid = proceeds + settlement fees + refunds + VRF fees");
+        assertGe(vrfFees, vrf.totalBilled(), "purchaser VRF fees cover the oracle bill");
         // controller side: proceeds are split into premium, maintenance, feed and the mint line
         uint256 mintFeesForReplacements = shapes.feesOwedTo(creator) - creatorBefore;
         console2.log("pulls", pulls);
@@ -90,6 +92,8 @@ contract GameTest is GameFixture {
         console2.log("maintenance", controller.totalMaintenanceBooked());
         console2.log("feed to GRAIL", controller.totalFeedBooked());
         console2.log("settlement fees", fees);
+        console2.log("VRF fees collected", vrfFees);
+        console2.log("VRF billed (mock)", vrf.totalBilled());
         _assertBooks();
     }
 
@@ -104,7 +108,7 @@ contract GameTest is GameFixture {
         vault.step();
         assertEq(vault.items().length, 0, "not eligible before fully funded");
         uint256 feedBefore = controller.totalFeedSent();
-        for (uint256 round; round < 40 && vault.fund() < 0.501 ether; ++round) {
+        for (uint256 round; round < 40 && vault.fund() < 0.501 ether && vault.liveGrails() == 0; ++round) {
             (, uint256 vrfId) = _pull(bob, 20);
             _fulfill(vrfId, uint256(keccak256(abi.encode("g", round))));
             _settleAll();
@@ -198,15 +202,6 @@ contract GameTest is GameFixture {
         assertEq(sink.balance, amount);
         assertEq(controller.nav(), 2.2 ether);
         _assertBooks();
-    }
-
-    function test_vrfTopUpFromMaintenance() public {
-        _openAndActivate();
-        controller.fundMaintenance{value: 0.05 ether}();
-        uint256 before = vrf.nativeBalance(subId);
-        // subscription already above target in the fixture: nothing moves
-        assertEq(controller.topUpVrf(), 0);
-        assertEq(vrf.nativeBalance(subId), before);
     }
 
     function test_listingPauseKeepsSettlement() public {

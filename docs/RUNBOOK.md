@@ -64,7 +64,8 @@ After the script: add the engine as VRF consumer (Safe), verify sources, publish
 | Settle and restock | `DrawController.settle(50)` | every block with new processed acquisitions; at least every 5 minutes |
 | GRAIL | `GrailVault.step()` when `stepDue()` | every few minutes |
 | Trading fees | `EngineHook.distribute()` | hourly |
-| VRF | `DrawController.topUpVrf()` | hourly |
+| VRF | none: purchasers fund the subscription at purchase (`DrawEngine.vrfFeeFor`); watch `Lens.vrf()` (collected vs subscription balance) | daily |
+| Buyback | `Buyback.buyAndBurn()` (anyone; bounty ≤ 0.5 % of ETH spent, capped at 0.00005 ETH; reverts below 0.005 ETH) | hourly after genesis |
 | POL | `Treasury.deployPol(minSqrtPrice)` (keeper) | daily, price limit 3 % below spot |
 | Backstop | `Treasury.backstop()` when restock waits | on alert |
 | Farm | `GenesisFarm.retireUnearned()` | once after day 14 resolves |

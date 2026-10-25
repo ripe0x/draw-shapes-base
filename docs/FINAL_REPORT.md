@@ -8,12 +8,12 @@ scenario outputs under disclosed assumptions and do not demonstrate market deman
 
 | Area | Delivered |
 | --- | --- |
-| Game engine | `DrawEngine`: fork of FWA's verified FWAClone, keeping its listing, staging/reservation, segment-tree inverse-notional selection, harmonic-mean pricing, ordered VRF settlement, slippage, delivery escrow and refund machinery; FWA's 5 % edge removed; 1 % settlement fee with 50/10/40 referrer / Token Works / development split; one Chainlink VRF v2.5 request per batch; participation ledger; multi-supplier listings and in-place hand-off; guardian pause vs timelock policy. |
-| House | `DrawController` (port of Draw Shapes `Pool`): real Shapes v1 and Draw Packs minted and listed at notional `b × 1.08 + mint fees`; books walk; margin split premium / maintenance / GRAIL feed after the mint line; Draw Shapes replacement draw; VRF funding from maintenance; surplus release above committed capital; external prizes; wind-down. |
-| GRAILs | `GrailVault`: minted only when fully funded (0.5 → 1 → 5 ETH ladder), listed at 80 % of backing, per-pull decay to 50 % under a 5 % probability cap; funded by the 4 % feed and 90 % of treasury trading receipts. |
+| Game engine | `DrawEngine`: fork of FWA's verified FWAClone, keeping its listing, staging/reservation, segment-tree inverse-notional selection, harmonic-mean pricing, ordered VRF settlement, slippage, delivery escrow and refund machinery; FWA's 5 % edge removed; 1 % settlement fee with 50/25/25 referrer / Token Works / development split; one Chainlink VRF v2.5 request per batch, paid by the purchaser as a separate per-batch VRF fee that funds the subscription; purchase on behalf of another wallet; participation ledger; multi-supplier listings and in-place hand-off; guardian pause vs timelock policy. |
+| House | `DrawController` (port of Draw Shapes `Pool`): real Shapes v1 and Draw Packs minted and listed at notional `b × 1.065 + mint fees`; books walk; margin split premium 4 % / maintenance 0.5 % / GRAIL feed 2 % after the mint line; Draw Shapes replacement draw; keeper refunds from maintenance; surplus release above committed capital after a 0.05 ETH maintenance floor; external prizes; wind-down. |
+| GRAILs | `GrailVault`: minted only when fully funded (0.5 → 1 → 5 ETH ladder), listed at 80 % of backing, per-pull decay to 50 % under a 5 % probability cap; replacement first (smallest rung while none is live); funded by the 2 % feed and treasury trading receipts (100 % while no GRAIL is live, else 90 %). |
 | ENGINE and market | Fixed-supply ERC-20 (35M recommended: 10M liquidity, 25M farm); v4 hook taking a 2 % ETH fee (0.25 % operator, 1.75 % treasury, cap 5 %); permanently locked full-range protocol liquidity. |
 | Genesis | `GenesisFarm`: 14 × 24 h epochs from game activation, 85 % pro rata to delivered pulls, 15 % to VRF bonus weight, pull claims, acceptance-epoch accounting, unearned-only burn. |
-| Treasury | Reserve first, then 90 % GRAIL / 10 % POL; permissionless restock backstop; post-genesis buyback-and-burn with slicing and impact cap. |
+| Treasury | Reserve first, then all to the GRAIL fund while no GRAIL is live, else 90 % GRAIL / 10 % POL; permissionless restock backstop; post-genesis buyback-and-burn with slicing, impact cap, minimum buy and a capped caller bounty. |
 | Deployment | Shared `Deployer` (tests = production wiring), config-driven `Deploy.s.sol` with mainnet confirmation guard and postflight checks, single atomic timelock activation batch. |
 | Frontend | `web/`: live state, quotes, pulls with referral links, my pulls and refunds, GRAIL progress, board odds, genesis claims, ENGINE disclosure. |
 | Evidence | `evidence/` (test outputs, VRF measurements, market CSVs, screenshots, Slither triage), `sim/results/`. |
@@ -28,13 +28,17 @@ fork of Base — succeeded with all postflight checks.
 
 Key reconciled numbers:
 
-- Reference board quote: 0.015070286533069302 ETH fee + 0.000150702865330693 settlement =
-  **0.015220989398399995 ETH per pull**, expected backing 84.22 %; equals an independent recomputation to the wei.
-- VRF on Base: live median charge 0.0000040 ETH per fulfilment (118 samples); our callback costs an
-  estimated 0.0000022–0.0000093 ETH per pull — far below the 0.000128 ETH maintenance allocation.
+- Reference board quote (follow-up configuration): 0.014878540357338322 ETH fee + 0.000148785403573383
+  settlement = **0.015027325760911705 ETH per pull before VRF**, expected backing 85.31 %; equals an
+  independent recomputation to the wei. Purchaser VRF fee per batch at 0.01 gwei: 0.0000233 ETH for 1
+  pull, 0.0000556 ETH for 4–20 pulls (≈ 0.0000056 per pull in a 10-pull batch).
+- VRF on Base: live median charge 0.0000040 ETH per fulfilment (118 samples); on the Base fork the
+  quoted fee covers the estimated bill for 1, 4 and 10-pull batches; collected ≥ billed at every
+  tested basefee (0.001–0.2 gwei) and batch size (1–20) against Chainlink's billing formula.
 - Rehearsal (200 pulls/day, 0.7 ETH/day outside buying): 2,800/2,800 pulls fulfilled; creator mint
-  fees 3.70 ETH; GRAIL funding 1.56 ETH feed + 0.30 ETH trading; two GRAILs minted; ordinary NAV
-  2.06 → 3.14 ETH; 0.94 ETH surplus released after genesis and bought/burned in slices.
+  fees 3.69 ETH; GRAIL funding 0.70 ETH feed + 0.31 ETH trading; two 0.5 ETH GRAILs minted; ordinary
+  NAV 2.06 → 3.44 ETH; 1.24 ETH releasable after genesis (0.05 ETH of it restores maintenance first),
+  bought/burned in slices. Before/after report: docs/FOLLOWUP.md.
 
 ## Recommendations (docs/MARKET.md, docs/M2_RESULTS.md)
 
@@ -46,8 +50,7 @@ Key reconciled numbers:
 
 ## Remaining blockers before public mainnet
 
-1. **GitHub push / PRs**: the remote returned HTTP 403 for this session; reconnect GitHub and install
-   the Claude GitHub App on `ripe0x/draw-shapes-base`, then push the three branches and open the PRs.
+1. (resolved) GitHub access; milestone PRs are open.
 2. Independent security audit.
 3. Legal review (paid chance-based play, referral payments, ENGINE).
 4. Token Works' Base recipient address, confirmed by Token Works.
@@ -61,6 +64,6 @@ Key reconciled numbers:
 - The Draw Shapes 1 ETH piece / merge GRAIL builder is not ported; Base GRAILs are single native Shapes.
 - `DrawEngine` accepts `ANY_INVENTORY_VERSION` as an opt-out of the exact-version check (fee and value guards remain).
 - Anyone (not only the purchaser) may convert a stuck delivery to the purchaser's refund after 7 days.
-- VRF is paid from maintenance (player VRF fee 0) so the quote equals fee + 1 %.
+- VRF: originally paid from maintenance; the follow-up moved it to a separate purchaser-paid per-batch fee.
 - Exact-output ENGINE sells revert on the canonical pool (fees are kept in ETH).
 - The farm allocation is set to 25M, below the 50M working maximum, on the liquidity model.

@@ -21,7 +21,12 @@ contract MockVRFCoordinator {
 
     uint256 public nextRequestId = 1;
     uint256 public nextSubId = 1;
-    uint256 public billPerFulfillment = 0.00002 ether;
+    /// @dev Chainlink v2.5 native billing: (callback gas + verification and accounting overhead) x the
+    ///      oracle's gas price x (1 + 60 % premium) + L1 data fee. Defaults from live Base fulfilments.
+    uint256 public billGasPrice = 0.00615 gwei;
+    uint256 public billOverheadGas = 300_000 + 42_500;
+    uint256 public billL1Wei = 0.0000005 ether;
+    uint256 public totalBilled;
     mapping(uint256 => Request) public requests;
     mapping(uint256 => uint96) public nativeBalance;
     mapping(uint256 => address) public subOwner;
@@ -78,9 +83,15 @@ contract MockVRFCoordinator {
         uint256 g = gasleft();
         (success,) = r.consumer.call{gas: r.callbackGasLimit}(abi.encodeCall(IRawFulfill.rawFulfillRandomWords, (id, words)));
         uint256 used = g - gasleft();
-        uint96 bill = uint96(billPerFulfillment);
-        nativeBalance[r.subId] = nativeBalance[r.subId] > bill ? nativeBalance[r.subId] - bill : 0;
+        uint96 bill = uint96((used + billOverheadGas) * billGasPrice * 160 / 100 + billL1Wei);
+        require(nativeBalance[r.subId] >= bill, "subscription underfunded");
+        nativeBalance[r.subId] -= bill;
+        totalBilled += bill;
         emit Fulfilled(id, success, used);
+    }
+
+    function setBilling(uint256 gasPrice, uint256 overheadGas, uint256 l1Wei) external {
+        (billGasPrice, billOverheadGas, billL1Wei) = (gasPrice, overheadGas, l1Wei);
     }
 
     /// @notice Marks `id` consumed without a callback (a lost callback).

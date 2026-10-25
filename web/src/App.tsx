@@ -149,7 +149,8 @@ export default function App() {
       "engine",
       "acquireBatch",
       [account, referrer ?? "0x0000000000000000000000000000000000000000", BigInt(count), q.fee, 0n, 1000n, ANY, deadline],
-      q.total,
+      // the VRF fee follows the basefee: send a 25 % margin on it; the engine returns any excess
+      q.total + q.vrfFee / 4n,
     );
     if (receipt) {
       const events = parseEventLogs({ abi: abi.engine, logs: receipt.logs, eventName: "AcquisitionRequested" }) as any[];
@@ -195,6 +196,7 @@ export default function App() {
           <div><dt>Per pull</dt><dd>{eth(perPull)} ETH</dd></div>
           <div><dt>Acquisition fee</dt><dd>{eth(live.quote?.fee)} ETH</dd></div>
           <div><dt>Settlement fee (1 %)</dt><dd>{eth(live.quote?.settlementFee)} ETH</dd></div>
+          <div><dt>VRF fee (whole batch, not refundable)</dt><dd>{eth(live.quote?.vrfFee)} ETH</dd></div>
           <div><dt>Expected ETH backing per pull</dt><dd>{eth(g?.expectedBackingPerPull)} ETH ({perPull ? pct(g?.expectedBackingPerPull ?? 0n, perPull) : "–"} of payment)</dd></div>
         </dl>
         {!live.quote?.purchasable && live.quote?.reason && <p className="note">Pulls unavailable: {live.quote.reason}</p>}

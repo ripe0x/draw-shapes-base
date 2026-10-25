@@ -125,9 +125,20 @@ contract GrailVault is ReentrancyGuard {
 
     /// @notice Backing of the GRAIL being funded, its mint fee, and the fund toward them.
     function progress() external view returns (uint256 targetWei, uint256 mintFee, uint256 funded) {
-        targetWei = Denominations.amountAt(_ladder[level]);
+        targetWei = nextTarget();
         mintFee = shapes.mintFee();
         funded = fund + engine.proceedsOf(address(this));
+    }
+
+    /// @notice Backing of the next GRAIL. While no GRAIL is live it is the smallest rung, so a
+    ///         captured headline prize is replaced as fast as possible; otherwise the current rung.
+    function nextTarget() public view returns (uint256) {
+        return Denominations.amountAt(_ladder[_items.length == 0 ? 0 : level]);
+    }
+
+    /// @notice Number of GRAILs currently held (listed or awaiting relist).
+    function liveGrails() external view returns (uint256) {
+        return _items.length;
     }
 
     function items() external view returns (GrailItem[] memory) {
@@ -165,7 +176,7 @@ contract GrailVault is ReentrancyGuard {
             if (s == DrawEngine.ListingStatus.Settled || s == DrawEngine.ListingStatus.DeliveryRefunded) return true;
         }
         if (paused) return false;
-        uint256 target = Denominations.amountAt(_ladder[level]);
+        uint256 target = nextTarget();
         return fund >= target + shapes.mintFee() && _items.length < MAX_GRAILS;
     }
 
@@ -206,8 +217,10 @@ contract GrailVault is ReentrancyGuard {
 
     function _mint() internal returns (bool) {
         uint256 fee = shapes.mintFee();
-        uint256 target = Denominations.amountAt(_ladder[level]);
+        uint256 target = nextTarget();
         if (fund < target + fee || _items.length >= MAX_GRAILS) return false;
+        // replacing a won GRAIL (none live, not the first cycle) does not move the ladder
+        bool replacement = _items.length == 0 && cycleId != 1;
         fund -= target + fee;
         totalBackingMinted += target;
         totalMintFeesPaid += fee;
@@ -219,7 +232,7 @@ contract GrailVault is ReentrancyGuard {
         emit GrailListed(listingId, id, target, notional);
 
         uint64 started = cycleStartedAt;
-        if (started != 0) {
+        if (started != 0 && !replacement) {
             uint256 elapsed = block.timestamp - started;
             if (elapsed < config.stepUpSeconds && level + 1 < _ladder.length) ++level;
             else if (elapsed > config.stepDownSeconds && level != 0) --level;

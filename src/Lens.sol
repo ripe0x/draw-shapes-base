@@ -105,6 +105,37 @@ contract Lens {
         uint256 treasuryToGrail;
     }
 
+    /// @notice Settlement receipt of one acquisition, assembled from the engine's own persistent
+    ///         records (no duplicate storage): status, parties, fees, the prize and its ledger credit.
+    struct Receipt {
+        uint8 status; // DrawEngine.AcquisitionStatus
+        address purchaser; // beneficiary: prize, units, refund credit
+        address referrer;
+        uint256 acquisitionFee;
+        uint256 settlementFee;
+        uint32 feePolicyId;
+        uint256 listingId;
+        address collection;
+        uint256 tokenId;
+        address depositor;
+        uint256 notional;
+        uint64 ledgerDay;
+        uint256 randomWord;
+        uint256 bonusWeight; // nonzero only once fulfilled
+        uint256 vrfRequestId;
+        bool final_; // fulfilled or refunded: no further transition
+        bool bookedByController; // the controller's walk has passed it (exactly-once booking)
+    }
+
+    struct VrfView {
+        uint256 feesCollected;
+        uint256 subscriptionBalance;
+        uint256 feeOne;
+        uint256 feeTen;
+        uint256 feeTwenty;
+        uint256 basefee;
+    }
+
     Addresses internal a;
 
     constructor(Addresses memory addrs) {
@@ -214,6 +245,38 @@ contract Lens {
         (uint64 mu, uint64 mb) = e.userDay(day, user);
         (v.userUnits, v.userBonus) = (mu, mb);
         v.userClaimable = f.claimable(user);
+    }
+
+    function receipt(uint256 requestId) external view returns (Receipt memory r) {
+        DrawEngine e = DrawEngine(payable(a.engine));
+        uint256 paid;
+        DrawEngine.AcquisitionStatus st;
+        (r.purchaser,, paid, r.listingId, st) = e.acquisitions(requestId);
+        r.status = uint8(st);
+        r.acquisitionFee = paid;
+        uint96 sfee;
+        (r.referrer, sfee, r.feePolicyId) = e.settlementTerms(requestId);
+        r.settlementFee = sfee;
+        (,, r.ledgerDay,,, r.randomWord) = e.acquisitionMeta(requestId);
+        r.vrfRequestId = e.vrfRequestOf(requestId);
+        if (r.listingId != 0) {
+            (r.collection, r.depositor,, r.tokenId,, r.notional,,) = e.listings(r.listingId);
+        }
+        r.final_ = st == DrawEngine.AcquisitionStatus.Fulfilled || st == DrawEngine.AcquisitionStatus.Expired
+            || st == DrawEngine.AcquisitionStatus.Refunded || st == DrawEngine.AcquisitionStatus.DeliveryRefunded;
+        if (st == DrawEngine.AcquisitionStatus.Fulfilled) r.bonusWeight = e.bonusWeightOf(r.randomWord);
+        r.bookedByController = DrawController(payable(a.controller)).nextSequenceToBook() > requestId;
+    }
+
+    function vrf() external view returns (VrfView memory v) {
+        DrawEngine e = DrawEngine(payable(a.engine));
+        v.feesCollected = e.vrfFeesCollected();
+        (, uint96 nativeBalance,,,) = e.vrfCoordinator().getSubscription(e.vrfSubscriptionId());
+        v.subscriptionBalance = nativeBalance;
+        v.feeOne = e.vrfFeeFor(1);
+        v.feeTen = e.vrfFeeFor(10);
+        v.feeTwenty = e.vrfFeeFor(20);
+        v.basefee = block.basefee;
     }
 
     function market() external view returns (MarketView memory m) {

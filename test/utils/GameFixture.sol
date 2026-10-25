@@ -50,6 +50,7 @@ abstract contract GameFixture is Test {
             address(this),
             guardian,
             LaunchParams.vrf(address(vrf), subId, keccak256("lane")),
+            LaunchParams.vrfFee(),
             LaunchParams.limits(),
             LaunchParams.fees(tokenWorks, dev)
         );

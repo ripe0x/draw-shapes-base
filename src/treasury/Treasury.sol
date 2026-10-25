@@ -5,6 +5,7 @@ import {ReentrancyGuard} from "solady/utils/ReentrancyGuard.sol";
 
 interface IGrailFund {
     function fundGrail() external payable;
+    function liveGrails() external view returns (uint256);
 }
 
 interface IPoolFund {
@@ -20,8 +21,9 @@ interface IProtocolLiquidity {
 /// @title Treasury
 /// @notice Receives the treasury share of ENGINE trading fees and routes it by fixed precedence:
 ///         1. the restock reserve is refilled to `reserveTarget`;
-///         2. the rest is split `grailBps` to the GRAIL fund and the remainder to protocol-owned
-///            liquidity (launch 90 % / 10 %).
+///         2. while the vault holds no GRAIL (before the first one, or after one was won), all of
+///            the rest to the GRAIL fund; otherwise the rest is split `grailBps` to the GRAIL fund
+///            and the remainder to protocol-owned liquidity (launch 90 % / 10 %).
 ///         The reserve exists only to keep the ordinary pool restockable: `backstop()` (anyone) moves
 ///         reserve ETH into the controller's cash when its replacement queue is waiting and its cash
 ///         is below `backstopFloor`.
@@ -105,7 +107,9 @@ contract Treasury is ReentrancyGuard {
             reserve += toReserve;
         }
         uint256 rest = amount - toReserve;
-        uint256 toGrail = rest * grailBps / BPS;
+        // While no GRAIL is held (before the first, or after one was won) every discretionary wei
+        // funds the next one; with a GRAIL on the board the split returns to grailBps / POL.
+        uint256 toGrail = grailVault.liveGrails() == 0 ? rest : rest * grailBps / BPS;
         uint256 toPol = rest - toGrail;
         polPending += toPol;
         totalToPol += toPol;

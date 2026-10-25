@@ -29,6 +29,7 @@ contract EngineTest is Test {
             address(this),
             guardian,
             LaunchParams.vrf(address(vrf), subId, keccak256("lane")),
+            LaunchParams.vrfFee(),
             LaunchParams.limits(),
             LaunchParams.fees(tokenWorks, dev)
         );
@@ -144,7 +145,10 @@ contract EngineTest is Test {
         _list(5, 0.01 ether);
         engine.activate();
         (uint256[] memory ids,) = _buy(alice, 2);
-        (,,, uint256 total) = engine.quoteAcquisitionPrice(2);
+        (uint256 f, uint256 sf, uint256 vf,) = engine.quoteAcquisitionPrice(2);
+        // the purchaser's VRF fee paid for the oracle request and is not refundable
+        uint256 total = (f + sf) * 2;
+        assertGt(vf, 0);
         _roll(engine.selectionTimeoutBlocks() + 1);
         assertEq(engine.processAcquisitions(10), 2);
         assertEq(uint256(_status(ids[0])), uint256(DrawEngine.AcquisitionStatus.Expired));
@@ -194,7 +198,8 @@ contract EngineTest is Test {
         engine.activate();
         nft.setBlocked(alice, true);
         (uint256[] memory ids, uint256 vrfId) = _buy(alice, 1);
-        (,,, uint256 total) = engine.quoteAcquisitionPrice(1);
+        (uint256 f, uint256 sf,,) = engine.quoteAcquisitionPrice(1);
+        uint256 total = f + sf;
         _roll(3);
         vrf.fulfill(vrfId, 1);
         engine.processAcquisitions(1);
@@ -310,7 +315,9 @@ contract EngineTest is Test {
         vm.expectRevert(DrawEngine.InvalidConfig.selector);
         engine.setFeePolicy(201, 5_000, 1_000);
         vm.expectRevert(DrawEngine.InvalidConfig.selector);
-        engine.setVrfFeePerBatch(0.002 ether);
+        DrawEngine.VrfFeeConfig memory vc = LaunchParams.vrfFee();
+        vc.bufferBps = 5_001;
+        engine.setVrfFeeConfig(vc);
         DrawEngine.Limits memory l = LaunchParams.limits();
         l.inventoryChangeCooldown = 2 hours;
         vm.expectRevert(DrawEngine.InvalidConfig.selector);

@@ -29,16 +29,16 @@ contract ReferenceBoardTest is GameFixture {
     }
 
     function test_referenceBoard_notionals() public view {
-        assertEq(controller.rowNotional(0), 0.0118 ether);
-        assertEq(controller.rowNotional(1), 0.0236 ether);
-        assertEq(controller.rowNotional(2), 0.0354 ether);
-        assertEq(controller.rowNotional(3), 0.055 ether);
-        assertEq(controller.rowNotional(4), 0.109 ether);
+        assertEq(controller.rowNotional(0), 0.01165 ether);
+        assertEq(controller.rowNotional(1), 0.0233 ether);
+        assertEq(controller.rowNotional(2), 0.03495 ether);
+        assertEq(controller.rowNotional(3), 0.05425 ether);
+        assertEq(controller.rowNotional(4), 0.1075 ether);
     }
 
     function test_referenceBoard_priceReconcilesToTheWei() public {
         _openAndActivate();
-        uint256[5] memory price = [uint256(0.0118 ether), 0.0236 ether, 0.0354 ether, 0.055 ether, 0.109 ether];
+        uint256[5] memory price = [uint256(0.01165 ether), 0.0233 ether, 0.03495 ether, 0.05425 ether, 0.1075 ether];
         uint256[5] memory count = [uint256(62), 26, 7, 4, 1];
         uint256 sumW;
         uint256 sumWP;
@@ -54,11 +54,13 @@ contract ReferenceBoardTest is GameFixture {
         (uint256 qFee, uint256 sFee, uint256 vrfFee, uint256 total) = engine.quoteAcquisitionPrice(1);
         assertEq(qFee, fee);
         assertEq(sFee, fee / 100, "1% settlement fee on the full fee");
-        assertEq(vrfFee, 0);
-        assertEq(total, fee + fee / 100);
-        // reference numbers from the brief
-        assertApproxEqAbs(fee, 0.015070 ether, 0.0000005 ether, "approx 0.015070");
-        assertApproxEqAbs(total, 0.015221 ether, 0.0000005 ether, "approx 0.015221");
+        assertEq(vrfFee, engine.vrfFeeFor(1), "VRF fee quoted separately");
+        assertGt(vrfFee, 0);
+        assertEq(total, fee + fee / 100 + vrfFee);
+        // exact reference numbers (premium 4 %, maintenance 0.5 %, feed 2 %)
+        assertEq(fee, 14_878_540_357_338_322, "acquisition fee");
+        assertEq(sFee, 148_785_403_573_383, "settlement fee");
+        assertEq(fee + sFee, 15_027_325_760_911_705, "reference price before VRF");
 
         // expected backing E[b] = Σ n b / p / Σ n / p
         uint256[5] memory b = [uint256(0.01 ether), 0.02 ether, 0.03 ether, 0.05 ether, 0.1 ether];
@@ -67,14 +69,17 @@ contract ReferenceBoardTest is GameFixture {
             num += count[r] * (1e36 / price[r]) * b[r];
         }
         uint256 eb = num / sumW;
-        assertApproxEqAbs(eb, 0.012819 ether, 0.0000005 ether, "expected backing");
+        assertEq(eb, 12_819_637_956_291_283, "expected backing");
+        // ordinary RTP before VRF: 85.31 %
+        assertEq(eb * 10_000 / (fee + sFee), 8530);
         console2.log("acquisition fee (wei)", fee);
         console2.log("settlement fee (wei)", sFee);
         console2.log("player payment (wei)", total);
         console2.log("expected backing (wei)", eb);
-        console2.log("return on payment (bps)", eb * 10_000 / total);
+        console2.log("return on fee + settlement (bps)", eb * 10_000 / (fee + sFee));
         (,,, uint256 t10) = engine.quoteAcquisitionPrice(10);
-        assertEq(t10, 10 * (fee + fee / 100));
+        assertEq(t10, 10 * (fee + fee / 100) + engine.vrfFeeFor(10));
+        assertLt(engine.vrfFeeFor(10), 10 * engine.vrfFeeFor(1), "batch shares VRF overhead");
     }
 
     function test_singlePull_endToEnd() public {
@@ -92,8 +97,8 @@ contract ReferenceBoardTest is GameFixture {
 
         // settlement fee split
         assertEq(engine.feeCreditOf(referrer), sfee / 2);
-        assertEq(engine.feeCreditOf(tokenWorks), sfee / 10);
-        assertEq(engine.feeCreditOf(dev), sfee - sfee / 2 - sfee / 10);
+        assertEq(engine.feeCreditOf(tokenWorks), sfee / 4);
+        assertEq(engine.feeCreditOf(dev), sfee - sfee / 2 - sfee / 4);
         assertEq(engine.proceedsOf(address(controller)), fee);
 
         _settleAll();
@@ -118,7 +123,7 @@ contract ReferenceBoardTest is GameFixture {
         (, uint256 vrfId) = _pullRef(alice, alice, 1);
         _fulfill(vrfId, 7);
         assertEq(engine.feeCreditOf(alice), 0);
-        assertEq(engine.feeCreditOf(dev), sfee - sfee / 10);
+        assertEq(engine.feeCreditOf(dev), sfee - sfee / 4);
     }
 }
 

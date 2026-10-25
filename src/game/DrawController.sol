@@ -11,7 +11,6 @@ import {Denominations} from "shapes/lib/Denominations.sol";
 import {IShapePacks} from "draw-packs/interfaces/IShapePacks.sol";
 import {PricingLib} from "./PricingLib.sol";
 import {DrawEngine} from "../engine/DrawEngine.sol";
-import {IVRFCoordinatorV2Plus} from "../vendor/chainlink/IVRFCoordinatorV2Plus.sol";
 
 interface GrailVaultLike {
     function fundGrail() external payable;
@@ -35,8 +34,8 @@ interface GrailVaultLike {
 ///      listed. Ordinary NAV = `cash + backing + receivable`.
 ///
 ///      Invariants (test/invariant): I1 `balance >= cash + maintenance`; I2 `backing` equals the
-///      summed value of ordinary items held or listed; I3 maintenance pays only keeper refunds and
-///      VRF subscription funding. GRAILs live in `GrailVault`, a separate engine supplier.
+///      summed value of ordinary items held or listed; I3 maintenance pays only keeper refunds (VRF
+///      is purchaser-funded in the engine). GRAILs live in `GrailVault`, a separate engine supplier.
 contract DrawController is ReentrancyGuard {
     using SafeCastLib for uint256;
 
@@ -120,8 +119,8 @@ contract DrawController is ReentrancyGuard {
     /// @notice Recipient of realised surplus (the buyback) and the time from which release is allowed.
     address public surplusSink;
     uint64 public surplusReleaseStart;
-    /// @notice Subscription balance the maintenance bucket keeps the VRF subscription topped up to.
-    uint256 public vrfTargetBalance;
+    /// @notice Operating reserve: before surplus leaves, it first tops maintenance up to this level.
+    uint256 public maintenanceFloor;
 
     // ------------------------------------------------------------------ registry
 
@@ -212,7 +211,7 @@ contract DrawController is ReentrancyGuard {
         uint256 bandBps;
         uint256 tipWei;
         uint256 capitalTarget;
-        uint256 vrfTargetBalance;
+        uint256 maintenanceFloor;
         address grailVault;
     }
 
@@ -232,7 +231,7 @@ contract DrawController is ReentrancyGuard {
         _setReplacement(p.surpriseBps, p.restoreK, p.bandBps);
         _setTip(p.tipWei);
         capitalTarget = p.capitalTarget;
-        vrfTargetBalance = p.vrfTargetBalance;
+        maintenanceFloor = p.maintenanceFloor;
         grailVault = GrailVaultLike(p.grailVault);
         IERC721(p.shapes).setApprovalForAll(p.engine, true);
         IERC721(p.drawPacks).setApprovalForAll(p.engine, true);
@@ -295,21 +294,8 @@ contract DrawController is ReentrancyGuard {
         if (listed != 0) _refundKeeper(gasStart);
     }
 
-    /// @notice Tops the VRF subscription up from maintenance to `vrfTargetBalance`. Anyone.
-    function topUpVrf() external nonReentrant returns (uint256 amount) {
-        IVRFCoordinatorV2Plus coordinator = engine.vrfCoordinator();
-        uint256 subId = engine.vrfSubscriptionId();
-        (, uint96 nativeBalance,,,) = coordinator.getSubscription(subId);
-        if (nativeBalance >= vrfTargetBalance) return 0;
-        amount = vrfTargetBalance - nativeBalance;
-        if (amount > maintenance) amount = maintenance;
-        if (amount == 0) return 0;
-        maintenance -= amount;
-        coordinator.fundSubscriptionWithNative{value: amount}(subId);
-        emit VrfFunded(amount);
-    }
-
-    /// @notice Sends realised surplus, ordinary NAV above `capitalTarget`, to `surplusSink` from cash.
+    /// @notice Sends realised surplus, ordinary NAV above `capitalTarget`, to `surplusSink` from cash,
+    ///         after topping maintenance up to `maintenanceFloor`.
     ///         Requires the books level with the engine, an empty replacement queue and a full
     ///         board, so released ETH is never needed for restocking. Anyone, from `surplusReleaseStart`.
     function releaseSurplus() external nonReentrant returns (uint256 amount) {
@@ -321,6 +307,14 @@ contract DrawController is ReentrancyGuard {
         amount = releasableSurplus();
         if (amount == 0) revert NothingToRelease();
         cash -= amount;
+        // operating reserve first: top maintenance up to its floor (a transfer, not earnings)
+        if (maintenance < maintenanceFloor) {
+            uint256 top = maintenanceFloor - maintenance;
+            if (top > amount) top = amount;
+            maintenance += top;
+            amount -= top;
+            if (amount == 0) return 0;
+        }
         totalSurplusReleased += amount;
         emit SurplusReleased(surplusSink, amount);
         SafeTransferLib.safeTransferETH(surplusSink, amount);
@@ -843,9 +837,9 @@ contract DrawController is ReentrancyGuard {
         _setTip(tip);
     }
 
-    function setTargets(uint256 capital, uint256 vrfBalance) external onlyGovernance {
+    function setTargets(uint256 capital, uint256 maintenanceFloor_) external onlyGovernance {
         capitalTarget = capital;
-        vrfTargetBalance = vrfBalance;
+        maintenanceFloor = maintenanceFloor_;
     }
 
     function setSurplusSink(address sink, uint64 releaseStart) external onlyGovernance {

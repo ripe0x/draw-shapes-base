@@ -31,7 +31,6 @@ for (;;) {
   if (await pub.readContract({ address: dep.grailVault, abi: abis.vault, functionName: "stepDue" })) await call(dep.grailVault, abis.vault, "step");
   if (tick % 60 === 0) {
     await call(dep.hook, abis.hook, "distribute");
-    await call(dep.controller, abis.controller, "topUpVrf");
   }
   tick++;
   await new Promise((r) => setTimeout(r, 15_000));

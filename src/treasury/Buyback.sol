@@ -31,7 +31,9 @@ interface IBurnableToken {
 ///         Permissionless and rate-limited: at most `maxPerCall` ETH per call, one call per
 ///         `minInterval`, and each buy stops at `maxImpactBps` of price movement. The caller earns
 ///         `bountyBps` of the ETH actually spent. Swaps are exempt from the hook fee (set on the hook).
-/// @dev Slicing and the impact cap bound sandwich losses to roughly one slice's impact; an attacker
+/// @dev The bounty is the incentive for third-party bots: `bountyBps` of the ETH spent, capped at
+///      `maxBounty`; buys below `minSpend` revert, so dust or impact-starved calls cannot farm it.
+///      Slicing and the impact cap bound sandwich losses to roughly one slice's impact; an attacker
 ///      also pays the 2 % hook fee on both legs of a sandwich. The contract holds no ENGINE after a
 ///      call and can send ETH nowhere but the pool and the caller's bounty.
 contract Buyback is IUnlockCallback, ReentrancyGuard {
@@ -52,6 +54,9 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
     uint256 public minInterval;
     uint16 public maxImpactBps;
     uint16 public bountyBps;
+    /// @notice Smallest buy that may run (prevents bounty farming with dust) and the bounty ceiling.
+    uint256 public minSpend;
+    uint256 public maxBounty;
     uint256 public lastBuyAt;
 
     uint256 public totalEthSpent;
@@ -69,6 +74,7 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
     error NotGuardian();
     error InvalidConfig();
     error NotPoolManager();
+    error BelowMinimum();
 
     constructor(
         IPoolManager manager,
@@ -81,7 +87,9 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
         uint256 maxPerCall_,
         uint256 minInterval_,
         uint16 maxImpactBps_,
-        uint16 bountyBps_
+        uint16 bountyBps_,
+        uint256 minSpend_,
+        uint256 maxBounty_
     ) {
         poolManager = manager;
         token = IBurnableToken(token_);
@@ -91,6 +99,7 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
         governance = governance_;
         guardian = guardian_;
         _set(maxPerCall_, minInterval_, maxImpactBps_, bountyBps_);
+        _setLimits(minSpend_, maxBounty_);
     }
 
     receive() external payable {
@@ -112,6 +121,7 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
         if (available == 0) revert NothingToSpend();
         uint256 slice = available < maxPerCall ? available : maxPerCall;
         uint256 spend = slice - slice * bountyBps / BPS;
+        if (spend < minSpend) revert BelowMinimum();
         lastBuyAt = block.timestamp;
 
         PoolKey memory key = keySource.poolKey();
@@ -120,9 +130,11 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
         uint160 limit = uint160(FP.fullMulDiv(price, FP.sqrt((BPS - maxImpactBps) * 1e18), FP.sqrt(BPS * 1e18)));
         bytes memory r = poolManager.unlock(abi.encode(key, spend, limit));
         (uint256 ethIn, uint256 out) = abi.decode(r, (uint256, uint256));
+        if (ethIn < minSpend) revert BelowMinimum();
         burned = out;
         token.burn(out);
         uint256 bounty = ethIn * bountyBps / BPS;
+        if (bounty > maxBounty) bounty = maxBounty;
         totalEthSpent += ethIn;
         totalBurned += out;
         if (bounty != 0) SafeTransferLib.forceSafeTransferETH(msg.sender, bounty);
@@ -151,6 +163,18 @@ contract Buyback is IUnlockCallback, ReentrancyGuard {
         if (msg.sender != governance) revert NotGovernance();
         emit ParamSet(msg.sig);
         _set(maxPerCall_, minInterval_, maxImpactBps_, bountyBps_);
+    }
+
+    function setLimits(uint256 minSpend_, uint256 maxBounty_) external {
+        if (msg.sender != governance) revert NotGovernance();
+        emit ParamSet(msg.sig);
+        _setLimits(minSpend_, maxBounty_);
+    }
+
+    function _setLimits(uint256 minSpend_, uint256 maxBounty_) internal {
+        if (minSpend_ > maxPerCall || maxBounty_ > 0.001 ether) revert InvalidConfig();
+        minSpend = minSpend_;
+        maxBounty = maxBounty_;
     }
 
     function _set(uint256 maxPerCall_, uint256 minInterval_, uint16 maxImpactBps_, uint16 bountyBps_) internal {

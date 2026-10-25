@@ -116,6 +116,7 @@ abstract contract Deployer is Script {
             me,
             c.guardian,
             LaunchParams.vrf(c.vrfCoordinator, c.vrfSubscriptionId, c.vrfKeyHash),
+            LaunchParams.vrfFee(),
             LaunchParams.limits(),
             LaunchParams.fees(c.tokenWorks, c.dev)
         );
@@ -181,7 +182,9 @@ abstract contract Deployer is Script {
             0.05 ether,
             1 hours,
             300,
-            50
+            50,
+            0.005 ether, // minimum buy
+            0.00005 ether // bounty cap
         );
         s.hook.setRecipients(c.creator, address(s.treasury));
         s.hook.setFeeExempt(address(s.liquidity), true);

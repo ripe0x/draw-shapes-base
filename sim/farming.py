@@ -10,7 +10,8 @@ Model (all inputs are assumptions, not forecasts):
   cost: pulls_d = realised_ETH(epoch d) / (loss_per_pull * (1 + required_margin)).
   The loss per pull is the reference-board payment minus expected backing plus wallet gas.
 - Per pull the game books (reference board, docs/ENGINE.md): replacement mint fees 0.001226 ETH to
-  the creator, premium 0.000385, maintenance 0.000128, GRAIL feed 0.000513, settlement fee 0.000151.
+  the creator, premium 0.000513, maintenance 0.000064, GRAIL feed 0.000256, settlement fee 0.000149
+  (premium 4 %, maintenance 0.5 %, feed 2 %; the purchaser's VRF fee goes to Chainlink).
 Writes sim/results/farming.md.
 """
 import os
@@ -18,12 +19,12 @@ from market import Pool
 
 LIQ_ETH = 2.0
 LIQ_TOKENS = 10e6
-PAYMENT = 0.015221
-EXPECTED_BACKING = 0.012819
+PAYMENT = 0.015027 + 0.0000056  # fee + settlement + VRF share of a 10-pull batch at 0.01 gwei (follow-up)
+EXPECTED_BACKING = 0.012820
 GAS_PER_PULL = 0.00002  # batched acquire + share of settle on Base; measured order 1e-6, kept conservative
 LOSS = PAYMENT - EXPECTED_BACKING + GAS_PER_PULL
-PER_PULL = {"mint_fees": 0.001226, "premium": 0.000385, "maintenance": 0.000128, "feed": 0.000513,
-            "settlement": 0.000151}
+PER_PULL = {"mint_fees": 0.001226, "premium": 0.000513, "maintenance": 0.000064, "feed": 0.000256,
+            "settlement": 0.000149}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 

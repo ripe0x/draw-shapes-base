@@ -54,6 +54,9 @@ Estimate = (callback gas + 300k verification + 42.5k) × 0.00615 gwei × 1.6. Ev
 costs < 8 % of the 0.000128 ETH maintenance allocation per pull, which funds the subscription
 (`DrawController.topUpVrf`). Launch therefore sets `vrfFeePerBatch = 0`.
 
+> Superseded by the follow-up (docs/FOLLOWUP.md): purchasers now pay a separate per-batch VRF fee
+> that funds the subscription at purchase; `topUpVrf` and `vrfFeePerBatch` were removed.
+
 ## Gas (local, warm)
 
 | Operation | Gas |

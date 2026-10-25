@@ -181,7 +181,6 @@ contract GenesisRehearsalTest is Test, Deployer {
             }
             if (day >= 1) _claimAndSell(day - 1);
             s.hook.distribute();
-            s.controller.topUpVrf();
             if (day % 4 == 3 && s.treasury.polPending() != 0) {
                 uint160 minPrice = s.liquidity.sqrtPriceX96() * 97 / 100;
                 vm.prank(keeperAddr);
@@ -252,7 +251,7 @@ contract GenesisRehearsalTest is Test, Deployer {
         }
         assertEq(fulfilled, units, "units = fulfilled acquisitions");
 
-        // player ETH: every wei paid is proceeds, settlement fees or refunds
+        // player ETH: every wei paid is proceeds, settlement fees, refunds or the VRF fee
         uint256 refunds;
         for (uint256 i; i < 3; ++i) refunds += e.acquisitionRefundCredit(farmers[i]);
         uint256 fees = e.feeCreditOf(site) + e.feeCreditOf(tw) + e.feeCreditOf(devAddr);
@@ -263,7 +262,13 @@ contract GenesisRehearsalTest is Test, Deployer {
         console2.log("token works credit", e.feeCreditOf(tw));
         console2.log("development credit", e.feeCreditOf(devAddr));
         uint256 grailProceeds = s.vault.totalProceeds() + e.proceedsOf(address(s.vault));
-        assertEq(paidIn, s.controller.totalProceedsBooked() + grailProceeds + fees + refunds, "player ETH reconciles");
+        uint256 vrfFees = e.vrfFeesCollected();
+        assertEq(
+            paidIn, s.controller.totalProceedsBooked() + grailProceeds + fees + refunds + vrfFees, "player ETH reconciles"
+        );
+        console2.log("VRF fees collected", vrfFees);
+        console2.log("VRF billed (mock)", vrf.totalBilled());
+        assertGe(vrfFees, vrf.totalBilled(), "purchaser VRF fees cover the oracle bill");
         console2.log("GRAIL capture proceeds", grailProceeds);
         assertGe(address(e).balance, e.liabilities(), "engine solvent");
 

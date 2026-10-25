@@ -52,6 +52,7 @@ contract BaseVrfForkTest is Test {
             address(this),
             makeAddr("guardian"),
             LaunchParams.vrf(COORDINATOR, subId, KEY_HASH_2_GWEI),
+            LaunchParams.vrfFee(),
             LaunchParams.limits(),
             LaunchParams.fees(makeAddr("tokenWorks"), makeAddr("dev"))
         );
@@ -102,6 +103,12 @@ contract BaseVrfForkTest is Test {
             console2.log("  settled inside callback", settledInCallback);
             console2.log("  estimated VRF charge at 0.00615 gwei (wei)", estimate);
             console2.log("  estimated VRF charge per acquisition (wei)", estimate / n);
+            // the purchaser's VRF fee, quoted at the fork's basefee, covers the estimated bill
+            uint256 quoted = engine.vrfFeeFor(n);
+            uint256 priced = block.basefee > 0.00615 gwei ? block.basefee : 0.00615 gwei;
+            console2.log("  fork basefee (wei)", block.basefee);
+            console2.log("  purchaser VRF fee quoted (wei)", quoted);
+            assertGe(quoted, billedGas * priced * 160 / 100, "VRF fee covers the bill at the fork gas price");
             engine.processAcquisitions(20);
             controller.settle(50);
         }
