@@ -163,7 +163,7 @@ contract GrailVault is ReentrancyGuard {
         if (paused) return changed;
         if (_relist()) changed = true;
         if (_mint()) changed = true;
-        if (engine.unsettledAcquisitionCount() == 0 && _reprice()) changed = true;
+        if (_reprice()) changed = true;
     }
 
     /// @notice True when `step` would change inventory or harvest.
@@ -177,7 +177,17 @@ contract GrailVault is ReentrancyGuard {
         }
         if (paused) return false;
         uint256 target = nextTarget();
-        return fund >= target + shapes.mintFee() && _items.length < MAX_GRAILS;
+        if (fund >= target + shapes.mintFee() && _items.length < MAX_GRAILS) return true;
+        uint256[] memory next = _repricePlan();
+        for (uint256 i; i < next.length; ++i) {
+            if (next[i] != 0) return true;
+        }
+        return false;
+    }
+
+    /// @notice Notionals the next `step` would set, per held GRAIL (0 = unchanged).
+    function repricePlan() external view returns (uint256[] memory) {
+        return _repricePlan();
     }
 
     function _status(uint256 listingId) internal view returns (DrawEngine.ListingStatus status) {
@@ -243,33 +253,60 @@ contract GrailVault is ReentrancyGuard {
     }
 
     function _reprice() internal returns (bool changed) {
+        uint256[] memory next = _repricePlan();
+        uint64 now_ = pulls();
+        for (uint256 i; i < next.length; ++i) {
+            if (next[i] == 0) continue;
+            GrailItem storage it = _items[i];
+            engine.updatePrice(it.listingId, next[i]);
+            it.notional = next[i];
+            it.listedAtPull = now_;
+            emit GrailListed(it.listingId, it.tokenId, it.backing, next[i]);
+            changed = true;
+        }
+    }
+
+    /// @notice Notionals `step` would set now, per held GRAIL (0 = unchanged). Empty unless the engine
+    ///         has no unsettled acquisition (weights never move under an outstanding draw) and every
+    ///         held GRAIL is active. Each GRAIL decays by `decayWeiPerPull` per processed pull since it
+    ///         was last priced, to `floorBps` of backing, and never below the notional at which the
+    ///         combined GRAIL weight would exceed `probCapBps` of the engine weight; a change under
+    ///         1 % waits (the decay keeps accruing).
+    function _repricePlan() internal view returns (uint256[] memory next) {
         uint256 n = _items.length;
+        next = new uint256[](n);
+        if (paused || n == 0 || engine.unsettledAcquisitionCount() != 0) return next;
         uint256 weight;
         for (uint256 i; i < n; ++i) {
-            if (_items[i].listingId == 0 || _status(_items[i].listingId) != DrawEngine.ListingStatus.Active) return false;
+            if (_items[i].listingId == 0 || _status(_items[i].listingId) != DrawEngine.ListingStatus.Active) {
+                return new uint256[](n);
+            }
             weight += PricingLib.weightOf(_items[i].notional);
         }
-        if (weight == 0) return false;
         uint256 total = engine.totalWeight();
         uint64 now_ = pulls();
+        uint256 cap = config.probCapBps;
         for (uint256 i; i < n; ++i) {
             GrailItem storage it = _items[i];
             uint256 old = it.notional;
-            uint256 next = PricingLib.decayedNotional(
+            uint256 target = PricingLib.decayedNotional(
                 old, config.decayWeiPerPull, now_ - it.listedAtPull, it.backing * config.floorBps / BPS
             );
-            if (next >= old || old - next < old / 100) continue;
+            if (target >= old) continue;
             uint256 oldWeight = PricingLib.weightOf(old);
-            uint256 nextWeight = PricingLib.weightOf(next);
-            uint256 newWeight = weight - oldWeight + nextWeight;
-            uint256 newTotal = total - oldWeight + nextWeight;
-            if (newWeight * BPS > newTotal * config.probCapBps) continue;
-            (weight, total) = (newWeight, newTotal);
-            engine.updatePrice(it.listingId, next);
-            it.notional = next;
-            it.listedAtPull = now_;
-            emit GrailListed(it.listingId, it.tokenId, it.backing, next);
-            changed = true;
+            // largest weight this GRAIL may take with the others unchanged:
+            // (others + w) * BPS <= cap * (rest + w)  =>  w <= (cap * rest - BPS * others) / (BPS - cap)
+            uint256 others = weight - oldWeight;
+            uint256 rest = total - oldWeight;
+            if (cap * rest <= BPS * others) continue;
+            uint256 maxWeight = cap >= BPS ? type(uint256).max : (cap * rest - BPS * others) / (BPS - cap);
+            if (maxWeight <= oldWeight) continue;
+            uint256 capNotional = PricingLib.NUM / maxWeight + 1;
+            if (target < capNotional) target = capNotional;
+            if (target >= old || old - target < old / 100) continue;
+            uint256 nextWeight = PricingLib.weightOf(target);
+            (weight, total) = (others + nextWeight, rest + nextWeight);
+            next[i] = target;
         }
     }
 

@@ -57,8 +57,11 @@ contract Lens {
         uint256 mintFee;
         uint256 funded;
         uint256 cycleId;
-        GrailVault.GrailItem[] items;
-        uint256[] oddsPpm;
+        GrailVault.GrailItem[] items; // fully funded GRAILs held by the vault
+        uint256[] oddsPpm; // per-pull odds, nonzero only while the listing is selectable (Active)
+        uint8[] status; // DrawEngine.ListingStatus of each GRAIL's listing (0 = awaiting relist)
+        uint256[] nextNotional; // notional the next vault step sets (0 = unchanged)
+        uint256 selectable; // GRAILs a pull can draw now
     }
 
     struct GameView {
@@ -188,10 +191,17 @@ contract Lens {
         g.cycleId = v.cycleId();
         g.items = v.items();
         g.oddsPpm = new uint256[](g.items.length);
-        uint256 total = DrawEngine(payable(a.engine)).totalWeight();
+        g.status = new uint8[](g.items.length);
+        g.nextNotional = v.repricePlan();
+        DrawEngine e = DrawEngine(payable(a.engine));
+        uint256 total = e.totalWeight();
         for (uint256 i; i < g.items.length; ++i) {
-            if (total != 0 && g.items[i].listingId != 0) {
+            if (g.items[i].listingId == 0) continue;
+            (,,,,,,, DrawEngine.ListingStatus st) = e.listings(g.items[i].listingId);
+            g.status[i] = uint8(st);
+            if (st == DrawEngine.ListingStatus.Active && total != 0) {
                 g.oddsPpm[i] = FP.fullMulDiv(1e36 / g.items[i].notional, 1e6, total);
+                ++g.selectable;
             }
         }
     }

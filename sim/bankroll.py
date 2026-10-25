@@ -24,8 +24,10 @@ FEE = 0.001
 ROWS = [  # rungs (backings), share bps
     ([0.01], 6200), ([0.01, 0.01], 2600), ([0.01, 0.01, 0.01], 700), ([0.05], 400), ([0.1], 100)]
 BOARD = 100
-MARKUP = 1 + (400 + 50 + 200) / BPS  # premium 4 %, maintenance 0.5 %, GRAIL feed 2 % (follow-up)
-SPLIT = (400, 50, 200)
+# premium / maintenance / GRAIL feed bps; BANKROLL_SPLIT="350,50,300" runs the alternative and writes
+# results/bankroll-<split>.md
+SPLIT = tuple(int(x) for x in os.environ.get("BANKROLL_SPLIT", "400,50,200").split(","))
+MARKUP = 1 + sum(SPLIT) / BPS
 SURPRISE_BPS, RESTORE_K, BAND_BPS = 200, 8, 3000
 LADDER = [0.5, 1.0, 5.0]
 GRAIL_LIST, GRAIL_FLOOR, GRAIL_DECAY, PROB_CAP = 0.8, 0.5, 0.00002, 0.05
@@ -296,7 +298,7 @@ def main():
             "p_uncovered", "backstop_p99", "max_queue_max", "unfunded_max", "min_cash_p01", "min_listed_min",
             "nav_p01", "nav_p50", "nav_p99", "premium_p50", "feed_p50", "grails_p50", "grail_wins_p50", "fee_p50",
             "rtp_p50"]
-    out = ["# Bankroll and restock stress (14 days)\n",
+    out = [f"# Bankroll and restock stress (14 days), premium / maintenance / feed = {SPLIT} bps\n",
            "Ordinary pool 2.2 ETH (1.79 ETH spent on the opening board, 0.41 ETH liquid) unless stated. Keeper settles every",
            "`keeper` minutes; requests arrive in batches of 10 (Poisson), priced at request time, settled in order against",
            "the live board (captured items leave at once, replacements wait for the keeper). No ENGINE income reaches the",
@@ -309,7 +311,8 @@ def main():
            "| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
     for r in rows:
         out.append("| " + " | ".join(f"{r[c]:.4f}" if isinstance(r[c], float) else str(r[c]) for c in cols) + " |")
-    path = os.path.join(os.path.dirname(__file__), "results", "bankroll.md")
+    name = "bankroll.md" if SPLIT == (400, 50, 200) else f"bankroll-{'-'.join(map(str, SPLIT))}.md"
+    path = os.path.join(os.path.dirname(__file__), "results", name)
     open(path, "w").write("\n".join(out) + "\n")
     print("\n".join(out))
 

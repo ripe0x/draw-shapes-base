@@ -1,5 +1,6 @@
-// Minimal keeper: settles, steps the GRAIL vault, distributes hook fees and tops up VRF.
-// All calls are permissionless. Usage: RPC=... KEEPER_KEY=0x... node scripts/keeper.mjs
+// Minimal keeper: settles, steps the GRAIL vault when stepDue() (including pending GRAIL decay) and
+// distributes hook fees. VRF is funded by purchasers. All calls are permissionless.
+// Usage: RPC=... KEEPER_KEY=0x... node scripts/keeper.mjs
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { readFileSync } from "node:fs";

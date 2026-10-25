@@ -44,6 +44,9 @@ function savePulls(account: string, ids: bigint[]) {
   }
 }
 
+const grailStatus = (st?: number) =>
+  st === 1 ? "Selectable" : st === 5 ? "Listed, selectable from the next pull" : st === 0 || st === undefined ? "Awaiting relist" : "Settling";
+
 export default function App() {
   const [account, setAccount] = useState<Address>();
   const [wallet, setWallet] = useState<WalletClient>();
@@ -214,19 +217,32 @@ export default function App() {
         <p className="big">{eth(grail?.funded, 4)} / {eth(grailNeed, 3)} ETH funded ({grailPct.toFixed(1)} %)</p>
         {grail?.items?.length > 0 && (
           <table>
-            <thead><tr><th>Live GRAIL</th><th>Backing</th><th>Notional</th><th>Odds per pull</th></tr></thead>
+            <thead><tr><th>Funded GRAIL</th><th>Backing</th><th>Notional</th><th>Status</th><th>Odds per pull</th></tr></thead>
             <tbody>
               {grail.items.map((it: any, i: number) => (
-                <tr key={i}><td>Shape #{String(it.tokenId)}</td><td>{eth(it.backing, 3)} ETH</td><td>{eth(it.notional, 4)} ETH</td><td>{grail.oddsPpm[i] ? `1 in ${Math.round(1e6 / Number(grail.oddsPpm[i])).toLocaleString()}` : "–"}</td></tr>
+                <tr key={i}>
+                  <td>Shape #{String(it.tokenId)}</td>
+                  <td>{eth(it.backing, 3)} ETH</td>
+                  <td>
+                    {eth(it.notional, 4)} ETH
+                    {grail.nextNotional?.[i] > 0n && <span className="note"> → {eth(grail.nextNotional[i], 4)} at next step</span>}
+                  </td>
+                  <td>{grailStatus(grail.status?.[i])}</td>
+                  <td>{grail.oddsPpm[i] ? `1 in ${Math.round(1e6 / Number(grail.oddsPpm[i])).toLocaleString()}` : "–"}</td>
+                </tr>
               ))}
             </tbody>
           </table>
         )}
+        <p className="note">
+          {String(grail?.selectable ?? 0n)} selectable now · {grail?.items?.length ?? 0} fully funded · {eth(grail?.funded, 4)} ETH accumulating toward the next.
+          A GRAIL's notional falls with every pull until its odds reach the 5 % cap or its notional reaches half its backing.
+        </p>
       </section>
 
       <section className="card">
         <h2>The board</h2>
-        <p className="note">Backing is the ETH inside the prize. Notional is its listing value: backing × 1.08 plus the replacement mint fee of each Shape in it.</p>
+        <p className="note">Backing is the ETH inside the prize. Notional is its listing value: backing plus the game's markup (premium, maintenance and GRAIL feed) plus the replacement mint fee of each Shape in it.</p>
         <table>
           <thead><tr><th>Prize</th><th>Backing</th><th>Notional</th><th>Listed / target</th><th>Odds per pull</th></tr></thead>
           <tbody>
