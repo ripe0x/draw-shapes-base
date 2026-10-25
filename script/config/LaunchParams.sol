@@ -18,6 +18,12 @@ library LaunchParams {
     uint256 internal constant OPERATIONS = 0.3 ether;
     uint256 internal constant TREASURY_RESERVE = 0.5 ether;
 
+    // ENGINE supply (docs/MARKET.md): 10M opening liquidity + 25M genesis farm, nothing else.
+    uint256 internal constant LIQUIDITY_TOKENS = 10_000_000 ether;
+    uint256 internal constant FARM_TOKENS = 25_000_000 ether;
+    uint16 internal constant HOOK_FEE_BPS = 200;
+    uint16 internal constant OPERATOR_FEE_BPS = 25;
+
     function limits() internal pure returns (DrawEngine.Limits memory) {
         return DrawEngine.Limits({
             maxAcquisitionsPerTx: 20,
