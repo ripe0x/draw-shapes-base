@@ -295,12 +295,6 @@ contract DrawController is ReentrancyGuard {
         if (listed != 0) _refundKeeper(gasStart);
     }
 
-    /// @notice Books engine acquisitions already processed by others, without processing more.
-    function book(uint256 maxCount) external nonReentrant {
-        _walk(maxCount > MAX_SETTLE_ITEMS ? MAX_SETTLE_ITEMS : maxCount);
-        _harvest();
-    }
-
     /// @notice Tops the VRF subscription up from maintenance to `vrfTargetBalance`. Anyone.
     function topUpVrf() external nonReentrant returns (uint256 amount) {
         IVRFCoordinatorV2Plus coordinator = engine.vrfCoordinator();
@@ -335,7 +329,6 @@ contract DrawController is ReentrancyGuard {
     /// @notice Surplus `releaseSurplus` would send now.
     function releasableSurplus() public view returns (uint256) {
         if (receivable != 0 || _replacementQueue.length != replacementHead || _boardCount() < boardItems) return 0;
-        if (_margin < 0 || _mintLineOwed != 0) return 0;
         uint256 value = nav();
         if (value <= capitalTarget) return 0;
         uint256 surplus = value - capitalTarget;
@@ -349,15 +342,27 @@ contract DrawController is ReentrancyGuard {
         (address collection,,, uint256 tokenId,,,, DrawEngine.ListingStatus status) = engine.listings(listingId);
         if (status != DrawEngine.ListingStatus.DeliveryRefunded) revert NotRefunded();
         engine.recoverRefundedNFT(listingId);
+        if (collection != address(shapes) && collection != address(drawPacks)) return;
+        uint256 value = IERC721Value(collection).valueOf(tokenId);
         uint256 before = address(this).balance;
-        if (collection == address(shapes)) {
-            uint256 value = shapes.backingOf(tokenId);
-            shapes.redeem(tokenId);
-            _creditRedeemed(listingId, value, before);
-        } else if (collection == address(drawPacks)) {
-            uint256 value = IERC721Value(address(drawPacks)).valueOf(tokenId);
-            drawPacks.redeem(tokenId);
-            _creditRedeemed(listingId, value, before);
+        IERC721Value(collection).burn(tokenId);
+        _creditRedeemed(listingId, value, before);
+    }
+
+    /// @notice After the engine is retired, withdraws ordinary listings and redeems them into cash,
+    ///         turning unawarded prizes back into ETH of the ordinary pool. Anyone; up to 20 per call.
+    function windDown(uint256[] calldata listingIds) external nonReentrant {
+        if (!engine.retired()) revert ReleaseNotOpen();
+        Item[] memory items = new Item[](listingIds.length);
+        for (uint256 i; i < listingIds.length; ++i) {
+            items[i] = _removeListed(listingIds[i]);
+        }
+        engine.withdrawListingsTo(listingIds, address(this));
+        for (uint256 i; i < items.length; ++i) {
+            uint256 before = address(this).balance;
+            IERC721Value(items[i].collection).burn(items[i].tokenId);
+            if (address(this).balance - before != items[i].value) revert RedeemMismatch();
+            cash += items[i].value;
         }
     }
 
@@ -388,10 +393,6 @@ contract DrawController is ReentrancyGuard {
         return (_rowCount[row], _queuedByRow[row]);
     }
 
-    function heldCount() external view returns (uint256) {
-        return _held.length;
-    }
-
     function queueLength() external view returns (uint256) {
         return _replacementQueue.length - replacementHead;
     }
@@ -400,25 +401,12 @@ contract DrawController is ReentrancyGuard {
         return _listed[listingId];
     }
 
-    function margin() external view returns (int256) {
-        return _margin;
-    }
-
-    function mintLineOwed() external view returns (uint256) {
-        return _mintLineOwed;
-    }
-
     /// @notice Notional the controller assigns to one item of `row` at the current mint fee.
     function rowNotional(uint256 row) public view returns (uint256) {
         FeeSplit memory s = feeSplit;
         return PricingLib.listingPrice(
             _rowBackingWei[row], s.premiumBps, s.maintenanceBps, s.feedBps, shapes.mintFee() * _mix[row].rungs.length
         );
-    }
-
-    /// @notice Target depth of `row`: `ceil(boardItems * shareBps / 10_000)`.
-    function rowTarget(uint256 row) public view returns (uint256) {
-        return PricingLib.rowDepth(boardItems, _mix[row].shareBps);
     }
 
     // ------------------------------------------------------------------ books
@@ -855,12 +843,9 @@ contract DrawController is ReentrancyGuard {
         _setTip(tip);
     }
 
-    function setCapitalTarget(uint256 value) external onlyGovernance {
-        capitalTarget = value;
-    }
-
-    function setVrfTargetBalance(uint256 value) external onlyGovernance {
-        vrfTargetBalance = value;
+    function setTargets(uint256 capital, uint256 vrfBalance) external onlyGovernance {
+        capitalTarget = capital;
+        vrfTargetBalance = vrfBalance;
     }
 
     function setSurplusSink(address sink, uint64 releaseStart) external onlyGovernance {

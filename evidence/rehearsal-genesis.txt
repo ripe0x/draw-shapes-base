@@ -1,0 +1,24 @@
+Logs:
+  opening quote per pull (wei) 15220989398399995
+  referrer credit 110622863417042170
+  token works credit 44223435677304540
+  development credit 287388057678710510
+  GRAIL capture proceeds 15555756095941438
+  pulls accepted 2800
+  pulls fulfilled 2800
+  player ETH in 44665670034078920580
+  settlement fees (ref+TW+dev) 442234356773057220
+  creator mint fees accrued 3697000000000000000
+  operator trading fees 47410877413855712
+  treasury trading receipts 331876141896991780
+  GRAIL funded: feed 1555001575830750810
+  GRAIL funded: trading 298688527707292596
+  GRAILs minted backing 1500000000000000000
+  ordinary NAV 3140127951421483682
+  premium booked 1166251181873063722
+  POL liquidity 4497735975894596050642
+  releasable surplus after genesis (wei) 940127951421483682
+  ordinary NAV (wei) 3140127951421483682
+  ENGINE burned by first buyback 150878513310720446490640
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 2.01s (1.79s CPU time)

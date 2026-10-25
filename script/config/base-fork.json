@@ -1,0 +1,17 @@
+{
+  "_comment": "Fork dry-run only: placeholder role addresses (anvil default accounts). Never broadcast with this file.",
+  "poolManager": "0x498581fF718922c3f8e6A244956aF099B2652b2b",
+  "vrfCoordinator": "0xd5D517aBE5cF79B7e95eC98dB0f0277788aFF634",
+  "vrfKeyHash": "0x00b81b5a830cb0a4009fbd8904de511e28631e62ce5ad231373d3cdad373ccab",
+  "vrfSubscriptionId": 1,
+  "shapes": "0x0000000000000000000000000000000000000000",
+  "drawPacks": "0x0000000000000000000000000000000000000000",
+  "creator": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+  "tokenWorks": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+  "dev": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+  "adminSafe": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+  "guardian": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+  "keeper": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+  "timelockDelay": 172800,
+  "maintenanceFloat": 50000000000000000
+}

@@ -56,7 +56,7 @@ contract GameTest is GameFixture {
         assertEq(units, fulfilled);
         assertEq(shapes.balanceOf(alice) + shapes.balanceOf(bob) + packs.balanceOf(alice) + packs.balanceOf(bob), fulfilled);
         console2.log("cash", controller.cash(), "queue", controller.queueLength());
-        console2.log("held", controller.heldCount(), "listed", controller.listedCount());
+        console2.log("listed", controller.listedCount());
         assertEq(controller.listedCount(), 100, "restocked");
         _assertBooks();
     }
@@ -90,7 +90,6 @@ contract GameTest is GameFixture {
         console2.log("maintenance", controller.totalMaintenanceBooked());
         console2.log("feed to GRAIL", controller.totalFeedBooked());
         console2.log("settlement fees", fees);
-        console2.logInt(controller.margin());
         _assertBooks();
     }
 

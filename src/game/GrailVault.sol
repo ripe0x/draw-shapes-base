@@ -82,7 +82,7 @@ contract GrailVault is ReentrancyGuard {
         address governance_,
         address guardian_,
         GrailConfig memory c,
-        uint8[] memory ladder
+        uint8[] memory ladder_
     ) {
         if (shapes_ == address(0) || engine_ == address(0) || governance_ == address(0) || guardian_ == address(0)) {
             revert ConfigInvalid();
@@ -92,7 +92,7 @@ contract GrailVault is ReentrancyGuard {
         governance = governance_;
         guardian = guardian_;
         _setConfig(c);
-        _setLadder(ladder);
+        _setLadder(ladder_);
         IERC721(shapes_).setApprovalForAll(engine_, true);
     }
 
