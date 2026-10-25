@@ -129,13 +129,25 @@ abstract contract Deployer is Script {
             Shapes shapes = new Shapes{value: 0.01 ether}(LaunchParams.MINT_FEE, c.creator, address(renderer), 0);
             BaseShapeCollection collection = new BaseShapeCollection(renderer, shapes);
             shapes.setCollection(address(collection));
+            // Base copy (the token contract, its ERC-721 name and its rules are unchanged): a separate
+            // collection from Shapes on Ethereum, with its own tokens and its own ETH
+            collection.setMetadataCopy(
+                "Base Shape ",
+                "Shapes on Base are ETH-backed onchain objects, a separate collection from Shapes on Ethereum: "
+                "the same contract and rules, with independent tokens and ETH. Each Shape wraps an exact amount "
+                "of ETH on Base; redeeming it returns exactly that amount. Artwork and metadata are generated "
+                "entirely onchain.",
+                "The contract owner token of Shapes on Base. Its current holder is returned by owner() and has no "
+                "administrative authority. Ownership moves with this Shape through compose, decompose and split. "
+                "Redeeming or burning it ends contract ownership."
+            );
             s.shapes = address(shapes);
         } else {
             s.shapes = c.shapes;
         }
         if (c.drawPacks == address(0)) {
             s.drawPacks = address(
-                new ShapePacks(s.shapes, address(new BasePackRenderer(s.shapes)), c.creator, "Draw Packs", "DRAW", 2)
+                new ShapePacks(s.shapes, address(new BasePackRenderer(s.shapes)), c.creator, "Base Draw Packs", "DRAW", 2)
             );
         } else {
             s.drawPacks = c.drawPacks;
