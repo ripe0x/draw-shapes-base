@@ -1,6 +1,6 @@
 # Draw Shapes on Base — final implementation report
 
-Date: 2026-10-25. Status: integrated production candidate, **not deployed** to Base mainnet, **not
+Date: 2026-10-25. Status: integrated production candidate, **not deployed** to Base mainnet or live on Base Sepolia, **not
 audited**. All results below are from tests and simulations in this repository; simulations are
 scenario outputs under disclosed assumptions and do not demonstrate market demand.
 
@@ -39,6 +39,19 @@ Key reconciled numbers:
   fees 3.69 ETH; GRAIL funding 0.70 ETH feed + 0.31 ETH trading; two 0.5 ETH GRAILs minted; ordinary
   NAV 2.06 → 3.44 ETH; 1.24 ETH releasable after genesis (0.05 ETH of it restores maintenance first),
   bought/burned in slices. Before/after report: docs/FOLLOWUP.md.
+
+## Prelaunch completion (current state)
+
+| Area | State |
+| --- | --- |
+| Launch configuration | 3.5 / 0.5 / 3 adopted in code. Price before VRF 0.015091880 ETH, RTP 84.94 %, both asserted to the wei (`docs/LAUNCH_CONFIG.md`). Opening GRAIL: +0.501 ETH new capital recommended, not reallocated, pending approval. |
+| Fixes this round | VRF callback cold-state stipend (engine; regression under the `fork` isolate profile); deploy postflight board check; runner subscription-id precision; keeper priority fee; frontend genesis claim; GRAIL display. |
+| Tests | 95 / 95 across 21 suites with Base and Base Sepolia fork RPCs (`evidence/prelaunch-tests.txt`), plus fork suites in cold-storage mode. Browser journey 11 / 11 (`web/scripts/e2e.mjs`). Slither rerun and triaged (`evidence/slither.md`); not an audit. |
+| Base Sepolia | Runner, keystore handling and report generator ready. Full flow rehearsed on a local Base Sepolia fork (`evidence/testnet/BASE_SEPOLIA_FORK_REHEARSAL.md`). **Not executed live: the testnet deployer needs 2.0 Base Sepolia ETH** (`evidence/testnet/BASE_SEPOLIA.md`). |
+| Keepers | Daemon with retries, idempotency, alerts, webhook and `/health`; systemd and Docker configuration; two keepers exercised concurrently on the fork. |
+| Frontend | Network handling, accurate quotes and VRF fee, selectable / funded / accumulating GRAIL states, player-facing statuses, claims, buyback activity, mobile layout. |
+| Launch materials | `docs/launch/`: landing copy, FAQ, announcement, prelaunch update, thread, Token Works heads-up. Drafts, not published or sent. |
+| Mainnet preparation | `docs/MAINNET_DEPLOYMENT.md`, `web/scripts/mainnet-preflight.mjs` (currently 10 / 20; fails on every placeholder), Safe Transaction Builder generator, ownership checklist. |
 
 ## GRAIL availability and launch economics (docs/GRAIL_AVAILABILITY.md)
 
