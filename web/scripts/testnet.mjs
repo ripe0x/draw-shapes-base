@@ -216,6 +216,27 @@ if (SMALL_GRAIL) {
   });
 }
 
+// Base Sepolia produces a block every 0.2 s (Base mainnet: 2 s), so the 1,800-block word deadline is
+// ~6 minutes there and the first live word (latency 362 s) arrived just after it. Testnet-only: the
+// engine's maximum 7,200-block window (~24 min) through the timelock, once the engine is idle.
+await step("testnet-vrf-window", async () => {
+  const { encodeFunctionData } = await import("viem");
+  const before = await rd(A.lens, ops.lens, "game");
+  while ((await rd(A.engine, ops.engine, "unsettledAcquisitionCount")) > 0n) {
+    await tx("processAcquisitions (late word: refund)", deployer, { address: A.engine, abi: ops.engine, functionName: "processAcquisitions", args: [20n] });
+  }
+  const v = {
+    coordinator: base.vrfCoordinator, subscriptionId: BigInt(vrf.subId), keyHash: base.vrfKeyHash,
+    requestConfirmations: Number(await rd(A.engine, ops.engine, "requestConfirmations")),
+    callbackGasBase: Number(await rd(A.engine, ops.engine, "callbackGasBase")),
+    callbackGasPerAcquisition: Number(await rd(A.engine, ops.engine, "callbackGasPerAcquisition")),
+    selectionTimeoutBlocks: 7_200n,
+  };
+  const r = await timelock("engine.setVrfConfig(word deadline 7,200 blocks, testnet only)", [A.engine], [0n],
+    [encodeFunctionData({ abi: ops.engine, functionName: "setVrfConfig", args: [v] })], keccak256(toHex("draw-shapes/testnet-vrf-window")));
+  return { ...r, selectionTimeoutBlocks: await rd(A.engine, ops.engine, "selectionTimeoutBlocks"), refundedLateWords: before.unsettled };
+});
+
 // ------------------------------------------------------------------ helpers for pulls
 await step("fund-accounts", async () => {
   // the player gets what the deployer can spare (prizes are redeemed between scenarios to recycle ETH)
@@ -237,7 +258,7 @@ async function pull(label, count, { ref = referrer.address, negSlippage = 1000n,
   const ids = r.logs.map((l) => { try { return decodeEventLog({ abi: ops.engine, ...l }); } catch { return null; } })
     .filter((x) => x?.eventName === "AcquisitionRequested").map((x) => x.args.requestId);
   const requestId = await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]]);
-  return { ids, requestId, quote: { fee, sfee, vrfFee, total }, requestTx: r.transactionHash, requestGas: r.gasUsed, subBefore: subBefore[1] };
+  return { ids, requestId, quote: { fee, sfee, vrfFee, total }, requestTx: r.transactionHash, requestGas: r.gasUsed, requestBlock: Number(r.blockNumber), subBefore: subBefore[1] };
 }
 async function awaitFulfilment(p) {
   let fulfil = null;
@@ -251,18 +272,28 @@ async function awaitFulfilment(p) {
     const r = await pub.waitForTransactionReceipt({ hash });
     fulfil = { hash, gasUsed: r.gasUsed, simulated: true, payment: null, latencySec: 0 };
   } else {
+    // poll the engine (the word is cached even when processing waits), then find the coordinator's
+    // fulfilment in 200-block log windows (public RPCs cap eth_getLogs ranges; Base Sepolia has 0.2 s blocks)
     const t0 = Date.now();
+    for (let i = 0; i < 360; i++) {
+      const st = Number((await rd(A.engine, ops.engine, "acquisitions", [p.ids[0]]))[4]);
+      if (st !== 1) break;
+      await new Promise((r) => setTimeout(r, 5_000));
+    }
+    const latencyWallSec = (Date.now() - t0) / 1000;
     const ev = coordinatorAbi.find((x) => x.name === "RandomWordsFulfilled");
-    const from = (await pub.getBlockNumber()) - 5n;
-    for (let i = 0; i < 120 && !fulfil; i++) {
-      const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: p.requestId }, fromBlock: from }).catch(() => []);
+    const head = await pub.getBlockNumber();
+    for (let from = BigInt(p.requestBlock); from <= head && !fulfil; from += 200n) {
+      const to = from + 199n > head ? head : from + 199n;
+      const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: p.requestId }, fromBlock: from, toBlock: to });
       if (logs.length) {
         const l = logs[0];
-        const r = await pub.getTransactionReceipt({ hash: l.transactionHash });
-        fulfil = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice, latencySec: (Date.now() - t0) / 1000 };
-      } else await new Promise((r) => setTimeout(r, 5_000));
+        const [r, b, rb] = await Promise.all([pub.getTransactionReceipt({ hash: l.transactionHash }), pub.getBlock({ blockNumber: l.blockNumber }), pub.getBlock({ blockNumber: BigInt(p.requestBlock) })]);
+        fulfil = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice,
+          latencyBlocks: Number(l.blockNumber - BigInt(p.requestBlock)), latencySec: Number(b.timestamp - rb.timestamp), latencyWallSec };
+      }
     }
-    if (!fulfil) throw new Error(`no VRF fulfilment for request ${p.requestId} within 10 min`);
+    if (!fulfil) throw new Error(`no VRF fulfilment for request ${p.requestId} within 30 min`);
   }
   state.txs.push({ label: `vrf fulfilment ${p.requestId}${FORK ? " (fork: coordinator impersonated)" : ""}`, ...fulfil });
   const statuses = [];

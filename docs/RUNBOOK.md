@@ -92,6 +92,21 @@ Alerts: engine `unsettledAcquisitionCount` > 100 or head pending > 10 min; contr
 no `settle` transaction for 15 min; `cash` < 0.15 ETH; VRF subscription < 0.01 ETH; any
 `AcquisitionRefundedSlippage` spike; `HarvestShortfall` event; `GrailVault.stepDue()` true for > 15 min.
 
+### Block time and the VRF word deadline
+
+The engine's word deadline is counted in blocks: `selectionTimeoutBlocks` 1,800, which is 1 h at Base
+mainnet's 2 s blocks (engine maximum 7,200). Base Sepolia already produces blocks every 0.2 s, where 1,800 blocks is
+6 minutes. The first live Sepolia word took 362 s and arrived just after the deadline, so that pull was refunded.
+
+If Base mainnet's block time changes, governance must reset the window to about 1 h of blocks, within the
+7,200 maximum, through `DrawEngine.setVrfConfig`. That call needs the engine idle:
+1. The guardian pauses acquisitions.
+2. Keepers settle until `unsettledAcquisitionCount == 0`.
+3. The timelock executes the new window.
+4. Unpause.
+
+`mainnet-preflight.mjs` checks the block time before deployment.
+
 ### Keeper outage: what happens and how to recover (sim/results/grail-outage.md, KeeperOutage.t.sol)
 
 Pulls keep settling inside the VRF callback during an outage; only booking, restocking and GRAIL

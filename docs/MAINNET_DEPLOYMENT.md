@@ -45,6 +45,7 @@ The preflight checks:
 - that the admin Safe, guardian and keeper are distinct;
 - the VRF subscription: exists, is owned by the admin Safe, and holds at least 0.02 ETH;
 - the key hash and the coordinator gas limit;
+- the block time (the 1,800-block VRF word deadline assumes 2 s blocks);
 - the 48 h delay;
 - the deployer balance.
 

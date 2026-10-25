@@ -59,6 +59,15 @@ check("VRF key hash registered on the coordinator", kh[0] === true, cfg.vrfKeyHa
 const conf = await pub.readContract({ address: cfg.vrfCoordinator, abi: coordinatorAbi, functionName: "s_config" });
 check("coordinator max callback gas ≥ 2.5M", conf[1] >= 2_500_000);
 check("timelock delay is 48 h", Number(cfg.timelockDelay) === 172_800, String(cfg.timelockDelay));
+// the VRF word deadline is counted in blocks (LaunchParams selectionTimeoutBlocks 1,800 = 1 h at 2 s blocks);
+// Base Sepolia already runs 0.2 s blocks, where 1,800 blocks is only 6 minutes
+{
+  const head = await pub.getBlockNumber();
+  const [b1, b0] = await Promise.all([pub.getBlock({ blockNumber: head }), pub.getBlock({ blockNumber: head - 3600n })]);
+  const blockTime = Number(b1.timestamp - b0.timestamp) / 3600;
+  check("block time is ~2 s, so the 1,800-block VRF word deadline is ~1 h", blockTime > 1.5 && blockTime < 2.5,
+    `${blockTime.toFixed(2)} s/block -> deadline ${(1800 * blockTime / 60).toFixed(0)} min; otherwise set selectionTimeoutBlocks (max 7,200) in LaunchParams.vrf`);
+}
 if (process.env.DEPLOYER) {
   const bal = await pub.getBalance({ address: process.env.DEPLOYER });
   const need = parseEther("5.01") + BigInt(cfg.maintenanceFloat ?? 0) + parseEther("0.02");

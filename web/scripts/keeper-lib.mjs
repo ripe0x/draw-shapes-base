@@ -223,7 +223,12 @@ export async function refundWindow(ctx, blocks = 1_800n) {
   const from = to > blocks ? to - blocks : 0n;
   const ev = ops.engine.find((x) => x.type === "event" && x.name === "AcquisitionProcessed");
   if (!ev) return;
-  const logs = await pub.getLogs({ address: dep.engine, event: ev, fromBlock: from, toBlock: to }).catch(() => []);
+  // public RPCs cap eth_getLogs ranges (Base Sepolia: 200 blocks), so scan in 200-block windows
+  const logs = [];
+  for (let f = from; f <= to; f += 200n) {
+    const t = f + 199n > to ? to : f + 199n;
+    logs.push(...(await pub.getLogs({ address: dep.engine, event: ev, fromBlock: f, toBlock: t }).catch(() => [])));
+  }
   let refunded = 0;
   // AcquisitionStatus: 3 Expired, 4 Refunded (slippage / empty board), 8 DeliveryRefunded
   for (const l of logs) if ([3, 4, 8].includes(Number(l.args.status))) refunded++;

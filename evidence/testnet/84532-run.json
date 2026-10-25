@@ -312,6 +312,45 @@
       "effectiveGasPrice": "6000000",
       "costWei": "2887734000000",
       "valueWei": "15938094099039374"
+    },
+    {
+      "label": "processAcquisitions (late word: refund)",
+      "hash": "0xc219318207e963d63d461e78da7a12930f3423042403aca7bd9e3ce5d8685c80",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50129113,
+      "status": "success",
+      "gasUsed": "103799",
+      "effectiveGasPrice": "6000000",
+      "costWei": "622794000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "timelock.scheduleBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only))",
+      "hash": "0xae6dd00afa17a93c0586a5fe98a469c40a96feb46f3fde21bed7492f1d23277c",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50129120,
+      "status": "success",
+      "gasUsed": "62414",
+      "effectiveGasPrice": "6000000",
+      "costWei": "374484000000",
+      "valueWei": "0"
+    }
+  ],
+  "findings": [
+    {
+      "title": "First live pull: word arrived after the block deadline (Base Sepolia 0.2 s blocks)",
+      "requestTx": "0xb440a51850ad241c94982a9213d19ebc809d50b192b31053ad8bb79b093d2c5a",
+      "requestBlock": 50125294,
+      "fulfilmentTx": "0xc0e4b40bd7975aa9411409ea94d696eb0489c285517cd3cff17b156ec40b22fd",
+      "fulfilmentBlock": 50127102,
+      "latencyBlocks": 1808,
+      "latencySec": 362,
+      "oracleChargeWei": "1792339200868",
+      "fulfilmentGas": 176620,
+      "gasPriceWei": 6000000,
+      "quotedVrfFeeWei": "25125000000000",
+      "outcome": "TimedOut (word after the 1,800-block deadline), refunded fee + settlement fee; VRF fee kept (it paid the request)",
+      "cause": "Base Sepolia produces blocks every 0.2 s (Base mainnet 2 s); the 1,800-block deadline is ~6 min there. Testnet window raised to 7,200 blocks through the timelock."
     }
   ]
 }
