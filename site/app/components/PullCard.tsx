@@ -12,7 +12,9 @@ import { referrerFor } from "../lib/referral";
 import { useDeployment } from "../Providers";
 import { Eth } from "./Measure";
 import { PullBatchView, SealedPacks } from "./PullReveal";
-import { TxLine, useTx } from "./Tx";
+import { TxButton, TxLine, useTx } from "./Tx";
+import { poolAbi } from "../lib/abi/pool";
+import { ACQ } from "../lib/pulls";
 
 /**
  * The pull card: pool state, batch size, price and the pull button, then the batch it sent in place
@@ -33,6 +35,7 @@ export function PullCard({
   const client = usePublicClient({ chainId: dep.chainId });
   const pool = usePool().data;
   const tx = useTx();
+  const finishTx = useTx();
   const pulls = usePulls();
   const [ownCount, setOwnCount] = useState(1);
   const count = countProp ?? ownCount;
@@ -74,6 +77,8 @@ export function PullCard({
   // The sent batch: its first acquisition id from the receipt's AcquisitionRequested log.
   const firstId = shown ? firstRequestId(tx.receipt.data?.logs) : undefined;
   const batch = firstId !== undefined ? pulls.data?.batches.find((b) => b.ids.includes(firstId)) : undefined;
+  // Pulls of this batch whose word arrived but whose delivery the VRF callback left for a later call.
+  const waiting = batch ? batch.ids.filter((id) => pulls.data?.cards[id.toString()]?.status === ACQ.Ready).length : 0;
 
   // A sent pull: sealed cards until its acquisitions are read, then its cards.
   if (shown || (tx.pending && !tx.error)) {
@@ -93,6 +98,23 @@ export function PullCard({
           <SealedPacks count={count} sent={!!tx.hash} />
         )}
         <TxLine tx={tx} />
+        {waiting > 0 && (
+          <div className="row-actions">
+            <TxButton
+              tx={finishTx}
+              label={`Finish delivering ${waiting} ${waiting === 1 ? "pull" : "pulls"}`}
+              outline
+              onClick={() =>
+                void finishTx.run(() => finishTx.write({ chainId: dep.chainId, address: dep.pool, abi: poolAbi, functionName: "settle", args: [20n] }))
+              }
+            />
+            <p className="vault-note">
+              The randomness has arrived; {waiting === 1 ? "this pull waits" : "these pulls wait"} for a settle call, which keepers usually make
+              within seconds. Anyone can make it, and it refunds the caller&apos;s gas.
+            </p>
+            <TxLine tx={finishTx} />
+          </div>
+        )}
         {(batch || reverted) && (
           <div className="pack-again">
             <button type="button" className="landing-pull-btn" onClick={again}>

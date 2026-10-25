@@ -140,7 +140,7 @@ function PullPack({ card, flip }: { card: Card; flip: boolean }) {
     return (
       <div className="pack pack-pending pack-drawing" aria-live="polite">
         <PackBack reel={Number(card.id % 97n)} />
-        <p className="pack-title">{status === ACQ.Fulfilled ? "Reading the item" : "Drawing"}</p>
+        <p className="pack-title">{status === ACQ.Fulfilled ? "Reading the item" : status === ACQ.Ready ? "Delivering" : "Drawing"}</p>
         <PackProgress
           steps={PULL_STEPS}
           active={stepOf(status)}
