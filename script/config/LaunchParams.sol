@@ -64,7 +64,7 @@ library LaunchParams {
             keyHash: keyHash,
             requestConfirmations: 3,
             callbackGasBase: 100_000,
-            callbackGasPerAcquisition: 650_000,
+            callbackGasPerAcquisition: 750_000, // a cold first acquisition uses ~620k inside the callback
             selectionTimeoutBlocks: 1_800
         });
     }

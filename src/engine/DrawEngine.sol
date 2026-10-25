@@ -179,7 +179,10 @@ contract DrawEngine is ReentrancyGuard {
     uint32 internal constant NUM_WORDS = 1;
     uint32 public constant MIN_CALLBACK_GAS_LIMIT = 150_000;
     uint32 public constant MAX_CALLBACK_GAS_LIMIT = 2_500_000;
-    uint256 internal constant CALLBACK_FAST_PATH_GAS = 600_000;
+    /// @dev The callback attempts an isolated single-acquisition self-call only with at least this much
+    ///      gas, and gives it everything above the return reserve (a cold first acquisition needs
+    ///      ~620k; a fixed stipend below that blocked the head until a keeper processed it).
+    uint256 internal constant CALLBACK_FAST_PATH_GAS = 400_000;
     uint256 internal constant CALLBACK_RETURN_GAS_RESERVE = 60_000;
     uint256 internal constant MIN_REQUEST_CONFIRMATIONS = 3;
     uint256 internal constant MAX_REQUEST_CONFIRMATIONS = 200;
@@ -1156,7 +1159,7 @@ contract DrawEngine is ReentrancyGuard {
             if (reservedListingsBySequence[head].length != 0) return;
             if (gasleft() < CALLBACK_FAST_PATH_GAS + CALLBACK_RETURN_GAS_RESERVE) return;
             bool ok;
-            uint256 gasStipend = CALLBACK_FAST_PATH_GAS;
+            uint256 gasStipend = gasleft() - CALLBACK_RETURN_GAS_RESERVE;
             assembly ("memory-safe") {
                 ok := call(gasStipend, address(), 0, add(callData, 0x20), mload(callData), 0, 0)
             }
