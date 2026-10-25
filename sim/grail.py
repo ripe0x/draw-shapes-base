@@ -213,7 +213,7 @@ class Sim:
         self.fulfilled += 1
         self.paid += fee * 1.01
         self.won += it["b"]
-        if self.outage_end is not None and self.t < self.outage_end:
+        if self.outage_end is not None and self.outage_start <= self.t < self.outage_end:
             self.house_outage += fee - it["b"]
         if it["grail"]:
             self.grail_wins += 1
@@ -432,6 +432,7 @@ class Sim:
         tick_s = p["keeper_min"] * 60
         out = p.get("outage")  # (start_h, hours)
         if out:
+            self.outage_start = out[0] * 3600
             self.outage_end = (out[0] + out[1]) * 3600
         t = 0.0
         while t < days * 86400:
@@ -672,8 +673,8 @@ def section_outage(seeds):
            "`rejected` = purchases that revert because the board is empty or 250 are unsettled; `refunded` = "
            "accepted pulls refunded (slippage or empty board), fee + settlement fee returned. `min ordinary active` = "
            "fewest selectable ordinary prizes (p1). `recovery` = hours after the keeper returns until the board is "
-           "full and the queue empty (p50 / max); `recovery cost` = keeper gas + tips for it (p50). "
-           "`house during outage` = expected margin booked on outage pulls (p1, negative = loss to the pool).\n",
+           "full and the queue empty (p50 / max; 0 = within the first keeper pass, a few consecutive settle transactions); `recovery cost` = keeper gas + tips for it (p50). "
+           "`house during outage` = margin (fee − backing won) on pulls settled during the outage (p1 / p50, negative = the pool lost on that window).\n",
            "| pulls/day | outage | basefee gwei | refunded | rejected | min ordinary active p1 | max queue p99 | "
            "min cash p1 | reserve used p99 | P(shortfall) | recovery h p50 / max | recovery calls / cost p50 | "
            "house during outage p1 / p50 |", "|" + "---|" * 13]
