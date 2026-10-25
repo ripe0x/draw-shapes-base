@@ -41,10 +41,15 @@ contract FollowupTest is GameFixture {
         _openAndActivate();
         vm.fee(0.01 gwei);
         DrawEngine.VrfFeeConfig memory c = LaunchParams.vrfFee();
-        // formula: (overhead + callback gas limit) x max(basefee, floor) x (1 + premium + buffer) + flat
-        uint256 expect1 = (uint256(c.overheadGas) + engine.callbackGasLimitFor(1)) * 0.01 gwei
-            * (10_000 + c.premiumBps + c.bufferBps) / 10_000 + c.flatWei;
-        assertEq(engine.vrfFeeFor(1), expect1, "VRF fee formula");
+        // formula: gas = (overhead + callback gas limit) x max(basefee, floor);
+        // forwarded = gas x (1 + premium + buffer) + flat; margin = gas x marginBps (FWA service margin)
+        uint256 gas1 = (uint256(c.overheadGas) + engine.callbackGasLimitFor(1)) * 0.01 gwei;
+        uint256 expect1 = gas1 * (10_000 + c.premiumBps + c.bufferBps) / 10_000 + c.flatWei;
+        (uint256 fwd1, uint256 margin1) = engine.vrfFeeParts(1);
+        assertEq(fwd1, expect1, "forwarded VRF fee formula");
+        assertEq(margin1, gas1 * c.marginBps / 10_000, "margin formula");
+        assertEq(c.marginBps, 3_000, "launch margin: FWA V2's 30 %");
+        assertEq(engine.vrfFeeFor(1), expect1 + margin1, "VRF fee = forwarded + margin");
         // one request per batch: per-pull VRF cost falls with batch size
         uint256 f1 = engine.vrfFeeFor(1);
         uint256 f10 = engine.vrfFeeFor(10);
@@ -54,10 +59,10 @@ contract FollowupTest is GameFixture {
         console2.log("VRF fee 1 / 10 / 20 pulls at 0.01 gwei", f1, f10, f20);
         // the basefee floor applies when the chain is quieter than the floor
         vm.fee(0);
+        uint256 gasFloor = (uint256(c.overheadGas) + engine.callbackGasLimitFor(1)) * c.minGasPrice;
         assertEq(
             engine.vrfFeeFor(1),
-            (uint256(c.overheadGas) + engine.callbackGasLimitFor(1)) * c.minGasPrice
-                * (10_000 + c.premiumBps + c.bufferBps) / 10_000 + c.flatWei
+            gasFloor * (10_000 + c.premiumBps + c.bufferBps) / 10_000 + c.flatWei + gasFloor * c.marginBps / 10_000
         );
         vm.fee(0.01 gwei);
 
@@ -65,13 +70,17 @@ contract FollowupTest is GameFixture {
         (uint256 fee, uint256 sfee, uint256 vf, uint256 total) = engine.quoteAcquisitionPrice(10);
         assertEq(vf, f10);
         assertEq(total, 10 * (fee + sfee) + vf, "VRF fee is separate from fee and settlement fee");
+        (uint256 fwd10, uint256 margin10) = engine.vrfFeeParts(10);
+        assertEq(fwd10 + margin10, vf);
+        uint256 devCreditBefore = engine.feeCreditOf(engine.devRecipient());
         _pull(alice, 10);
         (, uint96 subAfter,,,) = vrf.getSubscription(subId);
-        assertEq(subAfter - subBefore, vf, "collected VRF fee funds the subscription at purchase");
-        assertEq(engine.vrfFeesCollected(), vf);
+        assertEq(subAfter - subBefore, fwd10, "forwarded VRF fee funds the subscription at purchase");
+        assertEq(engine.vrfFeesCollected(), fwd10);
+        assertEq(engine.feeCreditOf(engine.devRecipient()) - devCreditBefore, margin10, "margin credited to development");
         assertEq(address(engine).balance, engine.liabilities(), "VRF fee never enters backing or escrow");
         Lens.VrfView memory v = lens.vrf();
-        assertEq(v.feesCollected, vf);
+        assertEq(v.feesCollected, fwd10);
         assertEq(v.subscriptionBalance, subAfter);
     }
 
@@ -115,8 +124,35 @@ contract FollowupTest is GameFixture {
         vm.roll(vm.getBlockNumber() + engine.selectionTimeoutBlocks() + 1);
         engine.processAcquisitions(10);
         assertEq(engine.acquisitionRefundCredit(alice), 3 * (fee + sfee), "fee + settlement fee refunded");
-        assertEq(engine.vrfFeesCollected(), vf, "VRF fee kept: it paid for the oracle request");
+        (uint256 fwd, uint256 margin) = engine.vrfFeeParts(3);
+        assertEq(fwd + margin, vf);
+        assertEq(engine.vrfFeesCollected(), fwd, "VRF fee kept: it paid for the oracle request");
         assertEq(address(engine).balance, engine.liabilities(), "engine holds exactly its liabilities");
+    }
+
+    function test_vrfMargin_capKeepsSubscriptionShareFirst_andIsBounded() public {
+        _openAndActivate();
+        DrawEngine.VrfFeeConfig memory c = LaunchParams.vrfFee();
+        uint256 max = engine.MAX_VRF_FEE_PER_BATCH();
+        // high basefee: forwarded share alone exceeds the cap, so the margin is zero
+        vm.fee(5 gwei);
+        (uint256 fwd, uint256 margin) = engine.vrfFeeParts(20);
+        assertEq(fwd, max);
+        assertEq(margin, 0, "the subscription is never shorted for the margin");
+        // in between: the margin fills only the room left under the cap
+        vm.fee(0.35 gwei);
+        (fwd, margin) = engine.vrfFeeParts(20);
+        assertLt(fwd, max);
+        assertEq(fwd + margin, max, "margin trimmed to the room under the cap");
+        assertLt(margin, (fwd - c.flatWei) * c.marginBps / (10_000 + c.premiumBps + c.bufferBps), "margin trimmed");
+        // governance bound and a zero margin
+        c.marginBps = uint16(engine.MAX_VRF_MARGIN_BPS() + 1);
+        vm.expectRevert(DrawEngine.InvalidConfig.selector);
+        engine.setVrfFeeConfig(c);
+        c.marginBps = 0;
+        engine.setVrfFeeConfig(c);
+        (, margin) = engine.vrfFeeParts(1);
+        assertEq(margin, 0);
     }
 
     /*//////////////////////////////////////////////////////////////

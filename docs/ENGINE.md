@@ -36,7 +36,7 @@ Reference board (test `ReferenceBoard.t.sol`, real Shapes and Draw Packs):
 | Acquisition fee | 14,942,455,786,105,613 wei |
 | Settlement fee | 148,785,403,573,383 wei |
 | Fee + settlement (reference price before VRF) | 15,091,880,343,966,669 wei (≈ 0.015092 ETH) |
-| VRF fee (per batch, basefee 0.01 gwei) | 1 pull 0.0000233 ETH; 4–20 pulls 0.0000556 ETH (callback limit capped at 2.5M) |
+| VRF fee (per batch, basefee 0.01 gwei) | 1 pull 0.0000289 ETH; 4–20 pulls 0.0000644 ETH (callback limit capped at 2.5M), each including the 30 % service margin |
 | Expected backing | 12,819,466,318,547,036 wei, 84.94 % of fee + settlement (84.91 % incl. a 10-pull batch's VRF share) |
 
 Previous configuration (3 / 1 / 4): fee 15,070,286,533,069,302, payment 15,220,989,398,399,995 wei, 84.22 %.
@@ -60,7 +60,7 @@ maintenance, feed and mint-line allowances. Nothing of the removed 5 % is counte
 | Price | `EV × (1 + edge)` | `EV` | Brief §4 |
 | Fees | Half edge to FWA | 1 % settlement fee on top, escrowed with the fee, split at verified delivery 50 % referrer / 25 % Token Works / 25 % development (follow-up; was 10 / 40) by the policy snapshotted at request; refunded with the fee on every refund path | Brief §6 |
 | VRF | One request per acquisition through FWA's VRF service | One Chainlink v2.5 request per `acquireBatch`; acquisition `i` uses `keccak256(word, i)`; callback gas `base + n × perAcquisition` | Brief §11 |
-| VRF fee | Player pays the service fee per request | Purchaser pays one VRF fee per batch, quoted separately: `(overheadGas + callbackGasLimit(n)) × max(basefee, floor) × (1 + premium + buffer) + flat`, capped at 0.002 ETH; forwarded to the subscription at purchase (`fundSubscriptionWithNative`), never part of backing, escrow or earnings; not refunded (it paid for the request) | FWA V2 model adapted to one request per batch (follow-up) |
+| VRF fee | Player pays the service fee per request | Purchaser pays one VRF fee per batch, quoted separately: `(overheadGas + callbackGasLimit(n)) × max(basefee, floor) × (1 + premium + buffer) + flat`, plus a service margin `(overheadGas + callbackGasLimit(n)) × max(basefee, floor) × marginBps` (30 %, FWA V2's `serviceMarginBps`) credited to development, capped at 0.002 ETH in total with the subscription's share kept first; the Chainlink part is forwarded to the subscription at purchase (`fundSubscriptionWithNative`); never part of backing, escrow or earnings; not refunded (it paid for the request) | FWA V2 model adapted to one request per batch (follow-up) |
 | Request ids | Chainlink request id | Local sequence number; `vrfRequestOf` / `vrfBatches` map batches | Batching |
 | Inventory | Single owner | Multiple governance-approved suppliers, proceeds per depositor, `transferListings` hand-off without moving NFTs | Extensibility (controller replacement, GRAIL vault, partner prizes) |
 | Version guard | Exact version required | Exact version, or `ANY_INVENTORY_VERSION` (fee and value guards still apply) | The protocol-owned controller relists after every capture; exact matching would make farmer batches revert constantly |
@@ -116,7 +116,7 @@ ported. Base targets are native Shapes rungs, so a GRAIL is a single mint.
 | Guardian | pause / unpause new acquisitions | pause / unpause minting and listing |
 | Anyone | process, retry delivery, refund stuck delivery after window, activate staged listings | settle, build, book, release surplus, recover refunded, vault step |
 
-Hard bounds in code: settlement fee ≤ 2 %, VRF fee ≤ 0.002 ETH / batch (premium ≤ 200 %, buffer ≤ 50 %), cooldown ≤ 1 h, batch ≤ 50,
+Hard bounds in code: settlement fee ≤ 2 %, VRF fee ≤ 0.002 ETH / batch (premium ≤ 200 %, buffer ≤ 50 %, service margin ≤ 100 %), cooldown ≤ 1 h, batch ≤ 50,
 unsettled ≤ 1,000, controller markups sum ≤ 15 %, tip ≤ 0.001 ETH. No role can move escrowed fees,
 refund credits, fee credits or listed NFTs to itself.
 

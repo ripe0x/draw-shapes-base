@@ -26,14 +26,17 @@ library LaunchParams {
 
     /// @notice Purchaser VRF charge (docs/FOLLOWUP.md section 2): 400k gas of verification and
     ///         post-callback overhead, the callback at its requested limit, at least 0.005 gwei, Chainlink's
-    ///         60 % native premium on Base, a 25 % fluctuation buffer and 0.000002 ETH for the L1 data fee.
+    ///         60 % native premium on Base, a 25 % fluctuation buffer and 0.000002 ETH for the L1 data fee,
+    ///         all forwarded to the subscription; plus FWA V2's 30 % service margin on the same gas cost,
+    ///         credited to development.
     function vrfFee() internal pure returns (DrawEngine.VrfFeeConfig memory) {
         return DrawEngine.VrfFeeConfig({
             overheadGas: 400_000,
             minGasPrice: 0.005 gwei,
             premiumBps: 6_000,
             bufferBps: 2_500,
-            flatWei: 0.000002 ether
+            flatWei: 0.000002 ether,
+            marginBps: 3_000
         });
     }
 

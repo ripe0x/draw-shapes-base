@@ -15,7 +15,7 @@ output. Model outputs are scenario results under stated assumptions; they are no
 | Engine | positive slippage / cooldown / word deadline | 10 % / 0 / 1,800 blocks (1 h on Base) |
 | Engine | settlement fee / split | 1 % of the acquisition fee; 50 % referrer, 25 % Token Works, 25 % development (referrer share to development when there is none); Token Works is inside the 1 % |
 | VRF | confirmations / callback gas | 3 / 100,000 + 750,000 per acquisition (cap 2.5M); each in-callback attempt gets all gas above a 60k reserve |
-| VRF fee (purchaser, per batch) | overhead / basefee floor / premium / buffer / flat / cap | 400,000 gas / 0.005 gwei / 60 % / 25 % / 0.000002 ETH / 0.002 ETH |
+| VRF fee (purchaser, per batch) | overhead / basefee floor / premium / buffer / flat / service margin / cap | 400,000 gas / 0.005 gwei / 60 % / 25 % / 0.000002 ETH / 30 % (to development, FWA V2's `serviceMarginBps`) / 0.002 ETH |
 | GRAIL | ladder / list / floor / decay / cap / steps | 0.5 → 1 → 5 ETH; 80 % of backing; 50 %; 0.00002 ETH per pull; 5 % of weight; up < 3 days, down > 14 days |
 | ENGINE | supply | 35,000,000: 10M liquidity, 25M farm |
 | Market | pool / fee | ETH/ENGINE v4, LP fee 0, tick spacing 200, full range; hook 200 bps (25 operator, 175 treasury) |

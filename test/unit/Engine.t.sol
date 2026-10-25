@@ -115,6 +115,7 @@ contract EngineTest is Test {
         _list(80, 0.01 ether);
         engine.activate();
         uint256 fee = engine.acquisitionFee();
+        (, uint256 margin20) = engine.vrfFeeParts(20); // VRF service margin, credited to dev at purchase
         (, uint256 v1) = _buy(alice, 20);
         (, uint256 v2) = _buy(bob, 20);
         (, uint256 v3) = _buy(alice, 20);
@@ -133,7 +134,7 @@ contract EngineTest is Test {
         assertEq(nft.balanceOf(alice) + nft.balanceOf(bob), 60);
         assertEq(engine.activeListingCount(), 20);
         assertEq(engine.proceedsOf(address(this)), 60 * fee);
-        assertEq(engine.feeCreditOf(ref) + engine.feeCreditOf(tokenWorks) + engine.feeCreditOf(dev), 60 * (fee / 100));
+        assertEq(engine.feeCreditOf(ref) + engine.feeCreditOf(tokenWorks) + engine.feeCreditOf(dev), 60 * (fee / 100) + 3 * margin20);
         (uint64 accepted, uint64 resolved, uint64 units,) = engine.dayTotals(0);
         assertEq(accepted, 60);
         assertEq(resolved, 60);

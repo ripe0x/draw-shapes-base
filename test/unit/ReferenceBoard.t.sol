@@ -86,6 +86,7 @@ contract ReferenceBoardTest is GameFixture {
         _openAndActivate();
         uint256 fee = engine.acquisitionFee();
         uint256 sfee = fee / 100;
+        (, uint256 vrfMargin) = engine.vrfFeeParts(1); // VRF service margin, credited to dev at purchase
         (uint256[] memory ids, uint256 vrfId) = _pullRef(alice, referrer, 1);
         assertEq(ids[0], 1);
         _fulfill(vrfId, 42);
@@ -98,7 +99,7 @@ contract ReferenceBoardTest is GameFixture {
         // settlement fee split
         assertEq(engine.feeCreditOf(referrer), sfee / 2);
         assertEq(engine.feeCreditOf(tokenWorks), sfee / 4);
-        assertEq(engine.feeCreditOf(dev), sfee - sfee / 2 - sfee / 4);
+        assertEq(engine.feeCreditOf(dev), sfee - sfee / 2 - sfee / 4 + vrfMargin);
         assertEq(engine.proceedsOf(address(controller)), fee);
 
         _settleAll();
@@ -120,10 +121,11 @@ contract ReferenceBoardTest is GameFixture {
     function test_selfReferralGoesToDev() public {
         _openAndActivate();
         uint256 sfee = engine.acquisitionFee() / 100;
+        (, uint256 vrfMargin) = engine.vrfFeeParts(1);
         (, uint256 vrfId) = _pullRef(alice, alice, 1);
         _fulfill(vrfId, 7);
         assertEq(engine.feeCreditOf(alice), 0);
-        assertEq(engine.feeCreditOf(dev), sfee - sfee / 4);
+        assertEq(engine.feeCreditOf(dev), sfee - sfee / 4 + vrfMargin);
     }
 
     /// The previous 4 / 0.5 / 2 split (comparison; governance `setFeeSplit`): exact values.

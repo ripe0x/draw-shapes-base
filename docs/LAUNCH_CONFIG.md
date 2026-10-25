@@ -14,7 +14,7 @@ of them is a demand forecast.
 | Ordinary premium / maintenance / GRAIL feed | **3.5 % / 0.5 % / 3 %** of backing | yes (was 4 / 0.5 / 2) |
 | Shape mint fee | 0.001 ETH per Shape (Shapes v1, to the creator) | no |
 | Settlement fee | 1 % of the acquisition fee: 50 % referrer, 25 % Token Works, 25 % development | no |
-| VRF | Purchaser-paid, once per batch: `(400k + callback limit) × max(basefee, 0.005 gwei) × 1.85 + 0.000002 ETH`, ≤ 0.002 ETH | callback gas per acquisition 650k → 750k (cold-state fix) |
+| VRF | Purchaser-paid, once per batch: `gas = (400k + callback limit) × max(basefee, 0.005 gwei)`; `gas × 1.85 + 0.000002 ETH` to the subscription, plus a 30 % service margin `gas × 0.3` credited to development (as FWA V2); ≤ 0.002 ETH in total | callback gas per acquisition 650k → 750k (cold-state fix); service margin added |
 | ENGINE | 35,000,000 fixed supply: 10M liquidity, 25M genesis farm (14 × 24 h) | no (immutable) |
 | ENGINE trading fee | 2 % of the ETH side; 0.25 % operator, 1.75 % treasury | no |
 | Treasury routing | Reserve to 0.5 ETH; then 100 % to the GRAIL fund while none is held, else 90 % GRAIL / 10 % POL | no |
@@ -50,8 +50,8 @@ Weights and price:
 | Acquisition fee | 14,942,455,786,105,613 | 0.014942456 |
 | Settlement fee (fee × 1 %) | 149,424,557,861,056 | 0.000149425 |
 | Fee + settlement (price before VRF) | 15,091,880,343,966,669 | **0.015091880** |
-| VRF fee, 10-pull batch at 0.01 gwei | 55,650,000,000,000 per batch | 0.0000056 per pull |
-| Player payment per pull in a 10-pull batch | | **0.0150974** |
+| VRF fee, 10-pull batch at 0.01 gwei | 64,350,000,000,000 per batch (55,650,000,000,000 to the subscription + 8,700,000,000,000 margin) | 0.0000064 per pull |
+| Player payment per pull in a 10-pull batch | | **0.0150983** |
 | Expected backing `Σ w·b / Σ w` | 12,819,466,318,547,036 | 0.012819466 |
 | Ordinary RTP (backing / fee + settlement) | | **84.94 %** (84.91 % including VRF) |
 

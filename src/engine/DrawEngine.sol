@@ -173,6 +173,8 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice Ceiling on the VRF fluctuation buffer and on the Chainlink premium assumption.
     uint256 public constant MAX_VRF_BUFFER_BPS = 5_000;
     uint256 public constant MAX_VRF_PREMIUM_BPS = 20_000;
+    /// @notice Ceiling on the protocol's VRF service margin (FWA V2 `serviceMarginBps`, 30 % there).
+    uint256 public constant MAX_VRF_MARGIN_BPS = 10_000;
     uint256 public constant MAX_ACQUISITIONS_PER_TX_CAP = 50;
     uint256 public constant MAX_UNSETTLED_CAP = 1_000;
 
@@ -222,13 +224,17 @@ contract DrawEngine is ReentrancyGuard {
     ///         Chainlink's post-callback accounting; the callback is charged at its requested limit
     ///         (Chainlink bills only the gas used); `premiumBps` is Chainlink's native premium;
     ///         `bufferBps` absorbs gas-price movement until fulfilment; `flatWei` covers the L1 data
-    ///         fee. The whole charge is forwarded to the subscription in the purchase transaction.
+    ///         fee. That charge is forwarded to the subscription in the purchase transaction.
+    ///         `marginBps` adds the protocol's service margin on the same gas cost (FWA V2
+    ///         `serviceMarginBps`): it is credited to `devRecipient` as a fee credit, never to the
+    ///         subscription. When the cap binds, the subscription's share is kept first.
     struct VrfFeeConfig {
         uint32 overheadGas;
         uint64 minGasPrice;
         uint16 premiumBps;
         uint16 bufferBps;
         uint96 flatWei;
+        uint16 marginBps;
     }
 
     VrfFeeConfig public vrfFeeConfig;
@@ -419,7 +425,7 @@ contract DrawEngine is ReentrancyGuard {
     event LimitsSet(uint256 maxPerTx, uint256 maxUnsettled, uint256 activations, uint256 slippageBps, uint256 cooldown);
     event VrfConfigSet(address coordinator, uint256 subId, bytes32 keyHash, uint16 confirmations, uint32 gasBase, uint32 gasPerAcquisition, uint256 timeoutBlocks);
     event VrfFeeConfigSet(VrfFeeConfig config);
-    event VrfFeeCollected(uint64 indexed firstSequence, uint256 count, uint256 amount);
+    event VrfFeeCollected(uint64 indexed firstSequence, uint256 count, uint256 amount, uint256 margin);
 
     /*//////////////////////////////////////////////////////////////
                                 ERRORS
@@ -899,11 +905,20 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice Purchaser VRF charge for one batch of `count` acquisitions at the current base fee.
     ///         Not refundable: Chainlink bills the request whether the acquisition later settles or not.
     function vrfFeeFor(uint256 count) public view returns (uint256 fee) {
+        (uint256 forwarded, uint256 margin) = vrfFeeParts(count);
+        fee = forwarded + margin;
+    }
+
+    /// @notice The batch VRF charge split into the part forwarded to the subscription and the
+    ///         protocol margin. Their sum is at most `MAX_VRF_FEE_PER_BATCH`.
+    function vrfFeeParts(uint256 count) public view returns (uint256 forwarded, uint256 margin) {
         VrfFeeConfig memory c = vrfFeeConfig;
         uint256 price = block.basefee > c.minGasPrice ? block.basefee : c.minGasPrice;
-        fee = (uint256(c.overheadGas) + callbackGasLimitFor(count)) * price * (BPS + c.premiumBps + c.bufferBps) / BPS
-            + c.flatWei;
-        if (fee > MAX_VRF_FEE_PER_BATCH) fee = MAX_VRF_FEE_PER_BATCH;
+        uint256 gasCost = (uint256(c.overheadGas) + callbackGasLimitFor(count)) * price;
+        forwarded = gasCost * (BPS + c.premiumBps + c.bufferBps) / BPS + c.flatWei;
+        if (forwarded >= MAX_VRF_FEE_PER_BATCH) return (MAX_VRF_FEE_PER_BATCH, 0);
+        margin = gasCost * c.marginBps / BPS;
+        if (forwarded + margin > MAX_VRF_FEE_PER_BATCH) margin = MAX_VRF_FEE_PER_BATCH - forwarded;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -941,8 +956,8 @@ contract DrawEngine is ReentrancyGuard {
 
         uint256 fee = _validateAcquisition(maxAcquisitionFee, minWeightedValue);
         uint256 settlementFee = settlementFeeFor(fee);
-        uint256 vrfFee = vrfFeeFor(count);
-        uint256 cost = count * (fee + settlementFee) + vrfFee;
+        (uint256 vrfFee, uint256 vrfMargin) = vrfFeeParts(count);
+        uint256 cost = count * (fee + settlementFee) + vrfFee + vrfMargin;
         if (msg.value < cost) revert InsufficientPayment();
 
         if (referrer == purchaser || referrer == address(this)) referrer = address(0);
@@ -966,8 +981,12 @@ contract DrawEngine is ReentrancyGuard {
         if (vrfFee != 0) {
             vrfFeesCollected += vrfFee;
             vrfCoordinator.fundSubscriptionWithNative{value: vrfFee}(vrfSubscriptionId);
-            emit VrfFeeCollected(firstSequence, count, vrfFee);
         }
+        if (vrfMargin != 0) {
+            feeCreditOf[devRecipient] += vrfMargin;
+            feeCreditTotal += vrfMargin;
+        }
+        emit VrfFeeCollected(firstSequence, count, vrfFee, vrfMargin);
         _requestRandomness(firstSequence, count);
 
         uint256 excess = msg.value - cost;
@@ -1631,7 +1650,10 @@ contract DrawEngine is ReentrancyGuard {
     }
 
     function _setVrfFeeConfig(VrfFeeConfig memory c) internal {
-        if (c.premiumBps > MAX_VRF_PREMIUM_BPS || c.bufferBps > MAX_VRF_BUFFER_BPS || c.flatWei > MAX_VRF_FEE_PER_BATCH) {
+        if (
+            c.premiumBps > MAX_VRF_PREMIUM_BPS || c.bufferBps > MAX_VRF_BUFFER_BPS || c.flatWei > MAX_VRF_FEE_PER_BATCH
+                || c.marginBps > MAX_VRF_MARGIN_BPS
+        ) {
             revert InvalidConfig();
         }
         vrfFeeConfig = c;
