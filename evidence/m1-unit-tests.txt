@@ -1,0 +1,80 @@
+No files changed, compilation skipped
+Ran 1 test for test/unit/GasProbe.t.sol:GasProbeTest
+[PASS] test_probe() (gas: 103605078)
+Logs:
+  batch 1 callback total gas (fast path may not run) 410742
+    process gas per acq 3521
+    controller settle gas 958517
+  batch 5 callback total gas (fast path may not run) 1163121
+    process gas per acq 704
+    controller settle gas 3669594
+  batch 10 callback total gas (fast path may not run) 2025586
+    process gas per acq 18750
+    controller settle gas 7266478
+  batch 15 callback total gas (fast path may not run) 1950397
+    process gas per acq 87833
+    controller settle gas 9293353
+  batch 20 callback total gas (fast path may not run) 1869771
+    process gas per acq 121805
+    controller settle gas 12963294
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 78.52ms (74.45ms CPU time)
+Ran 5 tests for test/unit/ReferenceBoard.t.sol:ReferenceBoardTest
+[PASS] test_referenceBoard_inventoryAndCost() (gas: 64116967)
+[PASS] test_referenceBoard_notionals() (gas: 58379)
+[PASS] test_referenceBoard_priceReconcilesToTheWei() (gas: 64150001)
+Logs:
+  acquisition fee (wei) 15070286533069302
+  settlement fee (wei) 150702865330693
+  player payment (wei) 15220989398399995
+  expected backing (wei) 12819127730909358
+  return on payment (bps) 8422
+[PASS] test_selfReferralGoesToDev() (gas: 64824668)
+[PASS] test_singlePull_endToEnd() (gas: 65938012)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 174.09ms (159.96ms CPU time)
+Ran 17 tests for test/unit/Engine.t.sol:EngineTest
+[PASS] testFuzz_feeIsHarmonicMean(uint96[8]) (runs: 256, μ: 3240861, ~: 3240964)
+[PASS] test_batchUsesOneVrfRequestAndIndependentWords() (gas: 12839139)
+[PASS] test_bonusWeightDistribution() (gas: 16151663)
+[PASS] test_concurrent60_outOfOrder() (gas: 40448328)
+[PASS] test_deliveryFailure_retrySucceeds() (gas: 1784651)
+[PASS] test_deliveryFailure_retry_and_refund() (gas: 1708380)
+[PASS] test_duplicateAndForeignCallbacks() (gas: 3093635)
+[PASS] test_expiryRefundsFeeAndSettlementFee_noUnits() (gas: 3108142)
+[PASS] test_feePolicySnapshottedAtRequest() (gas: 3138120)
+[PASS] test_governanceBounds() (gas: 33206)
+[PASS] test_inventoryVersionGuard() (gas: 3216791)
+[PASS] test_lateWordTimesOut() (gas: 2932467)
+[PASS] test_notActivated() (gas: 1792539)
+[PASS] test_pauseBlocksNewExposureOnly() (gas: 3144910)
+[PASS] test_slippageRefund() (gas: 2484689)
+[PASS] test_stagedListingsReservedByLaterRequest() (gas: 4192820)
+[PASS] test_transferListingsToSuccessor() (gas: 2616601)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 329.99ms (410.31ms CPU time)
+Ran 8 tests for test/unit/Game.t.sol:GameTest
+[PASS] test_concurrent50_onReferenceBoard() (gas: 101620193)
+Logs:
+  fulfilled 47 refunded (slippage) 3
+  cash 327837027224554300 queue 0
+  held 0 listed 100
+[PASS] test_ethRoutingReconciles() (gas: 186261998)
+Logs:
+  pulls 150
+  proceeds 2367580372923334975
+  backing captured 1990000000000000000
+  replacement mint fees 193000000000000000
+  premium 77611673456324471
+  maintenance 25870557818774795
+  feed to GRAIL 103482231275099246
+  settlement fees 23675803729233280
+  -12164609840084373
+[PASS] test_externalPrize_deliveryFailure_writeOffAndRecovery() (gas: 65760114)
+[PASS] test_grailDecaysWhileIdle() (gas: 218281388)
+[PASS] test_grailFundedByFeedAndTrading_thenCaptured() (gas: 1724830917)
+Logs:
+  next GRAIL backing 500000000000000000
+  GRAIL captured; vault fund 319539514426006019
+[PASS] test_listingPauseKeepsSettlement() (gas: 68326410)
+[PASS] test_surplusReleaseOnlyAboveCapitalAndFullBoard() (gas: 64337423)
+[PASS] test_vrfTopUpFromMaintenance() (gas: 64174100)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 1.37s (1.75s CPU time)
+Ran 4 test suites in 1.38s (1.96s CPU time): 31 tests passed, 0 failed, 0 skipped (31 total tests)

@@ -1,0 +1,7 @@
+[PASS] invariant_controllerBuckets() (runs: 64, calls: 4096, reverts: 4)
+[PASS] invariant_engineSolvent() (runs: 64, calls: 4096, reverts: 2)
+[PASS] invariant_ledgerConsistent() (runs: 64, calls: 4096, reverts: 2)
+[PASS] invariant_treeMatchesTotals() (runs: 64, calls: 4096, reverts: 0)
+[PASS] invariant_unsettledCount() (runs: 64, calls: 4096, reverts: 0)
+[PASS] invariant_vaultSolvent() (runs: 64, calls: 4096, reverts: 1)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 6.60s (26.77s CPU time)
