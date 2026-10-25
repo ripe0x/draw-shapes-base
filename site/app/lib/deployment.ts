@@ -19,6 +19,8 @@ export interface Deployment {
   buyback: Address;
   hook: Address;
   timelock: Address;
+  /** PrizeRouter: pull with prizes, or cash them out, in one transaction (zero if not deployed). */
+  prizeRouter: Address;
   /** Block the system was deployed in. */
   blockNumber: number;
 }
@@ -31,7 +33,7 @@ const RECORDS: Record<number, typeof sepolia | undefined> = { 84532: sepolia };
 function missing(chainId: number): Deployment {
   return {
     present: false, chainId, pool: ZERO, fwaPool: ZERO, lens: ZERO, shapes: ZERO, drawPacks: ZERO, grailVault: ZERO, farm: ZERO,
-    token: ZERO, treasury: ZERO, buyback: ZERO, hook: ZERO, timelock: ZERO, blockNumber: 0,
+    token: ZERO, treasury: ZERO, buyback: ZERO, hook: ZERO, timelock: ZERO, prizeRouter: ZERO, blockNumber: 0,
   };
 }
 
@@ -55,6 +57,7 @@ export function getDeployment(): Deployment {
     buyback: r.buyback as Address,
     hook: r.hook as Address,
     timelock: r.timelock as Address,
+    prizeRouter: ((r as { prizeRouter?: string }).prizeRouter ?? ZERO) as Address,
     blockNumber: Number(r.deployBlock ?? 0),
   };
 }

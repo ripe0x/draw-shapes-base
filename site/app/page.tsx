@@ -8,6 +8,8 @@ import { GrailBoard } from "./components/GrailBoard";
 import { OddsGlance } from "./components/OddsGlance";
 import { PoolGrid } from "./components/PoolGrid";
 import { PullCard } from "./components/PullCard";
+import { SessionPanel } from "./components/SessionPanel";
+import { useAccount } from "wagmi";
 
 /** `/`: the pull promise and live board summary, the card carousel, the pull card, the listed items
  *  grid beside the GRAIL, what a pull can draw and the ENGINE genesis band. */
@@ -15,6 +17,7 @@ export default function Landing() {
   const pool = usePool().data;
   const odds = pool ? drawOdds(pool.board, pool.grail) : undefined;
   const smallestWei = odds?.rows[0]?.backingWei;
+  const connected = !!useAccount().address;
 
   return (
     <main className="landing-page">
@@ -33,6 +36,11 @@ export default function Landing() {
         <CardFan />
         <PullCard variant="hero" />
       </section>
+      {connected && (
+        <div className="landing-session">
+          <SessionPanel />
+        </div>
+      )}
 
       <div className="landing-facts">
         <div className="landing-fact">

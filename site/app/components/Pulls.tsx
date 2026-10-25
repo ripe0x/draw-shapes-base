@@ -12,7 +12,7 @@ import { PullBatchView } from "./PullReveal";
 import { TxButton, TxLine, useTx } from "./Tx";
 
 /** Batches listed, newest first. */
-const SHOWN = 10;
+const SHOWN = 5;
 
 /** The connected wallet's pulls, newest batch first, with the calls that move a pull along. */
 export function Pulls() {

@@ -149,6 +149,18 @@ function PullPack({ card, flip }: { card: Card; flip: boolean }) {
       </div>
     );
   }
+  if (item.value === 0n) {
+    // redeemed (or played) since the pull: the token is burned, its ETH already paid out
+    return (
+      <div className="pack pack-opened pack-redeemed">
+        <PackBack />
+        <p className="pack-title">Redeemed</p>
+        <p className="vault-note pack-result-line">
+          {item.pack ? "Draw Pack" : "Shape"} #{item.tokenId.toString()}, already turned back into ETH.
+        </p>
+      </div>
+    );
+  }
   const art = <TokenArt token={item} />;
   const grail = item.grail === true;
   return (

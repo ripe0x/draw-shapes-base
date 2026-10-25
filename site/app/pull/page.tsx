@@ -5,6 +5,7 @@ import { OddsGlance } from "../components/OddsGlance";
 import { PullCard } from "../components/PullCard";
 import { Pulls } from "../components/Pulls";
 import { PullTicket } from "../components/PullTicket";
+import { SessionPanel } from "../components/SessionPanel";
 
 /** `/pull`: the pull card with batch size and price, the price breakdown, what a pull can draw, and
  *  the wallet's pulls with their reveal. */
@@ -19,6 +20,7 @@ export default function PullPage() {
           list price, and the engine delivers it to your wallet, usually within seconds.
         </p>
       </section>
+      <SessionPanel />
       <section className="vault-section two-col">
         <div>
           <div className="card">

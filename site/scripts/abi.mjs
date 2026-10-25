@@ -29,9 +29,10 @@ emit("game.ts", [
   block("vaultAbi", keep(abiOf("GrailVault")), "out/GrailVault.sol/GrailVault.json"),
   block("farmAbi", keep(abiOf("GenesisFarm")), "out/GenesisFarm.sol/GenesisFarm.json"),
   block("tokenAbi", keep(abiOf("EngineToken"), ["balanceOf", "totalSupply", "symbol"]), "out/EngineToken.sol/EngineToken.json"),
+  block("routerAbi", keep(abiOf("PrizeRouter")), "out/PrizeRouter.sol/PrizeRouter.json"),
 ]);
 emit("external.ts", [
   block("fwaCloneAbi", keep(abiOf("DrawEngine")), "out/DrawEngine.sol/DrawEngine.json"),
   block("shapesAbi", keep(abiOf("Shapes"), ["balanceOf", "ownerOf", "backingOf", "valueOf", "redeem", "tokenURI", "isApprovedForAll", "setApprovalForAll"]), "out/Shapes.sol/Shapes.json"),
-  block("packsAbi", keep(abiOf("ShapePacks"), ["ownerOf", "valueOf", "contentsOf", "redeem", "tokenURI"]), "out/ShapePacks.sol/ShapePacks.json"),
+  block("packsAbi", keep(abiOf("ShapePacks"), ["ownerOf", "valueOf", "contentsOf", "redeem", "tokenURI", "isApprovedForAll", "setApprovalForAll"]), "out/ShapePacks.sol/ShapePacks.json"),
 ]);

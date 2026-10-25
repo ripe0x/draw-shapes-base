@@ -94,3 +94,17 @@ export const tokenAbi = [
   {"type":"function","name":"symbol","inputs":[],"outputs":[{"name":"","type":"string","internalType":"string"}],"stateMutability":"pure"},
   {"type":"function","name":"totalSupply","inputs":[],"outputs":[{"name":"result","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},
 ] as const;
+
+// From out/PrizeRouter.sol/PrizeRouter.json.
+export const routerAbi = [
+  {"type":"function","name":"cashOut","inputs":[{"name":"shapeIds","type":"uint256[]","internalType":"uint256[]"},{"name":"packIds","type":"uint256[]","internalType":"uint256[]"},{"name":"recipient","type":"address","internalType":"address"}],"outputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},
+  {"type":"function","name":"engine","inputs":[],"outputs":[{"name":"","type":"address","internalType":"contract IDrawEngineBuy"}],"stateMutability":"view"},
+  {"type":"function","name":"packs","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},
+  {"type":"function","name":"pullWithPrizes","inputs":[{"name":"shapeIds","type":"uint256[]","internalType":"uint256[]"},{"name":"packIds","type":"uint256[]","internalType":"uint256[]"},{"name":"referrer","type":"address","internalType":"address"},{"name":"count","type":"uint256","internalType":"uint256"},{"name":"maxAcquisitionFee","type":"uint256","internalType":"uint256"},{"name":"maxNegativeSlippageBps","type":"uint256","internalType":"uint256"},{"name":"expectedInventoryVersion","type":"uint256","internalType":"uint256"},{"name":"deadline","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"requestIds","type":"uint256[]","internalType":"uint256[]"}],"stateMutability":"payable"},
+  {"type":"function","name":"shapes","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},
+  {"type":"event","name":"CashedOut","inputs":[{"name":"player","type":"address","indexed":true,"internalType":"address"},{"name":"recipient","type":"address","indexed":true,"internalType":"address"},{"name":"shapeCount","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"packCount","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"amount","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},
+  {"type":"event","name":"PulledWithPrizes","inputs":[{"name":"player","type":"address","indexed":true,"internalType":"address"},{"name":"count","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"shapeCount","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"packCount","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"prizeWei","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"ethIn","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"change","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},
+  {"type":"error","name":"InvalidRecipient","inputs":[]},
+  {"type":"error","name":"NothingToRedeem","inputs":[]},
+  {"type":"error","name":"Reentrancy","inputs":[]},
+] as const;
