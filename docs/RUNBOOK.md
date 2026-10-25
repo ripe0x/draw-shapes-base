@@ -133,6 +133,25 @@ If mainnet basefee rises above the lane's 2 gwei cap, words wait until it falls,
 deadline refund. That is the trade-off for the cheaper lane. The 30 gwei lane (`0xdc2f8767…`) would need a
 0.2+ ETH float.
 
+### Anyone can keep the game moving
+
+Keepers are a convenience, not a dependency. Every call the game needs to progress is permissionless:
+
+| Progress | Call | Caller |
+| --- | --- | --- |
+| Deliver pulls left after the VRF callback; expire and refund late words | `DrawEngine.processAcquisitions(n)` | anyone |
+| Book captures, collect proceeds, list replacements (processes pulls first) | `DrawController.settle(n)` | anyone; gas refunded from maintenance |
+| Finish building the board | `DrawController.build(n)`, `DrawEngine.activateListings(n)` | anyone |
+| Mint, list and reprice GRAILs | `GrailVault.step()` | anyone (guardian can pause) |
+| Retry or refund a failed NFT delivery | `retryNFTDelivery`, `refundFailedDelivery` | anyone |
+| Route trading fees; top up the pool from the reserve | `EngineHook.distribute()`, `Treasury.backstop()` | anyone |
+| Surplus release and buybacks | `DrawController.releaseSurplus()`, `Buyback.buyAndBurn()` | anyone (guardian can pause buybacks) |
+| Genesis claims; retire unearned rewards | `GenesisFarm.claim`, `retireUnearned()` | anyone |
+
+The one exception is `Treasury.deployPol`: keeper or governance only, because the caller picks the price limit. It
+never blocks gameplay; the POL share waits in the treasury. The site exposes settle, processing and the GRAIL step as
+buttons (Pull page, pull results, Protocol page).
+
 ### Keeper outage: what happens and how to recover (sim/results/grail-outage.md, KeeperOutage.t.sol)
 
 Pulls keep settling inside the VRF callback during an outage; only booking, restocking and GRAIL
