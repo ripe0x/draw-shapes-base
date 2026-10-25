@@ -57,7 +57,20 @@ After the script: add the engine as VRF consumer (Safe), verify sources, publish
    activate parts separately.
 5. Within 2 days: schedule `DrawController.setSurplusSink(buyback, ledgerOrigin + 14 days)`.
 
-## 5. Keepers (permissionless; run at least one)
+## 5. Keepers (permissionless; run two)
+
+Daemon: `web/scripts/keeper.mjs` (library `keeper-lib.mjs`). Production configuration:
+`ops/keeper/keeper.env.example`, `ops/keeper/draw-shapes-keeper.service` or `ops/keeper/Dockerfile`.
+Alert rules: `ops/monitoring/alerts.md`.
+
+Start:
+`RPC_URLS=… KEEPER_KEY=… DEPLOYMENT=deployments/8453.json HEALTH_PORT=9464 node web/scripts/keeper.mjs`.
+
+Recovery after any outage: start the keeper. It processes, books, restocks and steps everything due in its
+first pass, and all calls are idempotent.
+
+Testnet: `script/testnet/sepolia.sh` runs the whole Base Sepolia deployment and scenario suite. Mainnet:
+`docs/MAINNET_DEPLOYMENT.md`.
 
 | Task | Call | Cadence |
 | --- | --- | --- |

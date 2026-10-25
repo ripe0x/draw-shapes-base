@@ -20,7 +20,7 @@ Notional of an ordinary item with backing `b` made of `k` Shapes:
 
     p = b * (10_000 + premiumBps + maintenanceBps + feedBps) / 10_000 + k * mintFee
 
-with premium 400, maintenance 50, feed 200 bps (follow-up; previously 300 / 100 / 400) and the Shapes mint fee 0.001 ETH. Weight is
+with premium 350, maintenance 50, feed 300 bps (launch; previously 400 / 50 / 200, originally 300 / 100 / 400) and the Shapes mint fee 0.001 ETH. Weight is
 `1e36 / p` (FWA's integer numerator and truncation). The acquisition fee is FWA's
 `weightedBackingTotal / totalWeight` with **no edge multiplier**, i.e. the harmonic mean of active
 notionals, rounded down. The settlement fee is `fee * 100 / 10_000`, rounded down, on the full fee.
@@ -32,12 +32,12 @@ Reference board (test `ReferenceBoard.t.sol`, real Shapes and Draw Packs):
 | --- | --- |
 | Listings | 62 × 0.01, 26 × 0.02 pack, 7 × 0.03 pack, 4 × 0.05, 1 × 0.1 |
 | Backing / mint fees | 1.65 ETH / 0.14 ETH (140 Shapes) |
-| Notionals | 0.01165 / 0.0233 / 0.03495 / 0.05425 / 0.1075 ETH, exact |
-| Acquisition fee | 14,878,540,357,338,322 wei |
+| Notionals | 0.0117 / 0.0234 / 0.0351 / 0.0545 / 0.108 ETH, exact (launch 3.5 / 0.5 / 3) |
+| Acquisition fee | 14,942,455,786,105,613 wei |
 | Settlement fee | 148,785,403,573,383 wei |
-| Fee + settlement (reference price before VRF) | 15,027,325,760,911,705 wei (≈ 0.015027 ETH) |
+| Fee + settlement (reference price before VRF) | 15,091,880,343,966,669 wei (≈ 0.015092 ETH) |
 | VRF fee (per batch, basefee 0.01 gwei) | 1 pull 0.0000233 ETH; 4–20 pulls 0.0000556 ETH (callback limit capped at 2.5M) |
-| Expected backing | 12,819,637,956,291,283 wei, 85.31 % of fee + settlement (85.28 % incl. a 10-pull batch's VRF share) |
+| Expected backing | 12,819,466,318,547,036 wei, 84.94 % of fee + settlement (84.91 % incl. a 10-pull batch's VRF share) |
 
 Previous configuration (3 / 1 / 4): fee 15,070,286,533,069,302, payment 15,220,989,398,399,995 wei, 84.22 %.
 
@@ -66,7 +66,7 @@ maintenance, feed and mint-line allowances. Nothing of the removed 5 % is counte
 | Version guard | Exact version required | Exact version, or `ANY_INVENTORY_VERSION` (fee and value guards still apply) | The protocol-owned controller relists after every capture; exact matching would make farmer batches revert constantly |
 | Delivery refund | Purchaser only | Anyone after the 7-day window, credit always to the purchaser | So a ledger day always resolves |
 | Rewards | Separate rewards module | In-engine participation ledger per 24 h day of acceptance: accepted, resolved, units and VRF-derived bonus weight per purchaser | Farming (Milestone 2); no external call in settlement |
-| Fast path | One `processAcquisitions(1)` self-call | Word cached first, then up to `count` isolated single-item self-calls with a 600k stipend each | Batches settle inside the callback when gas allows (Base fork: 1 → 1, 4 → 4, 10 → 7 settled in the callback) |
+| Fast path | One `processAcquisitions(1)` self-call | Word cached first, then up to `count` isolated single-item self-calls, each given all gas above a 60k return reserve (≥ 400k to attempt; a cold first acquisition needs ~620k) | Batches settle inside the callback when gas allows (Base fork: 1 → 1, 4 → 4, 10 → 7 settled in the callback) |
 | Payer / beneficiary | Purchaser only | `msg.sender` pays and receives only overpayment; `purchaser` receives prize, genesis units and refunds; `referrer` separate; `AcquisitionRequested` carries the payer | Purchase on behalf (follow-up) |
 | Concurrency | Per-pool cap 10 (VRF service) | `maxUnsettledAcquisitions` 250, `maxAcquisitionsPerTx` 20 | Farmers batch |
 | Edge, protocol fee payout, factory hooks, `IMPLEMENTATION_KIND` | present | removed | Not used |
@@ -89,7 +89,7 @@ operator hook, retirement.
 - Expired / refunded: nothing.
 
 Margin split (Draw Shapes `_splitMargin`): positive margin repays the mint line, the rest divides
-4 : 0.5 : 2 into premium (stays in the ordinary pool), maintenance and GRAIL feed. Harvest withdraws
+3.5 : 0.5 : 3 into premium (stays in the ordinary pool), maintenance and GRAIL feed. Harvest withdraws
 engine proceeds when the walk is level and forwards the feed to `GrailVault`.
 
 Restocking mints from `cash` only (above `cashFloor`). An entry cash cannot fund stays queued.
@@ -102,7 +102,7 @@ decays by 0.00002 ETH per processed pull to a 50 % floor while the GRAIL weight 
 engine weight, and returns capture proceeds to the fund. A cycle funded in under 3 days steps the
 next target up, over 14 days down (Draw Shapes step rule). While no GRAIL is live the next target is
 the smallest rung (replacement first) and such a replacement does not move the ladder. Funding: the
-controller's 2 % feed and the treasury's trading-fee share (100 % while no GRAIL is live, else 90 %),
+controller's 3 % feed and the treasury's trading-fee share (100 % while no GRAIL is live, else 90 %),
 plus `fundGrail` from anyone.
 
 Deviation: the Draw Shapes 1 ETH piece and merge builder (5 / 10 / 25 / 50 / 100 ETH recipes) is not

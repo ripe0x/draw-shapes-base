@@ -62,3 +62,21 @@ attractive notionals; the 48 h delay is the defence and every such call is publi
   them. All are permissionless; settle refunds gas from maintenance.
 - Chainlink dependency: VRF outage stops new outcomes (requests expire and refund).
 - No independent audit has been performed. Slither 0.10.4 was run on `src/` (139 results, triaged in `evidence/slither.md`; no exploitable finding identified).
+
+## Prelaunch review: security-sensitive edge cases (this round)
+
+Automated tests, fork rehearsals and Slither (`evidence/slither.md`). **Not an independent audit.**
+
+| Edge case | Finding | Status |
+| --- | --- | --- |
+| VRF callback under cold storage | A first acquisition needs ~620k gas inside the callback; the fixed 600k stipend failed it and blocked every later callback at the head until a keeper processed it. Liveness only, with no fund risk. | **Fixed.** Each attempt gets all gas above the 60k return reserve, and callback gas is 750k per acquisition. Regression: `BaseSepoliaFork.t.sol` under `FOUNDRY_PROFILE=fork` (isolate). |
+| Warm-storage blind spot in tests | Single-transaction Foundry tests keep storage warm and hid the callback issue. | The fork profile runs fork suites isolated. The full suite under `--isolate` passes, apart from two VRF-fee tests whose `vm.fee` does not carry into isolated transactions (a harness limitation). |
+| An attempt's failure consuming the callback | An attempt now receives all remaining gas. If it fails, the callback returns using the 60k reserve, and EIP-150 keeps 1/64 back. NFT delivery inside an attempt is capped at 150k and isolated (`DeliveryPending`). | Reviewed. |
+| VRF fee quote vs execution basefee | The fee is computed at execution. A rise between quote and execution reverts with `InsufficientPayment`. | The app sends a 25 % margin and the engine refunds the excess to the payer. |
+| Keeper refund vs priority fee | `settle` refunds `gas × basefee + tip`. A keeper paying a large priority fee subsidises the difference itself. | The keeper uses a 0.001 gwei priority fee by default; measured net cost was negative (the keeper earned the tip). |
+| GRAIL odds on a drained board | The probability cap limits decay only. On a board drained by an outage, a GRAIL's share of the selection weight rises, and it can be won at its notional. The vault then receives ~0.4 ETH rather than ~0.015 ETH. | Accepted: no loss to the vault. Keeper alerts fire on board depth < 70 %. |
+| Buyback minimum vs pool depth | A 3 % impact cap with a 0.005 ETH minimum stops buybacks if the pool's ETH side is below ~0.34 ETH. | Operational alert; governance can lower `minSpend`. |
+| Testnet allocation reaching mainnet | Scaled allocations would weaken solvency. | `Deploy.s.sol` rejects `testnetAllocation` on chain 8453, and postflight requires the launch board (backing 1.65 ETH). |
+| Placeholder recipients | The Token Works address is unknown. | Zero placeholders make `_requireConfig` revert. `mainnet-preflight.mjs` also requires written confirmation. |
+| Frontend: unfunded / staged GRAIL shown as winnable | | Fixed: odds are shown only for selectable listings, and funded-but-staged and accumulating states are labelled. |
+| Frontend: genesis claim | Claiming every past epoch reverted after the first claim. | Fixed: the app claims only final, unclaimed epochs with a reward. |

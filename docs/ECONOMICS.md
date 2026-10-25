@@ -8,13 +8,13 @@ output. Model outputs are scenario results under stated assumptions; they are no
 | Area | Parameter | Value |
 | --- | --- | --- |
 | Board | items / mix | 100: 62 × 0.01 Shape, 26 × 0.02 Draw Pack (2 × 0.01), 7 × 0.03 Draw Pack (3 × 0.01), 4 × 0.05 Shape, 1 × 0.1 Shape |
-| Notional | markups on backing | premium 400, maintenance 50, GRAIL feed 200 bps; plus 0.001 ETH per Shape (replacement mint fee) (follow-up; was 300 / 100 / 400) |
+| Notional | markups on backing | premium 350, maintenance 50, GRAIL feed 300 bps; plus 0.001 ETH per Shape (replacement mint fee) (launch; decision and arithmetic in docs/LAUNCH_CONFIG.md) |
 | Replacement | deficit draw / surprise / band | `restoreK` 8, `surpriseBps` 200, `bandBps` 3,000 (Draw Shapes values) |
 | Controller | cash floor / tip / capital target / maintenance floor | 0 / 0.00001 ETH / 2.2 ETH / 0.05 ETH |
 | Engine | per tx / unsettled / activations per request | 20 / 250 / 6 |
 | Engine | positive slippage / cooldown / word deadline | 10 % / 0 / 1,800 blocks (1 h on Base) |
 | Engine | settlement fee / split | 1 % of the acquisition fee; 50 % referrer, 25 % Token Works, 25 % development (referrer share to development when there is none); Token Works is inside the 1 % |
-| VRF | confirmations / callback gas | 3 / 100,000 + 650,000 per acquisition (cap 2.5M) |
+| VRF | confirmations / callback gas | 3 / 100,000 + 750,000 per acquisition (cap 2.5M); each in-callback attempt gets all gas above a 60k reserve |
 | VRF fee (purchaser, per batch) | overhead / basefee floor / premium / buffer / flat / cap | 400,000 gas / 0.005 gwei / 60 % / 25 % / 0.000002 ETH / 0.002 ETH |
 | GRAIL | ladder / list / floor / decay / cap / steps | 0.5 → 1 → 5 ETH; 80 % of backing; 50 %; 0.00002 ETH per pull; 5 % of weight; up < 3 days, down > 14 days |
 | ENGINE | supply | 35,000,000: 10M liquidity, 25M farm |
@@ -28,16 +28,16 @@ output. Model outputs are scenario results under stated assumptions; they are no
 
 | Flow | wei | Goes to |
 | --- | --- | --- |
-| Acquisition fee | 14,878,540,357,338,322 | engine escrow → depositor of the captured listing (the controller, or the GRAIL vault for a GRAIL) |
-| Settlement fee | 148,785,403,573,383 | engine escrow → referrer 74,392,701,786,691 / Token Works 37,196,350,893,345 / development 37,196,350,893,347 |
-| **Fee + settlement (reference price before VRF)** | **15,027,325,760,911,705** | |
-| VRF fee, per batch (basefee 0.01 gwei) | 23,275,000,000,000 for 1 pull; 55,650,000,000,000 for 4–20 pulls | Chainlink subscription, at purchase |
-| Expected ETH backing received | 12,819,637,956,291,283 (85.31 % of fee + settlement) | the player, inside the prize |
+| Acquisition fee | 14,942,455,786,105,613 | engine escrow → depositor of the captured listing (the controller, or the GRAIL vault for a GRAIL) |
+| Settlement fee | 149,424,557,861,056 | engine escrow → referrer 74,712,278,930,528 / Token Works 37,356,139,465,264 / development 37,356,139,465,264 |
+| **Fee + settlement (reference price before VRF)** | **15,091,880,343,966,669** | |
+| VRF fee, per batch (basefee 0.01 gwei) | 25,125,000,000,000 for 1 pull; 55,650,000,000,000 for 4–20 pulls | Chainlink subscription, at purchase |
+| Expected ETH backing received | 12,819,466,318,547,036 (84.94 % of fee + settlement) | the player, inside the prize |
 
 The controller books `proceeds − captured backing` as margin: first it repays the replacement mint
 line (≈ 0.001226 ETH per pull = 1.226 Shapes × 0.001, paid to the creator through Shapes), then the
-rest divides 4 : 0.5 : 2 — premium ≈ 0.000513 stays in the ordinary pool, maintenance ≈ 0.000064 refunds
-keepers, feed ≈ 0.000256 goes to the GRAIL vault. These are expectations; any single pull
+rest divides 3.5 : 0.5 : 3 — premium ≈ 0.000449 stays in the ordinary pool, maintenance ≈ 0.000064 refunds
+keepers, feed ≈ 0.000385 goes to the GRAIL vault. These are expectations; any single pull
 can be a large gain or loss for the pool.
 
 ## 3. All money flows
@@ -118,6 +118,6 @@ feed and maintenance are not distributable.
 - `vault.totalFunded = controller.totalFeedSent + treasury.totalToGrail + direct fundGrail`.
 - `vault.totalFunded + vault.totalProceeds = vault.fund + totalBackingMinted + totalMintFeesPaid`.
 - A GRAIL exists on the board only after `fund ≥ backing + mintFee` was spent on it.
-- At ~300 pulls a day the 2 % feed alone funds ~0.077 ETH/day, i.e. a 0.5 ETH GRAIL in about 6.5
+- At ~300 pulls a day the 3 % feed alone funds ~0.116 ETH/day, i.e. a 0.5 ETH GRAIL in about 4.3
   days; trading fees shorten that and go 100 % to the GRAIL fund until one is live (rehearsal: two
   0.5 ETH GRAILs in 14 days at 200 pulls/day). Full 14-day policy results: docs/FOLLOWUP.md.
