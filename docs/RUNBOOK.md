@@ -96,7 +96,8 @@ no `settle` transaction for 15 min; `cash` < 0.15 ETH; VRF subscription < 0.01 E
 
 The engine's word deadline is counted in blocks: `selectionTimeoutBlocks` 1,800, which is 1 h at Base
 mainnet's 2 s blocks (engine maximum 7,200). Base Sepolia already produces blocks every 0.2 s, where 1,800 blocks is
-6 minutes. The first live Sepolia word took 362 s and arrived just after the deadline, so that pull was refunded.
+6 minutes. The first live Sepolia word arrived 1,808 blocks after the request, just after the deadline, so that pull was refunded.
+That delay was not oracle latency (next section).
 
 If Base mainnet's block time changes, governance must reset the window to about 1 h of blocks, within the
 7,200 maximum, through `DrawEngine.setVrfConfig`. That call needs the engine idle:
@@ -106,6 +107,30 @@ If Base mainnet's block time changes, governance must reset the window to about 
 4. Unpause.
 
 `mainnet-preflight.mjs` checks the block time before deployment.
+
+### VRF subscription balance: the node checks it at the lane's MAX gas price
+
+Found live on Base Sepolia. A Chainlink node fulfils a request only once the subscription's native balance
+covers the fulfilment priced at the key lane's **maximum** gas price, times (1 + native premium). The
+current gas price does not matter for this check. Until then the request just waits. Our words were late
+only for this reason; another consumer on the same lane was served in 19 blocks.
+
+| Request | Fulfilment gas | Needed at 30 gwei × 1.6 | Subscription | Outcome |
+| --- | --- | --- | --- | --- |
+| Single pull (in time) | 698k | 0.034 ETH | 0.030 → topped up to 0.045 | waited, then fulfilled about 1 min after the top-up |
+| Ten pulls (in time) | about 2.5M | about 0.12 ETH | 0.045 | waited until the word was late (7,205 blocks), when the callback costs 256k (0.012 ETH) and passes |
+
+The charge itself is at the real gas price: 0.0000077 ETH and 0.0000026 ETH for those two. The balance is
+a standing float that is not spent. Purchaser fees top it up on every request, but they never create it.
+
+| Network | Lane max | Premium | Worst case (2.5M + 0.15M gas) | Keep at least |
+| --- | --- | --- | --- | --- |
+| Base (`0x00b81b5a…`) | 2 gwei | 60 % | 0.0085 ETH | **0.02 ETH** (keeper `VRF_MIN_ETH` default, preflight) |
+| Base Sepolia (`0x9e1344a1…`) | 30 gwei | 60 % | 0.127 ETH | **0.25 ETH** |
+
+If mainnet basefee rises above the lane's 2 gwei cap, words wait until it falls, and requests past the
+deadline refund. That is the trade-off for the cheaper lane. The 30 gwei lane (`0xdc2f8767…`) would need a
+0.2+ ETH float.
 
 ### Keeper outage: what happens and how to recover (sim/results/grail-outage.md, KeeperOutage.t.sol)
 

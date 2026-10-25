@@ -331,7 +331,7 @@ async function recycle(ids, label) {
 }
 const keeperCtx = (acct) => ({ pub, wallet: wallet(acct), account: acct, dep: { ...A, grailVault: A.grailVault }, log: (o) => state.txs.push({ keeper: acct.address, ...o }),
   distributeMinWei: 0n, isPolKeeper: acct.address === deployer.address, thresholds: { unsettled: 100, headStallSec: 600, queueStallSec: 900, boardDepthShare: 0.7,
-  cashMinWei: parseEther("0.05"), vrfMinWei: parseEther("0.005"), stepDueStallSec: 900, settleStallSec: 900, refundRate: 0.05 } });
+  cashMinWei: parseEther("0.05"), vrfMinWei: parseEther(FORK ? "0.005" : "0.25"), stepDueStallSec: 900, settleStallSec: 900, refundRate: 0.05 } });
 async function keeperTick(acct) {
   const ctx = keeperCtx(acct);
   const before = await pub.getBalance({ address: acct.address });

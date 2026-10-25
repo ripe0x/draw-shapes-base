@@ -51,7 +51,13 @@ if (sub !== 0n) {
   check("VRF subscription exists", !!s);
   if (s) {
     check("VRF subscription owned by the admin Safe", getAddress(s[3]) === getAddress(cfg.adminSafe === ZERO ? s[3] : cfg.adminSafe) && cfg.adminSafe !== ZERO, s[3]);
-    check("VRF subscription native balance ≥ 0.02 ETH (seed; purchasers then fund it)", s[1] >= parseEther("0.02"), `${formatEther(s[1])} ETH`);
+    // nodes fulfil only while the balance covers the fulfilment at the lane's max gas price (found on Base Sepolia)
+    const [, laneMax] = await pub.readContract({ address: cfg.vrfCoordinator, abi: parseAbi(["function s_provingKeys(bytes32) view returns (bool,uint64)"]), functionName: "s_provingKeys", args: [cfg.vrfKeyHash] }).catch(() => [false, 0n]);
+    const c = await pub.readContract({ address: cfg.vrfCoordinator, abi: coordinatorAbi, functionName: "s_config" });
+    const worst = (BigInt(c[1]) + 150_000n) * BigInt(laneMax) * BigInt(100 + Number(c[7])) / 100n;
+    const need = 2n * worst > parseEther("0.02") ? 2n * worst : parseEther("0.02");
+    check("VRF subscription native balance ≥ 2x worst-case fulfilment at the lane's max gas price (and ≥ 0.02 ETH)", s[1] >= need,
+      `${formatEther(s[1])} of ${formatEther(need)} ETH (worst case ${formatEther(worst)} at ${Number(laneMax) / 1e9} gwei)`);
   }
 }
 const kh = await pub.readContract({ address: cfg.vrfCoordinator, abi: parseAbi(["function s_provingKeys(bytes32) view returns (bool,uint64)"]), functionName: "s_provingKeys", args: [cfg.vrfKeyHash] }).catch(() => [false]);

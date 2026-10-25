@@ -14,7 +14,10 @@ export const DEFAULT_THRESHOLDS = {
   queueStallSec: 900, // replacements queued this long
   boardDepthShare: 0.7, // selectable ordinary listings below 70 % of the board
   cashMinWei: 150_000_000_000_000_000n, // 0.15 ETH (scale with the allocation on testnets)
-  vrfMinWei: 10_000_000_000_000_000n, // 0.01 ETH in the VRF subscription
+  // Chainlink nodes fulfil only while the subscription covers the fulfilment at the key lane's MAX gas
+  // price (not the current one): worst case (2.5M + 0.15M) x 2 gwei x 1.6 = 0.0085 ETH on the Base 2 gwei
+  // lane, so alert at about twice that. The Base Sepolia lane is 30 gwei: set VRF_MIN_ETH=0.25 there.
+  vrfMinWei: 20_000_000_000_000_000n, // 0.02 ETH in the VRF subscription
   stepDueStallSec: 900, // GrailVault.stepDue() true this long
   settleStallSec: 900, // work pending and no successful settle this long
   refundRate: 0.05, // refunded share of resolved acquisitions over the recent window

@@ -43,7 +43,8 @@ The preflight checks:
 - the placeholders;
 - that the admin Safe is a contract with threshold ≥ 2, and that the guardian is a contract;
 - that the admin Safe, guardian and keeper are distinct;
-- the VRF subscription: exists, is owned by the admin Safe, and holds at least 0.02 ETH;
+- the VRF subscription: exists, is owned by the admin Safe, and holds at least twice the worst-case fulfilment at
+  the lane's max gas price (≥ 0.02 ETH);
 - the key hash and the coordinator gas limit;
 - the block time (the 1,800-block VRF word deadline assumes 2 s blocks);
 - the 48 h delay;
@@ -52,7 +53,9 @@ The preflight checks:
 ## 2. VRF subscription (admin Safe)
 
 1. Call `createSubscription()` on the coordinator from the Safe. Record the id in `base.json`.
-2. Call `fundSubscriptionWithNative(id)` with 0.02–0.05 ETH from the operations float.
+2. Call `fundSubscriptionWithNative(id)` with 0.02–0.05 ETH from the operations float. Never let it fall below
+   0.02 ETH: nodes only fulfil while the balance covers the worst-case fulfilment at the lane's 2 gwei max
+   (`docs/RUNBOOK.md`, "VRF subscription balance").
 
 Purchasers fund every request after launch (`DrawEngine.vrfFeeFor`); the float only covers the start.
 
