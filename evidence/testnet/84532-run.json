@@ -141,6 +141,35 @@
       "activated": true,
       "launched": true,
       "governance": "0x0a37004C35BC01Bd5D0E537B85b48Ae650A68bcb"
+    },
+    "post-activation-governance": {
+      "done": true,
+      "at": "2026-10-25T16:48:41.818Z",
+      "delay": "600",
+      "scheduledAt": "1792946315",
+      "executedAt": "1792946921",
+      "waitedSec": "606",
+      "timeSkippedOnFork": false,
+      "surplusSink": "0xcd6c48146Fa4DBb7C65B59A22F50c16D16BcE73D",
+      "surplusReleaseStart": "1794155914"
+    },
+    "testnet-grail-funded": {
+      "done": true,
+      "at": "2026-10-25T16:48:43.965Z",
+      "backing": "50000000000000000",
+      "notional": "40000000000000000",
+      "listingId": "28",
+      "tokenId": "39",
+      "status": [
+        1
+      ],
+      "oddsPpm": [
+        "14074"
+      ]
+    },
+    "fund-accounts": {
+      "done": true,
+      "at": "2026-10-25T16:48:46.475Z"
     }
   },
   "txs": [
@@ -209,6 +238,80 @@
       "effectiveGasPrice": "6000000",
       "costWei": "450816000000",
       "valueWei": "0"
+    },
+    {
+      "label": "timelock.executeBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only))",
+      "hash": "0x2a384a0f19f7d90c66681517a657b4d6171e89ace12f7334e040621a8a3c5189",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50125264,
+      "status": "success",
+      "gasUsed": "115832",
+      "effectiveGasPrice": "6000000",
+      "costWei": "694992000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "vault.fundGrail(testnet GRAIL backing + mint fee)",
+      "hash": "0x315c0907f297cdb4227a6ef696022e99d0e18b4480f8edbf94d1080d8c78c983",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50125270,
+      "status": "success",
+      "gasUsed": "67321",
+      "effectiveGasPrice": "6000000",
+      "costWei": "403926000000",
+      "valueWei": "51000000000000000"
+    },
+    {
+      "label": "vault.step(mint + list GRAIL)",
+      "hash": "0xcf773985e12924e45ee8ba85f604bff582a7aea1dd19d31282e89e2b1b3af83b",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "block": 50125275,
+      "status": "success",
+      "gasUsed": "840662",
+      "effectiveGasPrice": "6000000",
+      "costWei": "5043972000000",
+      "valueWei": "0"
+    },
+    {
+      "label": "fund player",
+      "hash": "0x7dcd3d8b86dc141c657b213fa538859f38b85d016b36ba53c375a65240cd91ec",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "to": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50125279,
+      "status": "success",
+      "gasUsed": "21000",
+      "valueWei": "313565929405872815"
+    },
+    {
+      "label": "fund referrer",
+      "hash": "0x5634b3ccf1786b0501ec70cc7f769c8a6d9fa6dc32fe896693ef7b137f667e69",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "to": "0xEDca467537444d2dB370033203A71842a229b83E",
+      "block": 50125282,
+      "status": "success",
+      "gasUsed": "21000",
+      "valueWei": "3000000000000000"
+    },
+    {
+      "label": "fund keeper-2",
+      "hash": "0x98b881780677ee79be127ddee5d2c36f980ba4b3372f930ab74fddced2a12724",
+      "from": "0x79F8829fB147658D537001ECbC535b22df31cFcB",
+      "to": "0x41846cde902AF0d4Ad7E51Eb0B1b6d6335FdFd25",
+      "block": 50125286,
+      "status": "success",
+      "gasUsed": "21000",
+      "valueWei": "10000000000000000"
+    },
+    {
+      "label": "acquireBatch(1) with referrer",
+      "hash": "0xb440a51850ad241c94982a9213d19ebc809d50b192b31053ad8bb79b093d2c5a",
+      "from": "0x14665897E9bA3268Ddc973Ff2014449571E8b60e",
+      "block": 50125294,
+      "status": "success",
+      "gasUsed": "481289",
+      "effectiveGasPrice": "6000000",
+      "costWei": "2887734000000",
+      "valueWei": "15938094099039374"
     }
   ]
 }
