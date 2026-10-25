@@ -54,7 +54,7 @@ if (sub !== 0n) {
     // nodes fulfil only while the balance covers the fulfilment at the lane's max gas price (found on Base Sepolia)
     const [, laneMax] = await pub.readContract({ address: cfg.vrfCoordinator, abi: parseAbi(["function s_provingKeys(bytes32) view returns (bool,uint64)"]), functionName: "s_provingKeys", args: [cfg.vrfKeyHash] }).catch(() => [false, 0n]);
     const c = await pub.readContract({ address: cfg.vrfCoordinator, abi: coordinatorAbi, functionName: "s_config" });
-    const worst = (BigInt(c[1]) + 150_000n) * BigInt(laneMax) * BigInt(100 + Number(c[7])) / 100n;
+    const worst = (BigInt(c[1]) + 200_000n) * BigInt(laneMax) * BigInt(100 + Number(c[7])) / 100n;
     const need = 2n * worst > parseEther("0.02") ? 2n * worst : parseEther("0.02");
     check("VRF subscription native balance ≥ 2x worst-case fulfilment at the lane's max gas price (and ≥ 0.02 ETH)", s[1] >= need,
       `${formatEther(s[1])} of ${formatEther(need)} ETH (worst case ${formatEther(worst)} at ${Number(laneMax) / 1e9} gwei)`);

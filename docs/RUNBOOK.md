@@ -110,7 +110,8 @@ If Base mainnet's block time changes, governance must reset the window to about 
 
 ### VRF subscription balance: the node checks it at the lane's MAX gas price
 
-Found live on Base Sepolia. A Chainlink node fulfils a request only once the subscription's native balance
+Found live on Base Sepolia, and it matches Chainlink's documented "Max Cost" minimum balance
+(docs.chain.link/vrf/v2-5/billing). Below that minimum, requests stay pending for up to 24 h. A Chainlink node fulfils a request only once the subscription's native balance
 covers the fulfilment priced at the key lane's **maximum** gas price, times (1 + native premium). The
 current gas price does not matter for this check. Until then the request just waits. Our words were late
 only for this reason; another consumer on the same lane was served in 19 blocks.
@@ -120,13 +121,13 @@ only for this reason; another consumer on the same lane was served in 19 blocks.
 | Single pull (in time) | 698k | 0.034 ETH | 0.030 → topped up to 0.045 | waited, then fulfilled about 1 min after the top-up |
 | Ten pulls (in time) | about 2.5M | about 0.12 ETH | 0.045 | waited until the word was late (7,205 blocks), when the callback costs 256k (0.012 ETH) and passes |
 
-The charge itself is at the real gas price: 0.0000077 ETH and 0.0000026 ETH for those two. The balance is
+The lane max is a ceiling, not the price paid. Actual Base Sepolia gas was 0.006 gwei, so the charge itself is at the real gas price: 0.0000077 ETH and 0.0000026 ETH for those two. The balance is
 a standing float that is not spent. Purchaser fees top it up on every request, but they never create it.
 
-| Network | Lane max | Premium | Worst case (2.5M + 0.15M gas) | Keep at least |
+| Network | Lane max | Premium | Worst case (2.5M callback + 0.2M verification) | Keep at least |
 | --- | --- | --- | --- | --- |
-| Base (`0x00b81b5a…`) | 2 gwei | 60 % | 0.0085 ETH | **0.02 ETH** (keeper `VRF_MIN_ETH` default, preflight) |
-| Base Sepolia (`0x9e1344a1…`) | 30 gwei | 60 % | 0.127 ETH | **0.25 ETH** |
+| Base (`0x00b81b5a…`) | 2 gwei | 60 % | 0.0086 ETH | **0.02 ETH** (keeper `VRF_MIN_ETH` default, preflight) |
+| Base Sepolia (`0x9e1344a1…`) | 30 gwei | 60 % | 0.130 ETH | **0.25 ETH** |
 
 If mainnet basefee rises above the lane's 2 gwei cap, words wait until it falls, and requests past the
 deadline refund. That is the trade-off for the cheaper lane. The 30 gwei lane (`0xdc2f8767…`) would need a
