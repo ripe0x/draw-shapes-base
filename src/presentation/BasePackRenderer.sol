@@ -333,7 +333,7 @@ contract BasePackRenderer is IShapePackRenderer, IERC165 {
             FixedPoint.toString(slot.height),
             '" rx="',
             FixedPoint.toString(slot.width / 50),
-            '" fill="#0052FF" filter="url(#d)"/><svg width="',
+            '" fill="#fff" filter="url(#d)"/><svg width="',
             FixedPoint.toString(slot.width),
             '" height="',
             FixedPoint.toString(slot.height),

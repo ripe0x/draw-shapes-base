@@ -996,8 +996,8 @@ contract BaseShapeRenderer is IShapeRenderer, IShapeGeometry, IERC165 {
     }
 
     function _svgFromCard(Card memory card, bool inverted) private pure returns (string memory) {
-        string memory bg = inverted ? "#fff" : "#0052FF";
-        string memory fg = inverted ? "#0052FF" : "#fff";
+        string memory bg = inverted ? "#0052FF" : "#fff";
+        string memory fg = inverted ? "#fff" : "#0052FF";
 
         bytes memory body;
         uint256 n = card.modules.length;

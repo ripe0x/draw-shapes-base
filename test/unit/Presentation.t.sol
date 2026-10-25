@@ -9,8 +9,8 @@ import {ShapePacks} from "draw-packs/ShapePacks.sol";
 import {SystemFixture} from "../utils/SystemFixture.sol";
 import {BaseShapeRenderer} from "../../src/presentation/BaseShapeRenderer.sol";
 
-/// @notice Base-blue card presentation: the deployed Shapes and Draw Packs render Base blue
-///         (#0052FF) cards; geometry is identical to the Ethereum v1 renderer.
+/// @notice Base card presentation: the deployed Shapes and Draw Packs render white cards with Base-blue
+///         (#0052FF) shapes; geometry is identical to the Ethereum v1 renderer.
 contract PresentationTest is SystemFixture {
     using LibString for string;
 
@@ -20,12 +20,14 @@ contract PresentationTest is SystemFixture {
         bytes32 seed = keccak256("card");
         string memory b = baseR.renderSVG(seed, 0.01 ether, false, 0);
         string memory e = v1.renderSVG(seed, 0.01 ether, false, 0);
-        assertTrue(b.contains('fill="#0052FF"/>'), "blue field");
-        assertFalse(b.contains('fill="#000"'), "no black field");
-        // replacing the colour literal in the v1 card yields exactly the Base card
-        assertEq(e.replace('height="350" fill="#000"', 'height="350" fill="#0052FF"'), b, "only the colour differs");
+        assertTrue(b.contains('height="350" fill="#fff"/>'), "white field");
+        assertTrue(b.contains('fill="#0052FF"') || b.contains('stroke="#0052FF"'), "blue marks");
+        assertFalse(b.contains("#000"), "no black");
+        // swapping the v1 colours (black field -> white, white marks -> blue) yields exactly the Base card
+        string memory swapped = e.replace('"#fff"', '"#0052FF"').replace('height="350" fill="#000"', 'height="350" fill="#fff"');
+        assertEq(swapped, b, "only the colours differ");
         string memory inv = baseR.renderSVG(seed, 0.01 ether, true, 0);
-        assertTrue(inv.contains('fill="#fff"') && inv.contains("#0052FF"), "inverted: white field, blue marks");
+        assertTrue(inv.contains('height="350" fill="#0052FF"/>') && inv.contains('"#fff"'), "inverted: blue field, white marks");
     }
 
     function test_deployedShapeAndPackTokenUrisUseBaseBlue() public {

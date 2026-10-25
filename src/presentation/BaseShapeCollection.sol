@@ -200,7 +200,7 @@ contract BaseShapeCollection is IShapeCollection, IERC165 {
                 '<filter id="d" x="-15%" y="-15%" width="130%" height="130%">'
                 '<feDropShadow dx="0" dy="0" stdDeviation="44" flood-color="#000" flood-opacity="0.22"/>'
                 "</filter>" "</defs>" '<rect width="3840" height="3840" fill="#fff"/>'
-                '<rect x="920" y="520" width="2000" height="2800" rx="40" fill="#0052FF" filter="url(#d)"/>'
+                '<rect x="920" y="520" width="2000" height="2800" rx="40" fill="#fff" filter="url(#d)"/>'
                 '<g clip-path="url(#c)"><g transform="translate(920,520)"><g class="s">',
                 strip,
                 "</g></g></g></svg>"
