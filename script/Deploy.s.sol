@@ -100,6 +100,7 @@ contract Deploy is Deployer {
         vm.serializeUint(o, "marketLiquidity", s.alloc.marketLiquidity);
         vm.serializeUint(o, "boardItems", s.alloc.boardItems);
         vm.serializeUint(o, "deployBlock", block.number);
+        vm.serializeAddress(o, "prizeRouter", address(s.prizeRouter));
         string memory out = vm.serializeAddress(o, "lens", address(s.lens));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));
 

@@ -24,6 +24,7 @@ import {GenesisFarm} from "../src/token/GenesisFarm.sol";
 import {Treasury} from "../src/treasury/Treasury.sol";
 import {Buyback} from "../src/treasury/Buyback.sol";
 import {Lens} from "../src/Lens.sol";
+import {PrizeRouter} from "../src/game/PrizeRouter.sol";
 import {LaunchParams} from "./config/LaunchParams.sol";
 
 /// @title Deployer
@@ -81,6 +82,7 @@ abstract contract Deployer is Script {
         Treasury treasury;
         Buyback buyback;
         Lens lens;
+        PrizeRouter prizeRouter;
         Allocation alloc;
     }
 
@@ -254,6 +256,8 @@ abstract contract Deployer is Script {
                 poolManager: c.poolManager
             })
         );
+        // stateless: lets players pull with, or cash out, their prizes in one transaction
+        s.prizeRouter = new PrizeRouter(address(s.engine), s.shapes, s.drawPacks);
     }
 
     /// @dev Funds the opening allocations held by contracts and builds the board (acquisitions stay
