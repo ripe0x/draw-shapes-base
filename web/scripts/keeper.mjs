@@ -17,7 +17,8 @@ import { parseEther } from "viem";
 import { makeClients, chainFor, snapshot, act, health, refundWindow, DEFAULT_THRESHOLDS } from "./keeper-lib.mjs";
 
 const rpcUrls = (process.env.RPC_URLS ?? process.env.RPC ?? "https://sepolia.base.org").split(",");
-const depPath = process.env.DEPLOYMENT ?? new URL("../src/deployment.json", import.meta.url).pathname;
+const depPath = process.env.DEPLOYMENT;
+if (!depPath) throw new Error("DEPLOYMENT=<path to deployments/<chainId>.json or web/src/deployment.<network>.json> is required");
 const dep = JSON.parse(readFileSync(depPath));
 const chain = chainFor(Number(dep.chainId), rpcUrls[0]);
 if (!process.env.KEEPER_KEY) console.warn("KEEPER_KEY not set: monitoring only");

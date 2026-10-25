@@ -10,6 +10,8 @@ const abis = {
   hook: pick("EngineHook.sol", "EngineHook"),
   lens: pick("Lens.sol", "Lens"),
   token: pick("EngineToken.sol", "EngineToken"),
+  buyback: pick("Buyback.sol", "Buyback"),
+  treasury: pick("Treasury.sol", "Treasury"),
 };
 writeFileSync(new URL("../src/abi.json", import.meta.url), JSON.stringify(abis));
 console.log("wrote src/abi.json:", Object.keys(abis).join(", "));
@@ -19,8 +21,6 @@ const art = (file, name) => JSON.parse(readFileSync(new URL(`${file}/${name}.jso
 const ops = {
   ...abis,
   timelock: pick("TimelockController.sol", "TimelockController"),
-  treasury: pick("Treasury.sol", "Treasury"),
-  buyback: pick("Buyback.sol", "Buyback"),
   liquidity: pick("ProtocolLiquidity.sol", "ProtocolLiquidity"),
   shapes: pick("Shapes.sol", "Shapes"),
   packs: pick("ShapePacks.sol", "ShapePacks"),

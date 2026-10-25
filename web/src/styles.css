@@ -43,3 +43,16 @@ th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line
 .toast.err { bottom: 64px; }
 footer { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 0.75rem; margin: 24px 0; }
 @media (max-width: 600px) { table { font-size: 0.8rem; } }
+header h1 small { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-left: 6px; }
+.banner { background: var(--warn); color: #fff; border-radius: 8px; padding: 10px 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.banner button { background: #fff; color: #000; }
+.label { margin: 12px 0 6px; font-weight: 600; }
+.toast.second { bottom: 72px; }
+a { color: var(--accent); }
+ol { padding-left: 20px; }
+ol li { margin: 4px 0; }
+@media (max-width: 600px) {
+  th:nth-child(3), td:nth-child(3) { display: none; }
+  .facts { grid-template-columns: 1fr 1fr; }
+  header h1 { font-size: 1.2rem; }
+}
