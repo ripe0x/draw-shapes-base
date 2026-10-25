@@ -85,7 +85,7 @@ class Sim:
         self.keeper_cost = self.keeper_unpaid = 0.0
         self.reserve = RESERVE
         self.backstopped = 0.0
-        self.grail_fund = 0.0
+        self.grail_fund = p.get("seed_grail", 0.0)  # optional opening GRAIL funded from new capital
         self.grail_from_feed = self.grail_from_trading = self.grail_from_capture = 0.0
         self.pol = 0.0
         self.level = 0
@@ -645,6 +645,26 @@ def section_levers(seeds):
     return out
 
 
+def section_seed(seeds):
+    out = ["", "## C2. Opening GRAIL funded at launch (new capital outside the 5 ETH split; needs approval)\n",
+           "`seed_grail` ETH is in the GRAIL fund at activation, so a 0.5 ETH GRAIL lists at launch. Nothing is "
+           "taken from the ordinary pool, the reserve or the liquidity.\n",
+           "| config | pulls/day | trading | seed | first GRAIL h | no GRAIL h (p50 / p90) | mean selectable | GRAILs won | "
+           "RTP total | buyback p50 / p10 |", "|" + "---|" * 10]
+    for cfg in CONFIGS:
+        for pulls in (100, 300):
+            for tr in (0, 3):
+                for seed in (0.0, 0.501):
+                    r = run(dict(config=cfg, pulls=pulls, trading=tr, seed_grail=seed), seeds)
+                    out.append(" | ".join([
+                        f"| {cfg}", str(pulls), str(tr), f"{seed}", fmt_h(med([x['first_grail_h'] for x in r])),
+                        f"{med([x['no_sel_genesis_h'] for x in r]):.0f} / {pct([x['no_sel_genesis_h'] for x in r], 0.9):.0f}",
+                        f"{sum(x['mean_sel'] for x in r) / seeds:.2f}", str(med([x['grail_wins'] for x in r])),
+                        f"{100 * med([x['rtp'] for x in r]):.2f} %",
+                        f"{med([x['buyback_genesis'] for x in r]):.3f} / {pct([x['buyback_genesis'] for x in r], 0.1):.3f} |"]))
+    return out
+
+
 def section_outage(seeds):
     out = ["", "## D. Keeper outages and recovery (current 4/0.5/2, no trading)\n",
            "One outage starting at hour 72 (day 4); otherwise keepers every 5 min. VRF callbacks keep settling "
@@ -676,7 +696,8 @@ def section_outage(seeds):
     return out
 
 
-SECTIONS = {"compare": section_compare, "post": section_post, "levers": section_levers, "outage": section_outage}
+SECTIONS = {"compare": section_compare, "post": section_post, "levers": section_levers, "seed": section_seed,
+            "outage": section_outage}
 
 
 def main():
