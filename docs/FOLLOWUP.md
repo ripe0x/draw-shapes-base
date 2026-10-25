@@ -86,7 +86,8 @@ without one.
 
 **Solvency.** Player escrow is unaffected by any of these changes: refunds still return fee +
 settlement fee, and the engine holds exactly its liabilities in the tests. Bankroll stress under
-the proposed markups is in section 6.
+the proposed markups is in section 6: the acceptance gate still passes, but pool-alone tails are
+2–3× wider.
 
 ## 2. Purchaser-funded VRF (FWA V2 model, one request per batch)
 
@@ -238,5 +239,33 @@ checks passed. The script logged a quoted payment of 0.015040 ETH per pull inclu
 
 ## 6. Bankroll stress under the proposed markups
 
-See `sim/results/bankroll.md` (2,000 seeds per row, regenerated with premium 4 / maintenance 0.5 /
-feed 2). The before table is in git history.
+Source: `sim/results/bankroll.md`, regenerated with 4 / 0.5 / 2, 2,000 seeds per row. "Shortfall"
+means a settle at which the pool could not fund the next replacement.
+
+| Scenario | Shortfall, pool alone: before → after | With the 0.5 ETH reserve backstop: before → after | NAV p1 before → after |
+| --- | --- | --- | --- |
+| 300/day, keeper 5 min (acceptance gate) | 0.10 % → 0.20 % | **0 → 0 / 2,000** | 3.18 → 3.24 |
+| 750/day, keeper 5 min | 0.30 % → 0.95 % | 0 → 0 | 5.17 → 5.76 |
+| 1,500/day, keeper 5 min | 0.50 % → 1.30 % | 0 → 0 | 8.44 → 9.71 |
+| 300/day, keeper 60 min | 0.60 % → 1.50 % | 0 → 0 | 2.88 → 2.82 |
+| 1,500/day, keeper 60 min | 3.75 % → 12.1 % | 0 → **0.45 %** | 4.07 → 3.35 |
+| 300/day, keeper 6 h | 3.5 % → 10.6 % | 0 → 0 | 2.03 → 1.76 |
+| 1,500/day, keeper 6 h | 4.8 % → 13.3 % | 0 → **0.20 %** | 2.00 → 1.74 |
+
+**The acceptance threshold is still met.** At 300 pulls/day with a 5-minute keeper, the pool plus
+reserve never fails (0 of 2,000 runs).
+
+Pool-alone tail risk is 2–3× higher. The total markup is lower (6.5 % vs 8 %), so each pull carries
+less margin. Early cash (0.41 ETH liquid after the opening board) is more exposed to a run of large
+wins before the mint line is repaid.
+
+Medians do improve, because the pool keeps 4 % instead of 3 %:
+- At 300/day, NAV p50 goes from 3.74 to 4.10 ETH.
+- Premium goes from 1.70 to 2.08 ETH.
+
+With slow keepers (hourly or 6-hourly at 1,500/day), the reserve no longer covers every tail
+(0.45 % / 0.20 % of runs). Shortfalls never touch player escrow; they thin the board until proceeds
+refill cash.
+
+**Operational consequence:** keep the 5-minute keeper cadence. It matters more now than in the
+previous configuration. The 5 ETH split needs no change at the target cadence.

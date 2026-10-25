@@ -92,7 +92,8 @@ GRAILs 1.5, NAV 3.1401, surplus 0.9401.
 | Operations | 0.30 | ops Safe (VRF subscription seed, maintenance float, gas) | — |
 | **Total** | **5.00** | | |
 
-Bankroll stress results and the acceptance threshold are in section 5. No change to the proposed split was needed.
+Bankroll stress results and the acceptance threshold are in section 5. No change to the proposed split was needed
+(re-checked under the follow-up markups: docs/FOLLOWUP.md section 6).
 
 ## 5. Bankroll stress
 
