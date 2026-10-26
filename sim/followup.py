@@ -112,10 +112,18 @@ LADDER = [0.5, 1.0, 5.0]
 GRAIL_LIST, GRAIL_FLOOR, GRAIL_DECAY, PROB_CAP = 0.8, 0.5, 0.00002, 0.05
 STEP_UP_DAYS, STEP_DOWN_DAYS = 3, 14
 FEE = 0.001
+# Platform rules. Base (DrawEngine): the player pays fee x 1.01 (settlement fee, outside the pool) plus
+# the purchaser VRF fee; the pool receives the fee. FWA V2 custom pool (FWAClone): the player pays
+# fee x (1 + edge), the pool owner receives fee x (1 + edge / 2), FWA keeps the other half; FWA's VRF
+# service charges the player `requestFee` (0 on Ethereum when read 2026-10-26) and pays the oracle.
+BASE_PLATFORM = dict(name="base", price=1.01, pool=1.0, own_vrf=True)
 
 
 def simulate(args):
-    cfg, pulls_per_day, trade_vol_per_day, basefee_gwei, settle_minutes, seed = args
+    cfg, pulls_per_day, trade_vol_per_day, basefee_gwei, settle_minutes, seed, *rest = args
+    plat = rest[0] if rest else BASE_PLATFORM
+    own_vrf = plat["own_vrf"]
+    platform_take = 0.0  # settlement fee (Base) or FWA's half of the edge
     name, prem, maint_bps, feed_bps, tw, purchaser_vrf, new_policy = cfg
     markup = 1 + (prem + maint_bps + feed_bps) / BPS
     split = (prem, maint_bps, feed_bps)
@@ -197,7 +205,9 @@ def simulate(args):
                 fee = sum(it[3] * it[2] for it in items) / sw
                 vf = vrf_fee(batch, basefee) / E
                 bill = vrf_bill(batch, gp) / E
-                if purchaser_vrf:
+                if not own_vrf:
+                    vf = bill = 0.0  # FWA's service pays the oracle
+                elif purchaser_vrf:
                     vrf_collected += vf
                 else:
                     maint_bal -= bill  # previous design: maintenance tops the subscription up
@@ -222,19 +232,21 @@ def simulate(args):
                             break
                     it = items.pop(idx)
                     pulls_done += 1
-                    pay = fee * 1.01 + (vf / batch if purchaser_vrf else 0.0)
+                    pay = fee * plat["price"] + (vf / batch if purchaser_vrf else 0.0)
                     paid += pay
+                    platform_take += fee * (plat["price"] - plat["pool"])
+                    proceeds = fee * plat["pool"]
                     backing_won += it[1]
                     if it[4]:
                         grail_wins += 1
                         backing_won_grail += it[1]
-                        grail_fund += fee
-                        grail_capture_proceeds += fee
+                        grail_fund += proceeds
+                        grail_capture_proceeds += proceeds
                         continue
                     counts[it[0]] -= 1
                     booked += 1
-                    receivable += fee
-                    margin += fee - it[1]
+                    receivable += proceeds
+                    margin += proceeds - it[1]
                     mint_line += FEE * ROW_N[it[0]]
                     row = choose_row(rnd, [counts[i] + queue.count(i) for i in range(len(ROWS))])
                     if row is not None:
@@ -330,7 +342,7 @@ def simulate(args):
                 grail_odds=weight_share_sum / max(1, weight_share_n), inventory=inventory, nav=nav,
                 surplus=surplus, buyback=buyback, topup=topup, mint_fees=mint_fees, vrf_collected=vrf_collected,
                 vrf_billed=vrf_billed, pol=pol, backstopped=backstopped, shortfall=shortfall, reserve=reserve,
-                player_loss=paid - backing_won)
+                player_loss=paid - backing_won, platform_take=platform_take)
 
 
 def med(xs):
@@ -343,9 +355,10 @@ def pct(xs, p):
     return s[min(len(s) - 1, int(p * len(s)))]
 
 
-def run(cfg, pulls, vol, basefee, seeds, settle=5):
+def run(cfg, pulls, vol, basefee, seeds, settle=5, platform=None):
     args = [(cfg, pulls, vol, basefee, settle,
-             int(hashlib.sha256(f"{cfg[0]}/{pulls}/{vol}/{i}".encode()).hexdigest()[:8], 16)) for i in range(seeds)]
+             int(hashlib.sha256(f"{cfg[0]}/{pulls}/{vol}/{i}".encode()).hexdigest()[:8], 16)) + ((platform,) if platform else ())
+            for i in range(seeds)]
     with MP(4) as mp:
         res = mp.map(simulate, args, chunksize=max(1, seeds // 16))
     out = {k: med([r[k] for r in res]) for k in res[0] if k != "inventory"}
