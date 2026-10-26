@@ -10,9 +10,9 @@ mainnet deployment.
 | --- | --- | --- |
 | Player escrow (acquisition + settlement fee) | `DrawEngine` | Released only to a depositor (on verified delivery) and fee recipients, or back to the purchaser as a refund credit. `balance ≥ liabilities()` (invariant-tested). |
 | Prize NFTs and their ETH backing | `DrawEngine` (listed), controller (held), Shapes/Draw Packs (ETH) | A listed NFT leaves only to a purchaser on selection, or to its depositor by withdrawal / refund recovery. Backing is redeemable only by the NFT holder at Shapes. |
-| Ordinary pool cash | `DrawController` | Spent only on Shape mints, keeper refunds (maintenance), surplus release above committed capital after the maintenance floor. VRF is funded by purchasers' separate VRF fee, never from pool cash. |
-| GRAIL fund | `GrailVault` | Spent only on GRAIL backing and its mint fee. |
-| Treasury reserve, POL share | `Treasury` | Leaves only into the controller (backstop), the GRAIL vault, or the locked LP position. No withdrawal function. |
+| Ordinary pool cash | `DrawController` | Spent only on Shape mints, keeper refunds (maintenance), surplus release above committed capital after the maintenance floor, or `migrateCapital` to a successor (governance, 48 h timelock; only with no unresolved pull, level books and nothing listed). VRF is funded by purchasers' separate VRF fee, never from pool cash. |
+| GRAIL fund | `GrailVault` | Spent only on GRAIL backing and its mint fee, or `migrate`d with unawarded GRAILs (redeemed) to a successor (governance, 48 h timelock; only with no unresolved pull). |
+| Treasury reserve, POL share | `Treasury` | Leaves only into the controller (backstop), the GRAIL vault, the locked LP position, or `migrate` to a successor (governance, 48 h timelock). |
 | Protocol liquidity | `ProtocolLiquidity` | No remove-liquidity function exists. |
 | Farm allocation and earned rewards | `GenesisFarm` | Only claims (by earners) and the one-time burn of epochs that earned nothing. No owner. |
 | ENGINE supply | `EngineToken` | Fixed at construction; no mint, no owner. |

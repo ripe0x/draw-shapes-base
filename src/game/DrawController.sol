@@ -16,17 +16,22 @@ interface GrailVaultLike {
     function fundGrail() external payable;
 }
 
+/// @dev A successor controller funded by `migrateCapital`.
+interface ControllerLike {
+    function fundPool() external payable;
+}
+
 /// @title DrawController
 /// @notice The protocol-owned house of Draw Shapes on Base. It mints ETH-backed Shapes and Draw
 ///         Packs, lists them on the `DrawEngine` at their notional price, books every settled
 ///         acquisition, replaces captured items from the mix table, splits the realised margin
 ///         between the ordinary pool, maintenance and the GRAIL fund, and builds and lists GRAILs.
 /// @dev Ported from ripe0x/draw-shapes `Pool`/`PoolBooks`/`PoolListing` (commit 4a13a09). Removed:
-///      depositors, shares, claims, entry fees, the volume cap, exits and migration, the FWA edge
+///      depositors, shares, claims, entry fees, the volume cap, depositor exits, the FWA edge
 ///      arithmetic and the 1 ETH piece / merge GRAIL builder. Kept: the booking walk, margin split
 ///      with the replacement mint line, deficit / surprise / band replacement draw, fill by held
 ///      Shape, mint or Draw Pack, and GRAIL listing below backing with per-pull decay and a
-///      probability cap.
+///      probability cap. Protocol capital moves to a successor through `migrateCapital`.
 ///
 ///      Buckets. Every wei the controller holds is in `cash` or `maintenance`, besides
 ///      the feed in flight; `receivable`, `maintenanceReceivable` and `feedReceivable` are engine
@@ -178,6 +183,7 @@ contract DrawController is ReentrancyGuard {
     event GovernanceTransferred(address indexed previous, address indexed next);
     event ListingPausedSet(bool paused);
     event RefundedRecovered(uint256 indexed listingId, uint256 value);
+    event CapitalMigrated(address indexed to, uint256 cash, uint256 maintenance);
 
     // ------------------------------------------------------------------ errors
 
@@ -195,6 +201,7 @@ contract DrawController is ReentrancyGuard {
     error UnexpectedToken();
     error RedeemMismatch();
     error NotRefunded();
+    error StillListed();
 
     // ------------------------------------------------------------------ construction
 
@@ -355,11 +362,40 @@ contract DrawController is ReentrancyGuard {
         }
         engine.withdrawListingsTo(listingIds, address(this));
         for (uint256 i; i < items.length; ++i) {
-            uint256 before = address(this).balance;
-            IERC721Value(items[i].collection).burn(items[i].tokenId);
-            if (address(this).balance - before != items[i].value) revert RedeemMismatch();
-            cash += items[i].value;
+            _redeemToCash(items[i]);
         }
+    }
+
+    /// @notice Moves the controller's capital (cash and maintenance) to `to` once nothing here is
+    ///         owed or on the board: no engine acquisition unresolved, the books level and harvested,
+    ///         and every ordinary listing wound down (after `DrawEngine.retire`) or handed off to a
+    ///         successor. Held items are redeemed into cash first, and listing stays paused here.
+    ///         `asController` funds a successor controller's cash through `fundPool` (its maintenance
+    ///         refills from margin); otherwise the ETH is a plain transfer. Player funds never pass through the controller.
+    ///         Governance (timelock).
+    function migrateCapital(address to, bool asController) external onlyGovernance nonReentrant {
+        if (engine.unsettledAcquisitionCount() != 0 || nextSequenceToBook != engine.nextSequenceToProcess()) {
+            revert BooksBehind();
+        }
+        _harvest();
+        if (listedCount | receivable | maintenanceReceivable | feedReceivable != 0) revert StillListed();
+        while (_held.length != 0) {
+            _redeemToCash(_removeHeld(_held.length - 1));
+        }
+        listingPaused = true;
+        (uint256 c, uint256 m) = (cash, maintenance);
+        (cash, maintenance) = (0, 0);
+        emit CapitalMigrated(to, c, m);
+        if (asController) ControllerLike(to).fundPool{value: c + m}();
+        else SafeTransferLib.safeTransferETH(to, c + m);
+    }
+
+    /// @dev Burns an ordinary item the controller holds and books its ETH backing as cash.
+    function _redeemToCash(Item memory it) internal {
+        uint256 before = address(this).balance;
+        IERC721Value(it.collection).burn(it.tokenId);
+        if (address(this).balance - before != it.value) revert RedeemMismatch();
+        cash += it.value;
     }
 
     function _creditRedeemed(uint256 listingId, uint256 value, uint256 before) internal {

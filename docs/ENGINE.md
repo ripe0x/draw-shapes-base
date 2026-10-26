@@ -118,7 +118,9 @@ ported. Base targets are native Shapes rungs, so a GRAIL is a single mint.
 
 Hard bounds in code: settlement fee ≤ 2 %, VRF fee ≤ 0.002 ETH / batch (premium ≤ 200 %, buffer ≤ 50 %, service margin ≤ 100 %), cooldown ≤ 1 h, batch ≤ 50,
 unsettled ≤ 1,000, controller markups sum ≤ 15 %, tip ≤ 0.001 ETH. No role can move escrowed fees,
-refund credits, fee credits or listed NFTs to itself.
+refund credits, fee credits or listed NFTs to itself. Protocol-owned capital outside the engine (controller
+cash and maintenance, the GRAIL fund, the treasury reserve) can move to a successor through the timelock
+(`migrateCapital` / `migrate`), only once no issued pull is unresolved.
 
 ## Base presentation (card colour)
 

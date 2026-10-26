@@ -2,11 +2,18 @@
 pragma solidity 0.8.28;
 
 import {ReentrancyGuard} from "solady/utils/ReentrancyGuard.sol";
+import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IShapes} from "shapes/interfaces/IShapes.sol";
+import {IERC721Value} from "shapes/interfaces/IERC721Value.sol";
 import {Denominations} from "shapes/lib/Denominations.sol";
 import {PricingLib} from "./PricingLib.sol";
 import {DrawEngine} from "../engine/DrawEngine.sol";
+
+/// @dev A successor vault funded by `GrailVault.migrate`.
+interface GrailFundLike {
+    function fundGrail() external payable;
+}
 
 /// @title GrailVault
 /// @notice Holds the GRAIL fund and lists fully funded GRAILs on the engine as its own supplier.
@@ -70,11 +77,13 @@ contract GrailVault is ReentrancyGuard {
     event GrailCycleCompleted(uint256 indexed cycleId, uint256 nextTargetWei);
     event ProceedsHarvested(uint256 amount);
     event ParamSet(bytes4 indexed selector);
+    event Migrated(address indexed to, uint256 amount);
 
     error NotGovernance();
     error NotGuardian();
     error ConfigInvalid();
     error UnexpectedSender();
+    error AcquisitionsOpen();
 
     constructor(
         address shapes_,
@@ -164,6 +173,32 @@ contract GrailVault is ReentrancyGuard {
         if (_relist()) changed = true;
         if (_mint()) changed = true;
         if (_reprice()) changed = true;
+    }
+
+    /// @notice Moves the GRAIL fund and every unawarded GRAIL, redeemed for its backing, to `to`, and
+    ///         pauses this vault. Needs no unresolved acquisition on the engine, so no issued pull can
+    ///         still select a GRAIL. `asVault` funds a successor vault through `fundGrail`; otherwise
+    ///         the ETH is a plain transfer. Governance (timelock).
+    function migrate(address to, bool asVault) external onlyGovernance nonReentrant returns (uint256 amount) {
+        if (engine.unsettledAcquisitionCount() != 0) revert AcquisitionsOpen();
+        _sync();
+        uint256 proceeds = engine.proceedsOf(address(this));
+        if (proceeds != 0) {
+            engine.withdrawProceeds();
+            totalProceeds += proceeds;
+        }
+        for (uint256 i = _items.length; i != 0; --i) {
+            GrailItem memory it = _items[i - 1];
+            _items.pop();
+            if (it.listingId != 0) engine.withdrawListingTo(it.listingId, address(this));
+            IERC721Value(address(shapes)).burn(it.tokenId);
+        }
+        paused = true;
+        amount = address(this).balance;
+        fund = 0;
+        emit Migrated(to, amount);
+        if (asVault) GrailFundLike(to).fundGrail{value: amount}();
+        else SafeTransferLib.safeTransferETH(to, amount);
     }
 
     /// @notice True when `step` would change inventory or harvest.

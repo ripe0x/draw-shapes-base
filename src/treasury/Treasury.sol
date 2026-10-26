@@ -2,6 +2,7 @@
 pragma solidity 0.8.28;
 
 import {ReentrancyGuard} from "solady/utils/ReentrancyGuard.sol";
+import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 
 interface IGrailFund {
     function fundGrail() external payable;
@@ -27,9 +28,10 @@ interface IProtocolLiquidity {
 ///         The reserve exists only to keep the ordinary pool restockable: `backstop()` (anyone) moves
 ///         reserve ETH into the controller's cash when its replacement queue is waiting and its cash
 ///         is below `backstopFloor`.
-/// @dev ETH can leave only into the game (controller cash, GRAIL fund) or into the locked protocol
-///      liquidity. There is no withdrawal to any account. Governance tunes the bounded split and
-///      thresholds; POL deployment needs a price limit and is governance/keeper only.
+/// @dev ETH leaves into the game (controller cash, GRAIL fund), into the locked protocol liquidity,
+///      or, through `migrate` (governance, behind the timelock delay), to a successor. Governance
+///      tunes the bounded split and thresholds; POL deployment needs a price limit and is
+///      governance/keeper only.
 contract Treasury is ReentrancyGuard {
     uint256 internal constant BPS = 10_000;
 
@@ -56,6 +58,7 @@ contract Treasury is ReentrancyGuard {
     event ReserveFunded(address indexed from, uint256 amount);
     event Backstopped(uint256 amount);
     event PolDeployed(uint256 amount, uint128 liquidity);
+    event Migrated(address indexed to, uint256 amount);
     event ParamSet(bytes4 indexed selector);
 
     error NotGovernance();
@@ -141,6 +144,17 @@ contract Treasury is ReentrancyGuard {
         polPending = 0;
         added = liquidity.addLiquidity{value: amount}(minSqrtPriceX96);
         emit PolDeployed(amount, added);
+    }
+
+    /// @notice Moves the reserve and pending POL (the whole balance) to `to`: a successor treasury,
+    ///         whose `receive` books it as reserve, or another destination. Point the hook's treasury
+    ///         recipient at the successor in the same batch. Governance (timelock).
+    function migrate(address to) external onlyGovernance nonReentrant returns (uint256 amount) {
+        amount = address(this).balance;
+        reserve = 0;
+        polPending = 0;
+        emit Migrated(to, amount);
+        SafeTransferLib.safeTransferETH(to, amount);
     }
 
     function setParams(uint256 reserveTarget_, uint256 backstopFloor_, uint16 grailBps_) external onlyGovernance {
