@@ -132,6 +132,21 @@ contract FollowupTest is GameFixture {
         assertEq(address(engine).balance, engine.liabilities(), "engine holds exactly its liabilities");
     }
 
+    /// @notice The service margin is per pull (as if each pull were its own request, FWA V2's model);
+    ///         the subscription is charged per request of up to 5 pulls.
+    function test_vrfMargin_perPull_subscriptionPerRequest() public {
+        _openAndActivate();
+        vm.fee(0.01 gwei);
+        (uint256 f1, uint256 m1) = engine.vrfFeeParts(1);
+        (uint256 f5,) = engine.vrfFeeParts(5);
+        (uint256 f10, uint256 m10) = engine.vrfFeeParts(10);
+        (, uint256 m7) = engine.vrfFeeParts(7);
+        assertEq(m10, 10 * m1, "margin: per pull");
+        assertEq(m7, 7 * m1);
+        assertEq(f10, 2 * f5, "subscription: per request of 5");
+        assertLt(f10, 10 * f1, "batching saves the Chainlink cost, not the margin");
+    }
+
     function test_vrfMargin_capKeepsSubscriptionShareFirst_andIsBounded() public {
         _openAndActivate();
         DrawEngine.VrfFeeConfig memory c = LaunchParams.vrfFee();

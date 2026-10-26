@@ -228,9 +228,9 @@ contract DrawEngine is ReentrancyGuard {
     ///         (Chainlink bills only the gas used); `premiumBps` is Chainlink's native premium;
     ///         `bufferBps` absorbs gas-price movement until fulfilment; `flatWei` covers the L1 data
     ///         fee. That charge is forwarded to the subscription in the purchase transaction.
-    ///         `marginBps` adds the protocol's service margin on the same gas cost (FWA V2
-    ///         `serviceMarginBps`): it is credited to `devRecipient` as a fee credit, never to the
-    ///         subscription. When the cap binds, the subscription's share is kept first.
+    ///         `marginBps` adds the protocol's service margin (FWA V2 `serviceMarginBps`), charged per
+    ///         pull on a single-pull request's gas cost: it is credited to `devRecipient` as a fee
+    ///         credit, never to the subscription. When the cap binds, the subscription's share is kept first.
     struct VrfFeeConfig {
         uint32 overheadGas;
         uint64 minGasPrice;
@@ -916,27 +916,22 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice The batch VRF charge split into the part forwarded to the subscription and the
     ///         protocol margin, summed over the batch's requests.
     function vrfFeeParts(uint256 count) public view returns (uint256 forwarded, uint256 margin) {
-        uint256 full = count / ACQUISITIONS_PER_VRF_REQUEST;
-        (forwarded, margin) = _vrfRequestFee(ACQUISITIONS_PER_VRF_REQUEST);
-        forwarded *= full;
-        margin *= full;
-        uint256 rest = count % ACQUISITIONS_PER_VRF_REQUEST;
-        if (rest != 0) {
-            (uint256 f, uint256 m) = _vrfRequestFee(rest);
+        VrfFeeConfig memory c = vrfFeeConfig;
+        uint256 price = block.basefee > c.minGasPrice ? block.basefee : c.minGasPrice;
+        // The service margin is charged per pull, as if each pull were its own request (FWA V2's
+        // per-acquisition requestFee); the subscription is charged for the shared requests.
+        uint256 perPull = (uint256(c.overheadGas) + callbackGasLimitFor(1)) * price * c.marginBps / BPS;
+        for (uint256 done; done < count; done += ACQUISITIONS_PER_VRF_REQUEST) {
+            uint256 n = count - done < ACQUISITIONS_PER_VRF_REQUEST ? count - done : ACQUISITIONS_PER_VRF_REQUEST;
+            // one request: its forwarded part plus its pulls' margin is at most MAX_VRF_FEE_PER_BATCH,
+            // the subscription's share kept first
+            uint256 f = (uint256(c.overheadGas) + callbackGasLimitFor(n)) * price * (BPS + c.premiumBps + c.bufferBps) / BPS + c.flatWei;
+            if (f > MAX_VRF_FEE_PER_BATCH) f = MAX_VRF_FEE_PER_BATCH;
+            uint256 m = n * perPull;
+            if (f + m > MAX_VRF_FEE_PER_BATCH) m = MAX_VRF_FEE_PER_BATCH - f;
             forwarded += f;
             margin += m;
         }
-    }
-
-    /// @dev One request's charge. Forwarded part plus margin is at most `MAX_VRF_FEE_PER_BATCH`.
-    function _vrfRequestFee(uint256 count) internal view returns (uint256 forwarded, uint256 margin) {
-        VrfFeeConfig memory c = vrfFeeConfig;
-        uint256 price = block.basefee > c.minGasPrice ? block.basefee : c.minGasPrice;
-        uint256 gasCost = (uint256(c.overheadGas) + callbackGasLimitFor(count)) * price;
-        forwarded = gasCost * (BPS + c.premiumBps + c.bufferBps) / BPS + c.flatWei;
-        if (forwarded >= MAX_VRF_FEE_PER_BATCH) return (MAX_VRF_FEE_PER_BATCH, 0);
-        margin = gasCost * c.marginBps / BPS;
-        if (forwarded + margin > MAX_VRF_FEE_PER_BATCH) margin = MAX_VRF_FEE_PER_BATCH - forwarded;
     }
 
     /*//////////////////////////////////////////////////////////////
