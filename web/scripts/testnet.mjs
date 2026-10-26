@@ -104,7 +104,7 @@ await step("preflight", async () => {
   // fork rehearsal of a specific budget: FORK_BALANCE=1.495 sets the deployer's balance
   if (FORK && process.env.FORK_BALANCE) await rpc("anvil_setBalance", [deployer.address, toHex(parseEther(process.env.FORK_BALANCE))]);
   const bal = await pub.getBalance({ address: deployer.address });
-  const need = parseEther(SEED_GRAIL ? "2.0" : "1.45");
+  const need = parseEther(SEED_GRAIL ? "1.05" : "0.55");
   say("deployer", deployer.address, "balance", formatEther(bal), "ETH; needs about", formatEther(need));
   if (bal < need) throw new Error(`deployer ${deployer.address} holds ${formatEther(bal)} ETH; fund it with ${formatEther(need - bal)} more Base Sepolia ETH`);
   const code = await pub.getCode({ address: base.vrfCoordinator });
