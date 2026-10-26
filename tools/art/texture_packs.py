@@ -1,6 +1,7 @@
+# Applies the riso treatment to each card of a Draw Pack SVG: python3 texture_packs.py <dir with svg/pack-*.svg>.
 import importlib.util, glob, os, re, sys
 S=os.path.dirname(os.path.abspath(__file__)); OUT=sys.argv[1]
-spec=importlib.util.spec_from_file_location('b3', os.path.join(S,'build3.py')); b3=importlib.util.module_from_spec(spec); spec.loader.exec_module(b3)
+spec=importlib.util.spec_from_file_location('b3', os.path.join(S,'texture.py')); b3=importlib.util.module_from_spec(spec); spec.loader.exec_module(b3)
 riso=b3.V[1][1]
 for f in glob.glob(os.path.join(OUT,'svg','pack-*.svg')):
     s=open(f).read()

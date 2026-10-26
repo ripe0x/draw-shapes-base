@@ -1,3 +1,4 @@
+# Riso texture treatments for Shapes (exploration). Used to render docs/design/texture-exploration.jpg and the art pack.
 import glob, os
 S=os.path.dirname(os.path.abspath(__file__)); ART=os.path.join(S,'..','art')
 BG='<rect x="0" y="0" width="250" height="350" fill="#fff"/>'
