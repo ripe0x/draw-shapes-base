@@ -56,7 +56,8 @@ const wallet = (acct) => createWalletClient({ chain, transport: http(RPC), accou
 
 const evDir = `${ROOT}evidence/testnet`;
 mkdirSync(evDir, { recursive: true });
-const statePath = `${evDir}/${chainId}${FORK ? "-fork" : ""}-run.json`;
+// RUN=v2 keeps a separate state file per deployment generation (each starts from preflight)
+const statePath = `${evDir}/${chainId}${FORK ? "-fork" : ""}${process.env.RUN ? `-${process.env.RUN}` : ""}-run.json`;
 const state = existsSync(statePath) ? JSON.parse(readFileSync(statePath)) : { chainId, fork: FORK, rpc: FORK ? "local anvil fork of Base Sepolia" : RPC, steps: {}, txs: [] };
 // a resumed run must match the chain: a restarted fork (or a different network) starts over
 if (state.steps["vrf-subscription"]?.done) {
@@ -114,6 +115,12 @@ await step("preflight", async () => {
 
 // ------------------------------------------------------------------ 1. VRF subscription
 const vrf = await step("vrf-subscription", async () => {
+  // REUSE_SUB_ID: add the new engine to an existing subscription the deployer owns (keeps its float)
+  if (process.env.REUSE_SUB_ID) {
+    const s = await rd(base.vrfCoordinator, coordinatorAbi, "getSubscription", [BigInt(process.env.REUSE_SUB_ID)]);
+    if (s[3].toLowerCase() !== deployer.address.toLowerCase()) throw new Error("REUSE_SUB_ID is not owned by the deployer");
+    return { subId: process.env.REUSE_SUB_ID, reused: true, nativeBalance: s[1] };
+  }
   const r = await tx("vrf.createSubscription", deployer, { address: base.vrfCoordinator, abi: coordinatorAbi, functionName: "createSubscription" });
   const log = r.logs.map((l) => { try { return decodeEventLog({ abi: coordinatorAbi, ...l }); } catch { return null; } }).find((x) => x?.eventName === "SubscriptionCreated");
   const subId = log.args.subId;
@@ -262,43 +269,60 @@ async function pull(label, count, { ref = referrer.address, negSlippage = 1000n,
   const ids = r.logs.map((l) => { try { return decodeEventLog({ abi: ops.engine, ...l }); } catch { return null; } })
     .filter((x) => x?.eventName === "AcquisitionRequested").map((x) => x.args.requestId);
   const requestId = await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]]);
-  return { ids, requestId, quote: { fee, sfee, vrfFee, total }, requestTx: r.transactionHash, requestGas: r.gasUsed, requestBlock: Number(r.blockNumber), subBefore: subBefore[1] };
+  // one VRF request per ACQUISITIONS_PER_VRF_REQUEST (5) acquisitions
+  const requestIds = [];
+  for (let i = 0; i < ids.length; i += 5) requestIds.push(await rd(A.engine, ops.engine, "vrfRequestOf", [ids[i]]));
+  return { ids, requestId, requestIds, quote: { fee, sfee, vrfFee, total }, requestTx: r.transactionHash, requestGas: r.gasUsed, requestBlock: Number(r.blockNumber), subBefore: subBefore[1] };
 }
 async function awaitFulfilment(p) {
-  let fulfil = null;
+  const reqs = p.requestIds ?? [p.requestId];
+  const fulfils = [];
   if (FORK) {
     await rpc("anvil_impersonateAccount", [base.vrfCoordinator]);
     await rpc("anvil_setBalance", [base.vrfCoordinator, toHex(parseEther("1"))]);
     for (let i = 0; i < 3; i++) await rpc("evm_mine", []);
-    const limit = await rd(A.engine, ops.engine, "callbackGasLimitFor", [BigInt(p.ids.length)]);
-    const hash = await pub.request({ method: "eth_sendTransaction", params: [{ from: base.vrfCoordinator, to: A.engine, gas: toHex(limit + 100_000n),
-      data: (await import("viem")).encodeFunctionData({ abi: ops.engine, functionName: "rawFulfillRandomWords", args: [p.requestId, [BigInt(keccak256(toHex(p.requestTx)))]] }) }] });
-    const r = await pub.waitForTransactionReceipt({ hash });
-    fulfil = { hash, gasUsed: r.gasUsed, simulated: true, payment: null, latencySec: 0 };
+    for (let k = 0; k < reqs.length; k++) {
+      const n = Math.min(5, p.ids.length - 5 * k);
+      const limit = await rd(A.engine, ops.engine, "callbackGasLimitFor", [BigInt(n)]);
+      const hash = await pub.request({ method: "eth_sendTransaction", params: [{ from: base.vrfCoordinator, to: A.engine, gas: toHex(limit + 100_000n),
+        data: (await import("viem")).encodeFunctionData({ abi: ops.engine, functionName: "rawFulfillRandomWords", args: [reqs[k], [BigInt(keccak256(toHex(`${p.requestTx}-${k}`)))]] }) }] });
+      const r = await pub.waitForTransactionReceipt({ hash });
+      fulfils.push({ hash, gasUsed: r.gasUsed, simulated: true, payment: null, latencySec: 0 });
+    }
   } else {
-    // poll the engine (the word is cached even when processing waits), then find the coordinator's
+    // poll the engine until no acquisition of the batch waits for a word, then find each request's
     // fulfilment in 200-block log windows (public RPCs cap eth_getLogs ranges; Base Sepolia has 0.2 s blocks)
     const t0 = Date.now();
     for (let i = 0; i < 360; i++) {
-      const st = Number((await rd(A.engine, ops.engine, "acquisitions", [p.ids[0]]))[4]);
-      if (st !== 1) break;
-      await new Promise((r) => setTimeout(r, 5_000));
+      let pending = false;
+      for (const id of p.ids) if (Number((await rd(A.engine, ops.engine, "acquisitions", [id]))[4]) === 1) { pending = true; break; }
+      if (!pending) break;
+      await new Promise((r) => setTimeout(r, 3_000));
     }
     const latencyWallSec = (Date.now() - t0) / 1000;
     const ev = coordinatorAbi.find((x) => x.name === "RandomWordsFulfilled");
     const head = await pub.getBlockNumber();
-    for (let from = BigInt(p.requestBlock); from <= head && !fulfil; from += 200n) {
-      const to = from + 199n > head ? head : from + 199n;
-      const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: p.requestId }, fromBlock: from, toBlock: to });
-      if (logs.length) {
-        const l = logs[0];
-        const [r, b, rb] = await Promise.all([pub.getTransactionReceipt({ hash: l.transactionHash }), pub.getBlock({ blockNumber: l.blockNumber }), pub.getBlock({ blockNumber: BigInt(p.requestBlock) })]);
-        fulfil = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice,
-          latencyBlocks: Number(l.blockNumber - BigInt(p.requestBlock)), latencySec: Number(b.timestamp - rb.timestamp), latencyWallSec };
+    const rb = await pub.getBlock({ blockNumber: BigInt(p.requestBlock) });
+    for (const req of reqs) {
+      let f = null;
+      for (let from = BigInt(p.requestBlock); from <= head && !f; from += 200n) {
+        const to = from + 199n > head ? head : from + 199n;
+        const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: req }, fromBlock: from, toBlock: to });
+        if (logs.length) {
+          const l = logs[0];
+          const [r, b] = await Promise.all([pub.getTransactionReceipt({ hash: l.transactionHash }), pub.getBlock({ blockNumber: l.blockNumber })]);
+          f = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice,
+            latencyBlocks: Number(l.blockNumber - BigInt(p.requestBlock)), latencySec: Number(b.timestamp - rb.timestamp), latencyWallSec };
+        }
       }
+      if (!f) throw new Error(`no VRF fulfilment for request ${req} within 30 min`);
+      fulfils.push(f);
     }
-    if (!fulfil) throw new Error(`no VRF fulfilment for request ${p.requestId} within 30 min`);
   }
+  // the batch's first request carries the report's headline numbers; every request is recorded
+  const fulfil = { ...fulfils[0], requests: fulfils.length, payment: fulfils.every((f) => f.payment != null) ? fulfils.reduce((t, f) => t + BigInt(f.payment), 0n) : null,
+    gasUsed: fulfils.reduce((t, f) => t + BigInt(f.gasUsed), 0n), latencySec: Math.max(...fulfils.map((f) => f.latencySec ?? 0)) };
+  for (const f of fulfils.slice(1)) state.txs.push({ label: `vrf fulfilment (request ${fulfils.indexOf(f) + 1} of ${fulfils.length})`, ...f });
   state.txs.push({ label: `vrf fulfilment ${p.requestId}${FORK ? " (fork: coordinator impersonated)" : ""}`, ...fulfil });
   const statuses = [];
   for (const id of p.ids) statuses.push(Number((await rd(A.engine, ops.engine, "acquisitions", [id]))[4]));
@@ -378,6 +402,49 @@ await step("keeper-booking-restock", async () => {
   const after = await rd(A.lens, ops.lens, "game");
   const delivered = await deliveries(state.steps["batch-of-ten"].ids.map(BigInt));
   return { keeper: k, before: { nextToBook: before.nextToBook, active: before.activeListings, cash: before.cash }, after: { nextToBook: after.nextToBook, active: after.activeListings, cash: after.cash, maintenance: after.maintenance }, deliveries: delivered };
+});
+// Playing winnings: approve the PrizeRouter once, pull with the smallest prizes (exact change back),
+// then cash the rest out, each in one transaction.
+const routerAbi = parseAbi([
+  "function pullWithPrizes(uint256[] shapeIds, uint256[] packIds, address referrer, uint256 count, uint256 maxAcquisitionFee, uint256 maxNegativeSlippageBps, uint256 expectedInventoryVersion, uint256 deadline) payable returns (uint256[])",
+  "function cashOut(uint256[] shapeIds, uint256[] packIds, address recipient) returns (uint256)",
+]);
+const approvalAbi = parseAbi(["function setApprovalForAll(address operator, bool approved)", "function valueOf(uint256) view returns (uint256)"]);
+if (A.prizeRouter) await step("prize-router", async () => {
+  const held = [];
+  for (const d of await deliveries([...state.steps["batch-of-ten"].ids, ...state.steps["single-pull"].ids].map(BigInt))) {
+    if (d.status === 2 && d.toBeneficiary) held.push({ ...d, value: await rd(d.collection, approvalAbi, "valueOf", [d.tokenId]) });
+  }
+  held.sort((x, y) => (x.value < y.value ? -1 : x.value > y.value ? 1 : 0));
+  const approveS = await tx("Shapes.setApprovalForAll(router)", player, { address: A.shapes, abi: approvalAbi, functionName: "setApprovalForAll", args: [A.prizeRouter, true] });
+  const approveP = await tx("Draw Packs.setApprovalForAll(router)", player, { address: A.drawPacks, abi: approvalAbi, functionName: "setApprovalForAll", args: [A.prizeRouter, true] });
+  const [fee, , , total] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [3n]);
+  const spend = [];
+  let covered = 0n;
+  for (const h of held) { if (covered >= total) break; spend.push(h); covered += h.value; }
+  const isPack = (h) => h.collection.toLowerCase() === A.drawPacks.toLowerCase();
+  const block = await pub.getBlock();
+  const before = await pub.getBalance({ address: player.address });
+  const topUp = covered >= total ? 0n : ((total - covered) * 110n) / 100n;
+  const r = await tx(`pullWithPrizes(3) paid with ${spend.length} prizes`, player, { address: A.prizeRouter, abi: routerAbi, functionName: "pullWithPrizes",
+    args: [spend.filter((h) => !isPack(h)).map((h) => h.tokenId), spend.filter(isPack).map((h) => h.tokenId), referrer.address, 3n, (fee * 102n) / 100n, 1000n, 2n ** 256n - 1n, block.timestamp + 600n], value: topUp });
+  const ids = r.logs.map((l) => { try { return decodeEventLog({ abi: ops.engine, ...l }); } catch { return null; } })
+    .filter((x) => x?.eventName === "AcquisitionRequested").map((x) => x.args.requestId);
+  const walletDelta = (await pub.getBalance({ address: player.address })) - before + r.gasUsed * r.effectiveGasPrice;
+  const p = { ids, requestId: await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]]), requestIds: [await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]])],
+    quote: { fee, total }, requestTx: r.transactionHash, requestBlock: Number(r.blockNumber), subBefore: 0n };
+  const f = await awaitFulfilment(p);
+  const rest = held.filter((h) => !spend.includes(h));
+  let cash = null;
+  if (rest.length) {
+    const c0 = await pub.getBalance({ address: player.address });
+    const c = await tx(`cashOut(${rest.length} prizes)`, player, { address: A.prizeRouter, abi: routerAbi, functionName: "cashOut",
+      args: [rest.filter((h) => !isPack(h)).map((h) => h.tokenId), rest.filter(isPack).map((h) => h.tokenId), player.address] });
+    cash = { hash: c.transactionHash, prizes: rest.length, valueWei: rest.reduce((t, h) => t + h.value, 0n),
+      receivedWei: (await pub.getBalance({ address: player.address })) - c0 + c.gasUsed * c.effectiveGasPrice, gasUsed: c.gasUsed };
+  }
+  return { approvals: [approveS.transactionHash, approveP.transactionHash], prizesSpent: spend.length, prizeWei: covered, priceWei: total, topUpWei: topUp,
+    walletChangeExGasWei: walletDelta, pullTx: r.transactionHash, pullGas: r.gasUsed, ids, statuses: f.statuses, fulfil: f.fulfil, cashOut: cash };
 });
 await step("redeem-prize-for-backing", async () => {
   // every won Shape or Draw Pack holds its ETH backing: redeem the batch's prizes and measure the ETH returned
