@@ -265,7 +265,7 @@ abstract contract Deployer is Script {
     ///      maintenance float, and the 2 ETH market liquidity held by the timelock for `launch`.
     function _fundAndBuild(System memory s, uint256 maintenanceFloat) internal {
         s.controller.fundPool{value: s.alloc.ordinaryPool}();
-        for (uint256 i; i < 20 && s.controller.listedCount() < s.controller.boardItems(); ++i) {
+        for (uint256 i; i < 20 && (s.controller.listedCount() < s.controller.boardItems() || s.controller.queueLength() != 0); ++i) {
             s.controller.build(8); // one listing batch per transaction stays under the per-tx gas cap
         }
         s.treasury.fundReserve{value: s.alloc.treasuryReserve}();

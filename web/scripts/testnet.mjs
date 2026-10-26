@@ -105,7 +105,7 @@ await step("preflight", async () => {
   // fork rehearsal of a specific budget: FORK_BALANCE=1.495 sets the deployer's balance
   if (FORK && process.env.FORK_BALANCE) await rpc("anvil_setBalance", [deployer.address, toHex(parseEther(process.env.FORK_BALANCE))]);
   const bal = await pub.getBalance({ address: deployer.address });
-  const need = parseEther(SEED_GRAIL ? "1.05" : "0.55");
+  const need = parseEther(SEED_GRAIL ? "1.15" : "0.65");
   say("deployer", deployer.address, "balance", formatEther(bal), "ETH; needs about", formatEther(need));
   if (bal < need) throw new Error(`deployer ${deployer.address} holds ${formatEther(bal)} ETH; fund it with ${formatEther(need - bal)} more Base Sepolia ETH`);
   const code = await pub.getCode({ address: base.vrfCoordinator });
@@ -418,7 +418,8 @@ if (A.prizeRouter) await step("prize-router", async () => {
   held.sort((x, y) => (x.value < y.value ? -1 : x.value > y.value ? 1 : 0));
   const approveS = await tx("Shapes.setApprovalForAll(router)", player, { address: A.shapes, abi: approvalAbi, functionName: "setApprovalForAll", args: [A.prizeRouter, true] });
   const approveP = await tx("Draw Packs.setApprovalForAll(router)", player, { address: A.drawPacks, abi: approvalAbi, functionName: "setApprovalForAll", args: [A.prizeRouter, true] });
-  const [fee, , , total] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [3n]);
+  const [fee, , vrfFee, total] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [3n]);
+  const subBefore = (await rd(base.vrfCoordinator, coordinatorAbi, "getSubscription", [BigInt(vrf.subId)]))[1];
   const spend = [];
   let covered = 0n;
   for (const h of held) { if (covered >= total) break; spend.push(h); covered += h.value; }
@@ -432,7 +433,7 @@ if (A.prizeRouter) await step("prize-router", async () => {
     .filter((x) => x?.eventName === "AcquisitionRequested").map((x) => x.args.requestId);
   const walletDelta = (await pub.getBalance({ address: player.address })) - before + r.gasUsed * r.effectiveGasPrice;
   const p = { ids, requestId: await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]]), requestIds: [await rd(A.engine, ops.engine, "vrfRequestOf", [ids[0]])],
-    quote: { fee, total }, requestTx: r.transactionHash, requestBlock: Number(r.blockNumber), subBefore: 0n };
+    quote: { fee, vrfFee, total }, requestTx: r.transactionHash, requestBlock: Number(r.blockNumber), subBefore };
   const f = await awaitFulfilment(p);
   const rest = held.filter((h) => !spend.includes(h));
   let cash = null;

@@ -15,7 +15,7 @@
   "timelockDelay": 600,
   "maintenanceFloat": 10000000000000000,
   "testnetAllocation": {
-    "ordinaryPool": 400000000000000000,
+    "ordinaryPool": 500000000000000000,
     "treasuryReserve": 30000000000000000,
     "backstopFloor": 20000000000000000,
     "marketLiquidity": 50000000000000000,

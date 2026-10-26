@@ -54,7 +54,7 @@ contract ResumeDeploy is Deploy {
 
         vm.startBroadcast();
         // the remaining steps of Deployer._fundAndBuild and _handOver, each transaction under the cap
-        for (uint256 i; i < 20 && s.controller.listedCount() < s.controller.boardItems(); ++i) s.controller.build(8);
+        for (uint256 i; i < 20 && (s.controller.listedCount() < s.controller.boardItems() || s.controller.queueLength() != 0); ++i) s.controller.build(8);
         if (s.treasury.reserve() == 0) s.treasury.fundReserve{value: c.alloc.treasuryReserve}();
         if (s.controller.maintenance() == 0 && maintenanceFloat != 0) s.controller.fundMaintenance{value: maintenanceFloat}();
         if (address(s.timelock).balance < c.alloc.marketLiquidity) {
