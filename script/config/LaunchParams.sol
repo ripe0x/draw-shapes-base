@@ -24,6 +24,22 @@ library LaunchParams {
     uint16 internal constant HOOK_FEE_BPS = 200;
     uint16 internal constant OPERATOR_FEE_BPS = 25;
 
+    /// @notice Purchaser VRF charge (docs/FOLLOWUP.md section 2): 400k gas of verification and
+    ///         post-callback overhead, the callback at its requested limit, at least 0.005 gwei, Chainlink's
+    ///         60 % native premium on Base, a 25 % fluctuation buffer and 0.000002 ETH for the L1 data fee,
+    ///         all forwarded to the subscription; plus FWA V2's 30 % service margin on the same gas cost,
+    ///         credited to development.
+    function vrfFee() internal pure returns (DrawEngine.VrfFeeConfig memory) {
+        return DrawEngine.VrfFeeConfig({
+            overheadGas: 400_000,
+            minGasPrice: 0.005 gwei,
+            premiumBps: 6_000,
+            bufferBps: 2_500,
+            flatWei: 0.000002 ether,
+            marginBps: 3_000
+        });
+    }
+
     function limits() internal pure returns (DrawEngine.Limits memory) {
         return DrawEngine.Limits({
             maxAcquisitionsPerTx: 20,
@@ -38,7 +54,7 @@ library LaunchParams {
         return DrawEngine.Fees({
             settlementFeeBps: 100,
             referrerBps: 5_000,
-            tokenWorksBps: 1_000,
+            tokenWorksBps: 2_500,
             tokenWorksRecipient: tokenWorks,
             devRecipient: dev
         });
@@ -51,7 +67,7 @@ library LaunchParams {
             keyHash: keyHash,
             requestConfirmations: 3,
             callbackGasBase: 100_000,
-            callbackGasPerAcquisition: 650_000,
+            callbackGasPerAcquisition: 750_000, // a cold first acquisition uses ~620k inside the callback
             selectionTimeoutBlocks: 1_800
         });
     }
@@ -88,7 +104,8 @@ library LaunchParams {
         p.engine = engine;
         p.governance = governance;
         p.guardian = guardian;
-        p.feeSplit = DrawController.FeeSplit({premiumBps: 300, maintenanceBps: 100, feedBps: 400});
+        // premium 3.5 %, maintenance 0.5 %, GRAIL feed 3 % (docs/GRAIL_AVAILABILITY.md, docs/LAUNCH_CONFIG.md)
+        p.feeSplit = DrawController.FeeSplit({premiumBps: 350, maintenanceBps: 50, feedBps: 300});
         p.mix = mix();
         p.boardItems = 100;
         p.cashFloor = 0;
@@ -97,7 +114,7 @@ library LaunchParams {
         p.bandBps = 3_000;
         p.tipWei = 0.00001 ether;
         p.capitalTarget = ORDINARY_POOL;
-        p.vrfTargetBalance = 0.02 ether;
+        p.maintenanceFloor = 0.05 ether;
         p.grailVault = grailVault;
     }
 

@@ -2,11 +2,18 @@
 pragma solidity 0.8.28;
 
 import {ReentrancyGuard} from "solady/utils/ReentrancyGuard.sol";
+import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IShapes} from "shapes/interfaces/IShapes.sol";
+import {IERC721Value} from "shapes/interfaces/IERC721Value.sol";
 import {Denominations} from "shapes/lib/Denominations.sol";
 import {PricingLib} from "./PricingLib.sol";
 import {DrawEngine} from "../engine/DrawEngine.sol";
+
+/// @dev A successor vault funded by `GrailVault.migrate`.
+interface GrailFundLike {
+    function fundGrail() external payable;
+}
 
 /// @title GrailVault
 /// @notice Holds the GRAIL fund and lists fully funded GRAILs on the engine as its own supplier.
@@ -70,11 +77,13 @@ contract GrailVault is ReentrancyGuard {
     event GrailCycleCompleted(uint256 indexed cycleId, uint256 nextTargetWei);
     event ProceedsHarvested(uint256 amount);
     event ParamSet(bytes4 indexed selector);
+    event Migrated(address indexed to, uint256 amount);
 
     error NotGovernance();
     error NotGuardian();
     error ConfigInvalid();
     error UnexpectedSender();
+    error AcquisitionsOpen();
 
     constructor(
         address shapes_,
@@ -82,7 +91,7 @@ contract GrailVault is ReentrancyGuard {
         address governance_,
         address guardian_,
         GrailConfig memory c,
-        uint8[] memory ladder
+        uint8[] memory ladder_
     ) {
         if (shapes_ == address(0) || engine_ == address(0) || governance_ == address(0) || guardian_ == address(0)) {
             revert ConfigInvalid();
@@ -92,7 +101,7 @@ contract GrailVault is ReentrancyGuard {
         governance = governance_;
         guardian = guardian_;
         _setConfig(c);
-        _setLadder(ladder);
+        _setLadder(ladder_);
         IERC721(shapes_).setApprovalForAll(engine_, true);
     }
 
@@ -125,9 +134,20 @@ contract GrailVault is ReentrancyGuard {
 
     /// @notice Backing of the GRAIL being funded, its mint fee, and the fund toward them.
     function progress() external view returns (uint256 targetWei, uint256 mintFee, uint256 funded) {
-        targetWei = Denominations.amountAt(_ladder[level]);
+        targetWei = nextTarget();
         mintFee = shapes.mintFee();
         funded = fund + engine.proceedsOf(address(this));
+    }
+
+    /// @notice Backing of the next GRAIL. While no GRAIL is live it is the smallest rung, so a
+    ///         captured headline prize is replaced as fast as possible; otherwise the current rung.
+    function nextTarget() public view returns (uint256) {
+        return Denominations.amountAt(_ladder[_items.length == 0 ? 0 : level]);
+    }
+
+    /// @notice Number of GRAILs currently held (listed or awaiting relist).
+    function liveGrails() external view returns (uint256) {
+        return _items.length;
     }
 
     function items() external view returns (GrailItem[] memory) {
@@ -152,7 +172,33 @@ contract GrailVault is ReentrancyGuard {
         if (paused) return changed;
         if (_relist()) changed = true;
         if (_mint()) changed = true;
-        if (engine.unsettledAcquisitionCount() == 0 && _reprice()) changed = true;
+        if (_reprice()) changed = true;
+    }
+
+    /// @notice Moves the GRAIL fund and every unawarded GRAIL, redeemed for its backing, to `to`, and
+    ///         pauses this vault. Needs no unresolved acquisition on the engine, so no issued pull can
+    ///         still select a GRAIL. `asVault` funds a successor vault through `fundGrail`; otherwise
+    ///         the ETH is a plain transfer. Governance (timelock).
+    function migrate(address to, bool asVault) external onlyGovernance nonReentrant returns (uint256 amount) {
+        if (engine.unsettledAcquisitionCount() != 0) revert AcquisitionsOpen();
+        _sync();
+        uint256 proceeds = engine.proceedsOf(address(this));
+        if (proceeds != 0) {
+            engine.withdrawProceeds();
+            totalProceeds += proceeds;
+        }
+        for (uint256 i = _items.length; i != 0; --i) {
+            GrailItem memory it = _items[i - 1];
+            _items.pop();
+            if (it.listingId != 0) engine.withdrawListingTo(it.listingId, address(this));
+            IERC721Value(address(shapes)).burn(it.tokenId);
+        }
+        paused = true;
+        amount = address(this).balance;
+        fund = 0;
+        emit Migrated(to, amount);
+        if (asVault) GrailFundLike(to).fundGrail{value: amount}();
+        else SafeTransferLib.safeTransferETH(to, amount);
     }
 
     /// @notice True when `step` would change inventory or harvest.
@@ -165,8 +211,18 @@ contract GrailVault is ReentrancyGuard {
             if (s == DrawEngine.ListingStatus.Settled || s == DrawEngine.ListingStatus.DeliveryRefunded) return true;
         }
         if (paused) return false;
-        uint256 target = Denominations.amountAt(_ladder[level]);
-        return fund >= target + shapes.mintFee() && _items.length < MAX_GRAILS;
+        uint256 target = nextTarget();
+        if (fund >= target + shapes.mintFee() && _items.length < MAX_GRAILS) return true;
+        uint256[] memory next = _repricePlan();
+        for (uint256 i; i < next.length; ++i) {
+            if (next[i] != 0) return true;
+        }
+        return false;
+    }
+
+    /// @notice Notionals the next `step` would set, per held GRAIL (0 = unchanged).
+    function repricePlan() external view returns (uint256[] memory) {
+        return _repricePlan();
     }
 
     function _status(uint256 listingId) internal view returns (DrawEngine.ListingStatus status) {
@@ -206,8 +262,10 @@ contract GrailVault is ReentrancyGuard {
 
     function _mint() internal returns (bool) {
         uint256 fee = shapes.mintFee();
-        uint256 target = Denominations.amountAt(_ladder[level]);
+        uint256 target = nextTarget();
         if (fund < target + fee || _items.length >= MAX_GRAILS) return false;
+        // replacing a won GRAIL (none live, not the first cycle) does not move the ladder
+        bool replacement = _items.length == 0 && cycleId != 1;
         fund -= target + fee;
         totalBackingMinted += target;
         totalMintFeesPaid += fee;
@@ -219,7 +277,7 @@ contract GrailVault is ReentrancyGuard {
         emit GrailListed(listingId, id, target, notional);
 
         uint64 started = cycleStartedAt;
-        if (started != 0) {
+        if (started != 0 && !replacement) {
             uint256 elapsed = block.timestamp - started;
             if (elapsed < config.stepUpSeconds && level + 1 < _ladder.length) ++level;
             else if (elapsed > config.stepDownSeconds && level != 0) --level;
@@ -230,33 +288,60 @@ contract GrailVault is ReentrancyGuard {
     }
 
     function _reprice() internal returns (bool changed) {
+        uint256[] memory next = _repricePlan();
+        uint64 now_ = pulls();
+        for (uint256 i; i < next.length; ++i) {
+            if (next[i] == 0) continue;
+            GrailItem storage it = _items[i];
+            engine.updatePrice(it.listingId, next[i]);
+            it.notional = next[i];
+            it.listedAtPull = now_;
+            emit GrailListed(it.listingId, it.tokenId, it.backing, next[i]);
+            changed = true;
+        }
+    }
+
+    /// @notice Notionals `step` would set now, per held GRAIL (0 = unchanged). Empty unless the engine
+    ///         has no unsettled acquisition (weights never move under an outstanding draw) and every
+    ///         held GRAIL is active. Each GRAIL decays by `decayWeiPerPull` per processed pull since it
+    ///         was last priced, to `floorBps` of backing, and never below the notional at which the
+    ///         combined GRAIL weight would exceed `probCapBps` of the engine weight; a change under
+    ///         1 % waits (the decay keeps accruing).
+    function _repricePlan() internal view returns (uint256[] memory next) {
         uint256 n = _items.length;
+        next = new uint256[](n);
+        if (paused || n == 0 || engine.unsettledAcquisitionCount() != 0) return next;
         uint256 weight;
         for (uint256 i; i < n; ++i) {
-            if (_items[i].listingId == 0 || _status(_items[i].listingId) != DrawEngine.ListingStatus.Active) return false;
+            if (_items[i].listingId == 0 || _status(_items[i].listingId) != DrawEngine.ListingStatus.Active) {
+                return new uint256[](n);
+            }
             weight += PricingLib.weightOf(_items[i].notional);
         }
-        if (weight == 0) return false;
         uint256 total = engine.totalWeight();
         uint64 now_ = pulls();
+        uint256 cap = config.probCapBps;
         for (uint256 i; i < n; ++i) {
             GrailItem storage it = _items[i];
             uint256 old = it.notional;
-            uint256 next = PricingLib.decayedNotional(
+            uint256 target = PricingLib.decayedNotional(
                 old, config.decayWeiPerPull, now_ - it.listedAtPull, it.backing * config.floorBps / BPS
             );
-            if (next >= old || old - next < old / 100) continue;
+            if (target >= old) continue;
             uint256 oldWeight = PricingLib.weightOf(old);
-            uint256 nextWeight = PricingLib.weightOf(next);
-            uint256 newWeight = weight - oldWeight + nextWeight;
-            uint256 newTotal = total - oldWeight + nextWeight;
-            if (newWeight * BPS > newTotal * config.probCapBps) continue;
-            (weight, total) = (newWeight, newTotal);
-            engine.updatePrice(it.listingId, next);
-            it.notional = next;
-            it.listedAtPull = now_;
-            emit GrailListed(it.listingId, it.tokenId, it.backing, next);
-            changed = true;
+            // largest weight this GRAIL may take with the others unchanged:
+            // (others + w) * BPS <= cap * (rest + w)  =>  w <= (cap * rest - BPS * others) / (BPS - cap)
+            uint256 others = weight - oldWeight;
+            uint256 rest = total - oldWeight;
+            if (cap * rest <= BPS * others) continue;
+            uint256 maxWeight = cap >= BPS ? type(uint256).max : (cap * rest - BPS * others) / (BPS - cap);
+            if (maxWeight <= oldWeight) continue;
+            uint256 capNotional = PricingLib.NUM / maxWeight + 1;
+            if (target < capNotional) target = capNotional;
+            if (target >= old || old - target < old / 100) continue;
+            uint256 nextWeight = PricingLib.weightOf(target);
+            (weight, total) = (others + nextWeight, rest + nextWeight);
+            next[i] = target;
         }
     }
 

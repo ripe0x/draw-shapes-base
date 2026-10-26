@@ -1,0 +1,31 @@
+No files changed, compilation skipped
+Ran 3 tests for test/rehearsal/GenesisRehearsal.t.sol:GenesisRehearsalTest
+[PASS] test_activationIsAtomic() (gas: 281365)
+[PASS] test_deployFailsWithoutVerifiedTokenWorks() (gas: 13835)
+[PASS] test_fullGenesisRehearsal() (gas: 2321863117)
+Logs:
+  opening quote per pull (wei) 15094762843966669
+  referrer credit 109304679483860980
+  token works credit 109379537005287610
+  development credit 218833931532005980
+  VRF fees collected 8071000000000000
+  VRF billed (mock) 7021129830080000
+  GRAIL capture proceeds 30721379585771071
+  pulls accepted 2800
+  pulls fulfilled 2800
+  player ETH in 44197403950136738240
+  settlement fees (ref+TW+dev) 437518148021154570
+  creator mint fees accrued 3685000000000000000
+  operator trading fees 47388317713294926
+  treasury trading receipts 331718223993066287
+  GRAIL funded: feed 1107468609655633681
+  GRAIL funded: trading 326828161976179393
+  GRAILs minted backing 1000000000000000000
+  ordinary NAV 3346046711264906859
+  premium booked 1292046711264906859
+  POL liquidity 4476589093735505851209
+  releasable surplus after genesis (wei) 1146046711264906859
+  ordinary NAV (wei) 3346046711264906859
+  ENGINE burned by first buyback 150437374470959378697566
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 2.01s (1.85s CPU time)
+Ran 1 test suite in 2.01s (2.01s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)

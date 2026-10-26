@@ -169,14 +169,25 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice Hard ceilings governance cannot exceed.
     uint256 public constant MAX_SETTLEMENT_FEE_BPS = 200;
     uint256 public constant MAX_INVENTORY_COOLDOWN = 1 hours;
-    uint256 public constant MAX_VRF_FEE_PER_BATCH = 0.001 ether;
+    uint256 public constant MAX_VRF_FEE_PER_BATCH = 0.002 ether;
+    /// @notice Ceiling on the VRF fluctuation buffer and on the Chainlink premium assumption.
+    uint256 public constant MAX_VRF_BUFFER_BPS = 5_000;
+    uint256 public constant MAX_VRF_PREMIUM_BPS = 20_000;
+    /// @notice Ceiling on the protocol's VRF service margin (FWA V2 `serviceMarginBps`, 30 % there).
+    uint256 public constant MAX_VRF_MARGIN_BPS = 10_000;
     uint256 public constant MAX_ACQUISITIONS_PER_TX_CAP = 50;
     uint256 public constant MAX_UNSETTLED_CAP = 1_000;
+    /// @notice Acquisitions per VRF request. A batch is split into requests of at most this many, so
+    ///         each callback has the gas (Chainlink's 2.5M cap) to deliver every acquisition it covers.
+    uint256 public constant ACQUISITIONS_PER_VRF_REQUEST = 5;
 
     uint32 internal constant NUM_WORDS = 1;
     uint32 public constant MIN_CALLBACK_GAS_LIMIT = 150_000;
     uint32 public constant MAX_CALLBACK_GAS_LIMIT = 2_500_000;
-    uint256 internal constant CALLBACK_FAST_PATH_GAS = 600_000;
+    /// @dev The callback attempts an isolated single-acquisition self-call only with at least this much
+    ///      gas, and gives it everything above the return reserve (a cold first acquisition needs
+    ///      ~620k; a fixed stipend below that blocked the head until a keeper processed it).
+    uint256 internal constant CALLBACK_FAST_PATH_GAS = 400_000;
     uint256 internal constant CALLBACK_RETURN_GAS_RESERVE = 60_000;
     uint256 internal constant MIN_REQUEST_CONFIRMATIONS = 3;
     uint256 internal constant MAX_REQUEST_CONFIRMATIONS = 200;
@@ -209,9 +220,29 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice Callback gas of a batch: `callbackGasBase + count * callbackGasPerAcquisition`, capped.
     uint32 public callbackGasBase;
     uint32 public callbackGasPerAcquisition;
-    /// @notice Optional purchaser contribution to the VRF subscription per batch. Zero at launch:
-    ///         the controller funds the subscription from its maintenance allocation.
-    uint256 public vrfFeePerBatch;
+    /// @notice Purchaser-funded VRF charge of a batch (FWA V2 `FWACloneVRFService.requestFee`,
+    ///         per batch instead of per request): `(overheadGas + callbackGasLimit(count)) *
+    ///         max(block.basefee, minGasPrice) * (10_000 + premiumBps + bufferBps) / 10_000 + flatWei`,
+    ///         capped at `MAX_VRF_FEE_PER_BATCH`. `overheadGas` covers proof verification and
+    ///         Chainlink's post-callback accounting; the callback is charged at its requested limit
+    ///         (Chainlink bills only the gas used); `premiumBps` is Chainlink's native premium;
+    ///         `bufferBps` absorbs gas-price movement until fulfilment; `flatWei` covers the L1 data
+    ///         fee. That charge is forwarded to the subscription in the purchase transaction.
+    ///         `marginBps` adds the protocol's service margin (FWA V2 `serviceMarginBps`), charged per
+    ///         pull on a single-pull request's gas cost: it is credited to `devRecipient` as a fee
+    ///         credit, never to the subscription. When the cap binds, the subscription's share is kept first.
+    struct VrfFeeConfig {
+        uint32 overheadGas;
+        uint64 minGasPrice;
+        uint16 premiumBps;
+        uint16 bufferBps;
+        uint96 flatWei;
+        uint16 marginBps;
+    }
+
+    VrfFeeConfig public vrfFeeConfig;
+    /// @notice Every VRF charge forwarded to the subscription, for reconciliation with Chainlink's bills.
+    uint256 public vrfFeesCollected;
 
     /*//////////////////////////////////////////////////////////////
                          ACQUISITION SEQUENCER
@@ -339,6 +370,7 @@ contract DrawEngine is ReentrancyGuard {
         uint256 acquisitionFee,
         uint256 settlementFee,
         address indexed referrer,
+        address payer,
         uint256 totalWeight
     );
     event AcquisitionSequenced(
@@ -395,7 +427,8 @@ contract DrawEngine is ReentrancyGuard {
     event FeeRecipientsSet(address tokenWorks, address dev);
     event LimitsSet(uint256 maxPerTx, uint256 maxUnsettled, uint256 activations, uint256 slippageBps, uint256 cooldown);
     event VrfConfigSet(address coordinator, uint256 subId, bytes32 keyHash, uint16 confirmations, uint32 gasBase, uint32 gasPerAcquisition, uint256 timeoutBlocks);
-    event VrfFeeSet(uint256 feePerBatch);
+    event VrfFeeConfigSet(VrfFeeConfig config);
+    event VrfFeeCollected(uint64 indexed firstSequence, uint256 count, uint256 amount, uint256 margin);
 
     /*//////////////////////////////////////////////////////////////
                                 ERRORS
@@ -477,13 +510,21 @@ contract DrawEngine is ReentrancyGuard {
         address devRecipient;
     }
 
-    constructor(address governance_, address guardian_, VrfConfig memory vrf, Limits memory limits, Fees memory fees) {
+    constructor(
+        address governance_,
+        address guardian_,
+        VrfConfig memory vrf,
+        VrfFeeConfig memory vrfFee,
+        Limits memory limits,
+        Fees memory fees
+    ) {
         if (governance_ == address(0) || guardian_ == address(0)) revert InvalidConfig();
         governance = governance_;
         guardian = guardian_;
         emit GovernanceTransferred(address(0), governance_);
         emit GuardianSet(guardian_);
         _setVrfConfig(vrf);
+        _setVrfFeeConfig(vrfFee);
         _setLimits(limits);
         _setFeePolicy(fees.settlementFeeBps, fees.referrerBps, fees.tokenWorksBps);
         _setFeeRecipients(fees.tokenWorksRecipient, fees.devRecipient);
@@ -831,7 +872,7 @@ contract DrawEngine is ReentrancyGuard {
     /// @notice Quote a purchase of `count` acquisitions against its hypothetical idle FIFO activation.
     /// @return fee Acquisition fee per acquisition.
     /// @return settlementFee Settlement fee per acquisition.
-    /// @return vrfFee VRF contribution for the whole batch (zero at launch).
+    /// @return vrfFee VRF charge for the whole batch, shared by its acquisitions (see `vrfFeeFor`).
     /// @return total Full minimum payment, `count * (fee + settlementFee) + vrfFee`.
     function quoteAcquisitionPrice(uint256 count)
         public
@@ -854,15 +895,51 @@ contract DrawEngine is ReentrancyGuard {
         }
         if (weight != 0) fee = weightedValue / weight;
         settlementFee = settlementFeeFor(fee);
-        vrfFee = vrfFeePerBatch;
+        vrfFee = vrfFeeFor(count);
         total = count * (fee + settlementFee) + vrfFee;
+    }
+
+    /// @notice Callback gas limit requested for a batch of `count` acquisitions.
+    function callbackGasLimitFor(uint256 count) public view returns (uint256 gas) {
+        gas = uint256(callbackGasBase) + count * callbackGasPerAcquisition;
+        if (gas > MAX_CALLBACK_GAS_LIMIT) gas = MAX_CALLBACK_GAS_LIMIT;
+    }
+
+    /// @notice Purchaser VRF charge for one batch of `count` acquisitions at the current base fee: one
+    ///         request per `ACQUISITIONS_PER_VRF_REQUEST` acquisitions. Not refundable: Chainlink bills
+    ///         each request whether its acquisitions later settle or not.
+    function vrfFeeFor(uint256 count) public view returns (uint256 fee) {
+        (uint256 forwarded, uint256 margin) = vrfFeeParts(count);
+        fee = forwarded + margin;
+    }
+
+    /// @notice The batch VRF charge split into the part forwarded to the subscription and the
+    ///         protocol margin, summed over the batch's requests.
+    function vrfFeeParts(uint256 count) public view returns (uint256 forwarded, uint256 margin) {
+        VrfFeeConfig memory c = vrfFeeConfig;
+        uint256 price = block.basefee > c.minGasPrice ? block.basefee : c.minGasPrice;
+        // The service margin is charged per pull, as if each pull were its own request (FWA V2's
+        // per-acquisition requestFee); the subscription is charged for the shared requests.
+        uint256 perPull = (uint256(c.overheadGas) + callbackGasLimitFor(1)) * price * c.marginBps / BPS;
+        for (uint256 done; done < count; done += ACQUISITIONS_PER_VRF_REQUEST) {
+            uint256 n = count - done < ACQUISITIONS_PER_VRF_REQUEST ? count - done : ACQUISITIONS_PER_VRF_REQUEST;
+            // one request: its forwarded part plus its pulls' margin is at most MAX_VRF_FEE_PER_BATCH,
+            // the subscription's share kept first
+            uint256 f = (uint256(c.overheadGas) + callbackGasLimitFor(n)) * price * (BPS + c.premiumBps + c.bufferBps) / BPS + c.flatWei;
+            if (f > MAX_VRF_FEE_PER_BATCH) f = MAX_VRF_FEE_PER_BATCH;
+            uint256 m = n * perPull;
+            if (f + m > MAX_VRF_FEE_PER_BATCH) m = MAX_VRF_FEE_PER_BATCH - f;
+            forwarded += f;
+            margin += m;
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
                              REQUEST ACQUISITIONS
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice Pay for and request `count` acquisitions with one VRF request. Send at least
+    /// @notice Pay for and request `count` acquisitions, one VRF request per
+    ///         `ACQUISITIONS_PER_VRF_REQUEST`. Send at least
     ///         `quoteAcquisitionPrice(count).total`; any excess is refunded to the caller.
     /// @param purchaser Recipient of every acquisition, its NFT, participation units and refund rights.
     /// @param referrer Referrer credited with the referral share of each fulfilled acquisition's
@@ -893,9 +970,18 @@ contract DrawEngine is ReentrancyGuard {
 
         uint256 fee = _validateAcquisition(maxAcquisitionFee, minWeightedValue);
         uint256 settlementFee = settlementFeeFor(fee);
-        uint256 vrfFee = vrfFeePerBatch;
-        uint256 cost = count * (fee + settlementFee) + vrfFee;
-        if (msg.value < cost) revert InsufficientPayment();
+        (uint256 vrfFee, uint256 vrfMargin) = vrfFeeParts(count);
+        uint256 cost = count * (fee + settlementFee) + vrfFee + vrfMargin;
+        // A buyer's own refund credit pays first, so a refund simply rolls into the next pull.
+        uint256 paid = msg.value;
+        if (paid < cost && msg.sender == purchaser) {
+            uint256 credit = acquisitionRefundCredit[purchaser];
+            uint256 used = cost - paid < credit ? cost - paid : credit;
+            acquisitionRefundCredit[purchaser] = credit - used;
+            acquisitionRefundCreditTotal -= used;
+            paid += used;
+        }
+        if (paid < cost) revert InsufficientPayment();
 
         if (referrer == purchaser || referrer == address(this)) referrer = address(0);
 
@@ -915,10 +1001,21 @@ contract DrawEngine is ReentrancyGuard {
         }
         dayTotals[order.day].accepted += uint64(count);
 
-        if (vrfFee != 0) vrfCoordinator.fundSubscriptionWithNative{value: vrfFee}(vrfSubscriptionId);
-        _requestRandomness(firstSequence, count);
+        if (vrfFee != 0) {
+            vrfFeesCollected += vrfFee;
+            vrfCoordinator.fundSubscriptionWithNative{value: vrfFee}(vrfSubscriptionId);
+        }
+        if (vrfMargin != 0) {
+            feeCreditOf[devRecipient] += vrfMargin;
+            feeCreditTotal += vrfMargin;
+        }
+        emit VrfFeeCollected(firstSequence, count, vrfFee, vrfMargin);
+        for (uint256 done; done < count; done += ACQUISITIONS_PER_VRF_REQUEST) {
+            uint256 n = count - done < ACQUISITIONS_PER_VRF_REQUEST ? count - done : ACQUISITIONS_PER_VRF_REQUEST;
+            _requestRandomness(firstSequence + uint64(done), n);
+        }
 
-        uint256 excess = msg.value - cost;
+        uint256 excess = paid - cost;
         if (excess != 0) SafeTransferLib.forceSafeTransferETH(msg.sender, excess);
     }
 
@@ -1009,15 +1106,14 @@ contract DrawEngine is ReentrancyGuard {
         unsettledAcquisitionCount += 1;
         acquisitionEscrowTotal += o.fee + o.settlementFee;
 
-        emit AcquisitionRequested(requestId, o.purchaser, o.fee, o.settlementFee, o.referrer, totalWeight);
+        emit AcquisitionRequested(requestId, o.purchaser, o.fee, o.settlementFee, o.referrer, msg.sender, totalWeight);
         emit AcquisitionSequenced(requestId, sequence, o.wordDeadline, reservedCount);
     }
 
     /// @dev One VRF request for the batch. The sequence numbers and reservations are committed
     ///      before the external request; a coordinator revert rolls the whole transaction back.
     function _requestRandomness(uint64 firstSequence, uint256 count) internal {
-        uint256 gas = uint256(callbackGasBase) + count * callbackGasPerAcquisition;
-        if (gas > MAX_CALLBACK_GAS_LIMIT) gas = MAX_CALLBACK_GAS_LIMIT;
+        uint256 gas = callbackGasLimitFor(count);
         uint256 vrfRequestId = vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: vrfKeyHash,
@@ -1094,7 +1190,9 @@ contract DrawEngine is ReentrancyGuard {
             emit RandomnessCached(requestId, meta.sequence, derived);
         }
 
-        _tryProcessCallbackHead(count);
+        // The head may include an earlier request's acquisitions when words arrive out of order, so
+        // the fast path runs while gas allows rather than for this request's count only.
+        _tryProcessCallbackHead(2 * ACQUISITIONS_PER_VRF_REQUEST);
     }
 
     /// @dev Best-effort fast path: up to `maxItems` single-item self-calls into the guarded processor,
@@ -1108,7 +1206,7 @@ contract DrawEngine is ReentrancyGuard {
             if (reservedListingsBySequence[head].length != 0) return;
             if (gasleft() < CALLBACK_FAST_PATH_GAS + CALLBACK_RETURN_GAS_RESERVE) return;
             bool ok;
-            uint256 gasStipend = CALLBACK_FAST_PATH_GAS;
+            uint256 gasStipend = gasleft() - CALLBACK_RETURN_GAS_RESERVE;
             assembly ("memory-safe") {
                 ok := call(gasStipend, address(), 0, add(callData, 0x20), mload(callData), 0, 0)
             }
@@ -1575,10 +1673,19 @@ contract DrawEngine is ReentrancyGuard {
         _setVrfConfig(vrf);
     }
 
-    function setVrfFeePerBatch(uint256 fee) external onlyGovernance {
-        if (fee > MAX_VRF_FEE_PER_BATCH) revert InvalidConfig();
-        vrfFeePerBatch = fee;
-        emit VrfFeeSet(fee);
+    function setVrfFeeConfig(VrfFeeConfig calldata c) external onlyGovernance {
+        _setVrfFeeConfig(c);
+    }
+
+    function _setVrfFeeConfig(VrfFeeConfig memory c) internal {
+        if (
+            c.premiumBps > MAX_VRF_PREMIUM_BPS || c.bufferBps > MAX_VRF_BUFFER_BPS || c.flatWei > MAX_VRF_FEE_PER_BATCH
+                || c.marginBps > MAX_VRF_MARGIN_BPS
+        ) {
+            revert InvalidConfig();
+        }
+        vrfFeeConfig = c;
+        emit VrfFeeConfigSet(c);
     }
 
     function _setFeePolicy(uint256 settlementBps, uint16 referrerBps, uint16 tokenWorksBps) internal {

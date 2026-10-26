@@ -65,3 +65,9 @@ int_types = "long"
 
 [lint]
 lint_on_build = false
+
+# Fork suites run every top-level call as its own transaction (`isolate`), so storage is cold the way
+# it is on chain: `FOUNDRY_PROFILE=fork forge test --match-path "test/fork/*"`. Without it the
+# deployment's writes stay warm and a cold-state gas regression (e.g. the VRF callback) cannot show.
+[profile.fork]
+isolate = true

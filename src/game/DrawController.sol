@@ -11,10 +11,14 @@ import {Denominations} from "shapes/lib/Denominations.sol";
 import {IShapePacks} from "draw-packs/interfaces/IShapePacks.sol";
 import {PricingLib} from "./PricingLib.sol";
 import {DrawEngine} from "../engine/DrawEngine.sol";
-import {IVRFCoordinatorV2Plus} from "../vendor/chainlink/IVRFCoordinatorV2Plus.sol";
 
 interface GrailVaultLike {
     function fundGrail() external payable;
+}
+
+/// @dev A successor controller funded by `migrateCapital`.
+interface ControllerLike {
+    function fundPool() external payable;
 }
 
 /// @title DrawController
@@ -23,11 +27,11 @@ interface GrailVaultLike {
 ///         acquisition, replaces captured items from the mix table, splits the realised margin
 ///         between the ordinary pool, maintenance and the GRAIL fund, and builds and lists GRAILs.
 /// @dev Ported from ripe0x/draw-shapes `Pool`/`PoolBooks`/`PoolListing` (commit 4a13a09). Removed:
-///      depositors, shares, claims, entry fees, the volume cap, exits and migration, the FWA edge
+///      depositors, shares, claims, entry fees, the volume cap, depositor exits, the FWA edge
 ///      arithmetic and the 1 ETH piece / merge GRAIL builder. Kept: the booking walk, margin split
 ///      with the replacement mint line, deficit / surprise / band replacement draw, fill by held
 ///      Shape, mint or Draw Pack, and GRAIL listing below backing with per-pull decay and a
-///      probability cap.
+///      probability cap. Protocol capital moves to a successor through `migrateCapital`.
 ///
 ///      Buckets. Every wei the controller holds is in `cash` or `maintenance`, besides
 ///      the feed in flight; `receivable`, `maintenanceReceivable` and `feedReceivable` are engine
@@ -35,8 +39,8 @@ interface GrailVaultLike {
 ///      listed. Ordinary NAV = `cash + backing + receivable`.
 ///
 ///      Invariants (test/invariant): I1 `balance >= cash + maintenance`; I2 `backing` equals the
-///      summed value of ordinary items held or listed; I3 maintenance pays only keeper refunds and
-///      VRF subscription funding. GRAILs live in `GrailVault`, a separate engine supplier.
+///      summed value of ordinary items held or listed; I3 maintenance pays only keeper refunds (VRF
+///      is purchaser-funded in the engine). GRAILs live in `GrailVault`, a separate engine supplier.
 contract DrawController is ReentrancyGuard {
     using SafeCastLib for uint256;
 
@@ -68,8 +72,10 @@ contract DrawController is ReentrancyGuard {
 
     uint256 internal constant BPS = 10_000;
     uint256 public constant MAX_FEE_SPLIT_BPS = 1_500;
-    uint256 public constant MAX_SETTLE_ITEMS = 50;
-    uint256 public constant MAX_LIST_PER_CALL = 40;
+    uint256 public constant MAX_SETTLE_ITEMS = 20;
+    /// @dev Listings per call: each mints and lists (0.86-1.36M gas with cold storage), so 8 keeps settle(50) and build
+    ///      the EIP-7825 per-transaction cap of 16,777,216 gas (Base Sepolia; coming to Base mainnet).
+    uint256 public constant MAX_LIST_PER_CALL = 6;
     uint256 public constant MAX_TIP = 0.001 ether;
     uint256 public constant MAX_RESTORE_K = 100;
     uint256 public constant MAX_BAND_BPS = 100_000;
@@ -120,8 +126,8 @@ contract DrawController is ReentrancyGuard {
     /// @notice Recipient of realised surplus (the buyback) and the time from which release is allowed.
     address public surplusSink;
     uint64 public surplusReleaseStart;
-    /// @notice Subscription balance the maintenance bucket keeps the VRF subscription topped up to.
-    uint256 public vrfTargetBalance;
+    /// @notice Operating reserve: before surplus leaves, it first tops maintenance up to this level.
+    uint256 public maintenanceFloor;
 
     // ------------------------------------------------------------------ registry
 
@@ -177,6 +183,7 @@ contract DrawController is ReentrancyGuard {
     event GovernanceTransferred(address indexed previous, address indexed next);
     event ListingPausedSet(bool paused);
     event RefundedRecovered(uint256 indexed listingId, uint256 value);
+    event CapitalMigrated(address indexed to, uint256 cash, uint256 maintenance);
 
     // ------------------------------------------------------------------ errors
 
@@ -194,6 +201,7 @@ contract DrawController is ReentrancyGuard {
     error UnexpectedToken();
     error RedeemMismatch();
     error NotRefunded();
+    error StillListed();
 
     // ------------------------------------------------------------------ construction
 
@@ -212,7 +220,7 @@ contract DrawController is ReentrancyGuard {
         uint256 bandBps;
         uint256 tipWei;
         uint256 capitalTarget;
-        uint256 vrfTargetBalance;
+        uint256 maintenanceFloor;
         address grailVault;
     }
 
@@ -232,7 +240,7 @@ contract DrawController is ReentrancyGuard {
         _setReplacement(p.surpriseBps, p.restoreK, p.bandBps);
         _setTip(p.tipWei);
         capitalTarget = p.capitalTarget;
-        vrfTargetBalance = p.vrfTargetBalance;
+        maintenanceFloor = p.maintenanceFloor;
         grailVault = GrailVaultLike(p.grailVault);
         IERC721(p.shapes).setApprovalForAll(p.engine, true);
         IERC721(p.drawPacks).setApprovalForAll(p.engine, true);
@@ -295,27 +303,8 @@ contract DrawController is ReentrancyGuard {
         if (listed != 0) _refundKeeper(gasStart);
     }
 
-    /// @notice Books engine acquisitions already processed by others, without processing more.
-    function book(uint256 maxCount) external nonReentrant {
-        _walk(maxCount > MAX_SETTLE_ITEMS ? MAX_SETTLE_ITEMS : maxCount);
-        _harvest();
-    }
-
-    /// @notice Tops the VRF subscription up from maintenance to `vrfTargetBalance`. Anyone.
-    function topUpVrf() external nonReentrant returns (uint256 amount) {
-        IVRFCoordinatorV2Plus coordinator = engine.vrfCoordinator();
-        uint256 subId = engine.vrfSubscriptionId();
-        (, uint96 nativeBalance,,,) = coordinator.getSubscription(subId);
-        if (nativeBalance >= vrfTargetBalance) return 0;
-        amount = vrfTargetBalance - nativeBalance;
-        if (amount > maintenance) amount = maintenance;
-        if (amount == 0) return 0;
-        maintenance -= amount;
-        coordinator.fundSubscriptionWithNative{value: amount}(subId);
-        emit VrfFunded(amount);
-    }
-
-    /// @notice Sends realised surplus, ordinary NAV above `capitalTarget`, to `surplusSink` from cash.
+    /// @notice Sends realised surplus, ordinary NAV above `capitalTarget`, to `surplusSink` from cash,
+    ///         after topping maintenance up to `maintenanceFloor`.
     ///         Requires the books level with the engine, an empty replacement queue and a full
     ///         board, so released ETH is never needed for restocking. Anyone, from `surplusReleaseStart`.
     function releaseSurplus() external nonReentrant returns (uint256 amount) {
@@ -327,6 +316,14 @@ contract DrawController is ReentrancyGuard {
         amount = releasableSurplus();
         if (amount == 0) revert NothingToRelease();
         cash -= amount;
+        // operating reserve first: top maintenance up to its floor (a transfer, not earnings)
+        if (maintenance < maintenanceFloor) {
+            uint256 top = maintenanceFloor - maintenance;
+            if (top > amount) top = amount;
+            maintenance += top;
+            amount -= top;
+            if (amount == 0) return 0;
+        }
         totalSurplusReleased += amount;
         emit SurplusReleased(surplusSink, amount);
         SafeTransferLib.safeTransferETH(surplusSink, amount);
@@ -335,7 +332,6 @@ contract DrawController is ReentrancyGuard {
     /// @notice Surplus `releaseSurplus` would send now.
     function releasableSurplus() public view returns (uint256) {
         if (receivable != 0 || _replacementQueue.length != replacementHead || _boardCount() < boardItems) return 0;
-        if (_margin < 0 || _mintLineOwed != 0) return 0;
         uint256 value = nav();
         if (value <= capitalTarget) return 0;
         uint256 surplus = value - capitalTarget;
@@ -349,16 +345,57 @@ contract DrawController is ReentrancyGuard {
         (address collection,,, uint256 tokenId,,,, DrawEngine.ListingStatus status) = engine.listings(listingId);
         if (status != DrawEngine.ListingStatus.DeliveryRefunded) revert NotRefunded();
         engine.recoverRefundedNFT(listingId);
+        if (collection != address(shapes) && collection != address(drawPacks)) return;
+        uint256 value = IERC721Value(collection).valueOf(tokenId);
         uint256 before = address(this).balance;
-        if (collection == address(shapes)) {
-            uint256 value = shapes.backingOf(tokenId);
-            shapes.redeem(tokenId);
-            _creditRedeemed(listingId, value, before);
-        } else if (collection == address(drawPacks)) {
-            uint256 value = IERC721Value(address(drawPacks)).valueOf(tokenId);
-            drawPacks.redeem(tokenId);
-            _creditRedeemed(listingId, value, before);
+        IERC721Value(collection).burn(tokenId);
+        _creditRedeemed(listingId, value, before);
+    }
+
+    /// @notice After the engine is retired, withdraws ordinary listings and redeems them into cash,
+    ///         turning unawarded prizes back into ETH of the ordinary pool. Anyone; up to 20 per call.
+    function windDown(uint256[] calldata listingIds) external nonReentrant {
+        if (!engine.retired()) revert ReleaseNotOpen();
+        Item[] memory items = new Item[](listingIds.length);
+        for (uint256 i; i < listingIds.length; ++i) {
+            items[i] = _removeListed(listingIds[i]);
         }
+        engine.withdrawListingsTo(listingIds, address(this));
+        for (uint256 i; i < items.length; ++i) {
+            _redeemToCash(items[i]);
+        }
+    }
+
+    /// @notice Moves the controller's capital (cash and maintenance) to `to` once nothing here is
+    ///         owed or on the board: no engine acquisition unresolved, the books level and harvested,
+    ///         and every ordinary listing wound down (after `DrawEngine.retire`) or handed off to a
+    ///         successor. Held items are redeemed into cash first, and listing stays paused here.
+    ///         `asController` funds a successor controller's cash through `fundPool` (its maintenance
+    ///         refills from margin); otherwise the ETH is a plain transfer. Player funds never pass through the controller.
+    ///         Governance (timelock).
+    function migrateCapital(address to, bool asController) external onlyGovernance nonReentrant {
+        if (engine.unsettledAcquisitionCount() != 0 || nextSequenceToBook != engine.nextSequenceToProcess()) {
+            revert BooksBehind();
+        }
+        _harvest();
+        if (listedCount | receivable | maintenanceReceivable | feedReceivable != 0) revert StillListed();
+        while (_held.length != 0) {
+            _redeemToCash(_removeHeld(_held.length - 1));
+        }
+        listingPaused = true;
+        (uint256 c, uint256 m) = (cash, maintenance);
+        (cash, maintenance) = (0, 0);
+        emit CapitalMigrated(to, c, m);
+        if (asController) ControllerLike(to).fundPool{value: c + m}();
+        else SafeTransferLib.safeTransferETH(to, c + m);
+    }
+
+    /// @dev Burns an ordinary item the controller holds and books its ETH backing as cash.
+    function _redeemToCash(Item memory it) internal {
+        uint256 before = address(this).balance;
+        IERC721Value(it.collection).burn(it.tokenId);
+        if (address(this).balance - before != it.value) revert RedeemMismatch();
+        cash += it.value;
     }
 
     function _creditRedeemed(uint256 listingId, uint256 value, uint256 before) internal {
@@ -388,10 +425,6 @@ contract DrawController is ReentrancyGuard {
         return (_rowCount[row], _queuedByRow[row]);
     }
 
-    function heldCount() external view returns (uint256) {
-        return _held.length;
-    }
-
     function queueLength() external view returns (uint256) {
         return _replacementQueue.length - replacementHead;
     }
@@ -400,25 +433,12 @@ contract DrawController is ReentrancyGuard {
         return _listed[listingId];
     }
 
-    function margin() external view returns (int256) {
-        return _margin;
-    }
-
-    function mintLineOwed() external view returns (uint256) {
-        return _mintLineOwed;
-    }
-
     /// @notice Notional the controller assigns to one item of `row` at the current mint fee.
     function rowNotional(uint256 row) public view returns (uint256) {
         FeeSplit memory s = feeSplit;
         return PricingLib.listingPrice(
             _rowBackingWei[row], s.premiumBps, s.maintenanceBps, s.feedBps, shapes.mintFee() * _mix[row].rungs.length
         );
-    }
-
-    /// @notice Target depth of `row`: `ceil(boardItems * shareBps / 10_000)`.
-    function rowTarget(uint256 row) public view returns (uint256) {
-        return PricingLib.rowDepth(boardItems, _mix[row].shareBps);
     }
 
     // ------------------------------------------------------------------ books
@@ -855,12 +875,9 @@ contract DrawController is ReentrancyGuard {
         _setTip(tip);
     }
 
-    function setCapitalTarget(uint256 value) external onlyGovernance {
-        capitalTarget = value;
-    }
-
-    function setVrfTargetBalance(uint256 value) external onlyGovernance {
-        vrfTargetBalance = value;
+    function setTargets(uint256 capital, uint256 maintenanceFloor_) external onlyGovernance {
+        capitalTarget = capital;
+        maintenanceFloor = maintenanceFloor_;
     }
 
     function setSurplusSink(address sink, uint64 releaseStart) external onlyGovernance {

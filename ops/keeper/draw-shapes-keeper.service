@@ -1,0 +1,22 @@
+# systemd unit for a Draw Shapes keeper. Install: copy to /etc/systemd/system/, then
+#   systemctl daemon-reload && systemctl enable --now draw-shapes-keeper
+[Unit]
+Description=Draw Shapes keeper (settle, restock, GRAIL step, fees, buyback)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=draw-shapes
+WorkingDirectory=/opt/draw-shapes
+EnvironmentFile=/etc/draw-shapes/keeper.env
+ExecStart=/usr/bin/node web/scripts/keeper.mjs
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -10,7 +10,8 @@ Model (all inputs are assumptions, not forecasts):
   cost: pulls_d = realised_ETH(epoch d) / (loss_per_pull * (1 + required_margin)).
   The loss per pull is the reference-board payment minus expected backing plus wallet gas.
 - Per pull the game books (reference board, docs/ENGINE.md): replacement mint fees 0.001226 ETH to
-  the creator, premium 0.000385, maintenance 0.000128, GRAIL feed 0.000513, settlement fee 0.000151.
+  the creator, premium 0.000449, maintenance 0.000064, GRAIL feed 0.000385, settlement fee 0.000149
+  (launch: premium 3.5 %, maintenance 0.5 %, feed 3 %; the purchaser's VRF fee goes to Chainlink).
 Writes sim/results/farming.md.
 """
 import os
@@ -18,17 +19,18 @@ from market import Pool
 
 LIQ_ETH = 2.0
 LIQ_TOKENS = 10e6
-PAYMENT = 0.015221
+PAYMENT = 0.015092 + 0.0000056  # fee + settlement + VRF share of a 10-pull batch at 0.01 gwei (launch 3.5/0.5/3)
 EXPECTED_BACKING = 0.012819
 GAS_PER_PULL = 0.00002  # batched acquire + share of settle on Base; measured order 1e-6, kept conservative
 LOSS = PAYMENT - EXPECTED_BACKING + GAS_PER_PULL
-PER_PULL = {"mint_fees": 0.001226, "premium": 0.000385, "maintenance": 0.000128, "feed": 0.000513,
-            "settlement": 0.000151}
+PER_PULL = {"mint_fees": 0.001226, "premium": 0.000449, "maintenance": 0.000064, "feed": 0.000385,
+            "settlement": 0.000149}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-def run(farm, buy_per_day, fee_bps=200, sell_share=1.0, margin=0.0, days=16):
+def run(farm, buy_per_day, fee_bps=200, sell_share=1.0, margin=0.0, days=16, reinvest=1.0, loss=None):
+    loss = LOSS if loss is None else loss
     pool = Pool(LIQ_ETH, LIQ_TOKENS, fee_bps)
     per_epoch = farm / 14
     realised = [0.0] * 15  # realised ETH of epoch e's rewards
@@ -43,7 +45,8 @@ def run(farm, buy_per_day, fee_bps=200, sell_share=1.0, margin=0.0, days=16):
                 pool.buy(buy_per_day / 24)
             if to_sell:
                 realised[epoch] += pool.sell(to_sell / 24)
-    pulls = [realised[e] / (LOSS * (1 + margin)) for e in range(14)]
+    # farmers put `reinvest` of the ETH their ENGINE realises into pulls (1.0 = competitive equilibrium)
+    pulls = [reinvest * realised[e] / (loss * (1 + margin)) for e in range(14)]
     total = sum(pulls)
     out = {
         "pulls_total": total,
@@ -58,6 +61,10 @@ def run(farm, buy_per_day, fee_bps=200, sell_share=1.0, margin=0.0, days=16):
         "treasury_fees": pool.fees - pool.operator,
         "buyer_tokens": LIQ_TOKENS - pool.y + farm * sell_share,  # circulating outside the pool
         "unsold_farmer_tokens": farm * (1 - sell_share),
+        # where farmer ETH comes from: outside buyers' ETH (net of hook fees) or the opening liquidity
+        "external_eth": buy_per_day * days,
+        "liquidity_drained": LIQ_ETH - pool.x,
+        "farmer_kept": (1 - reinvest) * sum(realised[:14]),
     }
     for k, v in PER_PULL.items():
         out[k] = total * v
@@ -131,6 +138,34 @@ def main():
                              ("Unsold farmer ENGINE", lambda r: f"{r['unsold_farmer_tokens']/1e6:.1f}M"),
                              ("End price (1e-7)", lambda r: f"{r['end_price']*1e7:.2f}"),
                              ("End pool ETH", lambda r: f"{r['end_pool_eth']:.2f}")]))
+    lines.append("## Sensitivity: partial reinvestment and the source of farmer ETH (25M, 2 %, farmers sell everything)\n")
+    lines.append("The equilibrium above assumes farmers put all realised ENGINE proceeds into pulls. Here only "
+                 "`reinvest` of it is; the rest leaves the system as farmer profit. Farmer ETH comes from outside "
+                 "buyers (external ETH, net of hook fees) and, where buying is weak, from draining the opening "
+                 "2 ETH of liquidity (`liquidity drained`, negative = the pool ended with more ETH). Creator mint fees "
+                 "are model outputs scaled from pulls, not expected revenue: they exist only if outside buyers bring "
+                 "that ETH and farmers spend it on pulls. Loss per pull for each configuration includes the VRF share.\n")
+    sens = []
+    configs = (("current 4/0.5/2", 0.015032891 - 0.012819638 + GAS_PER_PULL),
+               ("alternative 3.5/0.5/3", 0.015097445 - 0.012819466 + GAS_PER_PULL))
+    for buy in (0.0, 0.3, 0.7, 1.5):
+        for name, loss in configs:
+            for reinvest in (1.0, 0.75, 0.5, 0.25):
+                r = run(25e6, buy, reinvest=reinvest, loss=loss)
+                r.update(buy=buy, cfg=name, reinvest=reinvest, loss=loss)
+                sens.append(r)
+    lines.append(table(sens, [("Outside buying ETH/day", lambda r: f"{r['buy']:.1f}"),
+                              ("Config", lambda r: r["cfg"]),
+                              ("Loss / pull", lambda r: f"{r['loss']:.6f}"),
+                              ("Reinvest", lambda r: f"{r['reinvest']*100:.0f} %"),
+                              ("Pulls/day", lambda r: f"{r['pulls_per_day']:.0f}"),
+                              ("Farmer ETH realised", lambda r: f"{r['farmer_eth']:.2f}"),
+                              ("of which kept", lambda r: f"{r['farmer_kept']:.2f}"),
+                              ("External ETH in", lambda r: f"{r['external_eth']:.2f}"),
+                              ("Liquidity drained", lambda r: f"{r['liquidity_drained']:.2f}"),
+                              ("Creator mint fees (model)", lambda r: f"{r['pulls_total'] * 0.0012256:.2f}"),
+                              ("Premium", lambda r: f"{r['pulls_total'] * (0.000513 if r['cfg'].startswith('current') else 0.000449):.3f}"),
+                              ("GRAIL feed", lambda r: f"{r['pulls_total'] * (0.000256 if r['cfg'].startswith('current') else 0.000385):.3f}")]))
     path = os.path.join(HERE, "results", "farming.md")
     open(path, "w").write("\n".join(lines))
     print(open(path).read())

@@ -1,0 +1,16 @@
+{
+  "chainId": 84532,
+  "shapes": "0x062193a0f3df55d88a7e37366d442cd2238cced0",
+  "drawPacks": "0x835c2447878ca51329edfffed95bb2977782e6c4",
+  "timelock": "0x0a37004c35bc01bd5d0e537b85b48ae650a68bcb",
+  "engine": "0xf1a489f5b1e629cc0bc9359f59eb5adcce36e48f",
+  "grailVault": "0xe58349913ac8d01da859369ffa3000bc1b9c3937",
+  "controller": "0x2071743214fd3460934c79bc33fae1abd6beb0da",
+  "token": "0x5a38a453d15ee4e918e2d4a24c4ebbf5f0b0fc48",
+  "hook": "0xe385f6958bd9afdfcfcfd085767202c10fc9e0cc",
+  "liquidity": "0x7794be8f04f98430b5da3719c653cd9a2d0ad477",
+  "farm": "0xd3a6b5bc9294e6b39374378b17908551308d9df0",
+  "treasury": "0x44736e45e6b547109337c1d405ade39ed1c1c38c",
+  "buyback": "0xcd6c48146fa4dbb7c65b59a22f50c16d16bce73d",
+  "lens": "0x16367f2722e98092670fadc1b1d43c5c31f4591f"
+}

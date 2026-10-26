@@ -1,0 +1,18 @@
+# Netlify: the player site (site/, ported from the original Draw Shapes app) as a static export,
+# built against the bundled Base Sepolia deployment record (site/deployments/84532.json). ABIs are
+# committed (site/app/lib/abi), so no Foundry build is needed on Netlify.
+[build]
+  base = "site"
+  command = "npm ci && npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_PUBLIC_CHAIN_ID = "84532"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"

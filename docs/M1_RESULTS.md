@@ -28,7 +28,7 @@ Reproduce: `forge test --match-path "test/unit/*"`, `forge test --match-path "te
 | Total per pull | 15,220,989,398,399,995 | 0.015221 |
 | Expected backing | 12,819,127,730,909,358 | 0.012819 (84.22 %) |
 
-Wallet gas is additional. The settlement fee splits 75,351,432,665,347 to the referrer,
+Wallet gas is additional. The settlement fee splits 75,351,432,665,346 to the referrer,
 15,070,286,533,069 to Token Works and the remainder to development per fulfilled pull.
 
 ## VRF (Chainlink v2.5, Base)
@@ -53,6 +53,9 @@ Our callback (fork, cold storage, includes settling and delivering inside the ca
 Estimate = (callback gas + 300k verification + 42.5k) × 0.00615 gwei × 1.6. Even a single pull
 costs < 8 % of the 0.000128 ETH maintenance allocation per pull, which funds the subscription
 (`DrawController.topUpVrf`). Launch therefore sets `vrfFeePerBatch = 0`.
+
+> Superseded by the follow-up (docs/FOLLOWUP.md): purchasers now pay a separate per-batch VRF fee
+> that funds the subscription at purchase; `topUpVrf` and `vrfFeePerBatch` were removed.
 
 ## Gas (local, warm)
 

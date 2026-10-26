@@ -50,6 +50,7 @@ abstract contract GameFixture is Test {
             address(this),
             guardian,
             LaunchParams.vrf(address(vrf), subId, keccak256("lane")),
+            LaunchParams.vrfFee(),
             LaunchParams.limits(),
             LaunchParams.fees(tokenWorks, dev)
         );
@@ -71,8 +72,8 @@ abstract contract GameFixture is Test {
     /// @dev Funds the ordinary pool with the launch allocation and lists the whole board.
     function _openBoard() internal {
         controller.fundPool{value: LaunchParams.ORDINARY_POOL}();
-        for (uint256 i; i < 5 && controller.listedCount() < controller.boardItems(); ++i) {
-            controller.build(40);
+        for (uint256 i; i < 30 && controller.listedCount() < controller.boardItems(); ++i) {
+            controller.build(40); // lists at most MAX_LIST_PER_CALL per call
         }
     }
 
@@ -91,11 +92,12 @@ abstract contract GameFixture is Test {
         uint256 any = engine.ANY_INVENTORY_VERSION();
         vm.prank(who);
         ids = engine.acquireBatch{value: total}(who, ref, count, 0, 0, 1_000, any, block.timestamp);
+        vrf.markGroup(vrfId, vrf.nextRequestId());
     }
 
     function _fulfill(uint256 vrfId, uint256 word) internal {
         vm.roll(vm.getBlockNumber() + 3);
-        vrf.fulfill(vrfId, word);
+        vrf.fulfillGroup(vrfId, word);
     }
 
     /// @dev Processes and books everything outstanding.
@@ -103,8 +105,8 @@ abstract contract GameFixture is Test {
         for (uint256 i; i < 50; ++i) {
             controller.settle(50);
             vault.step();
+            // booked and fully restocked (settle lists at most MAX_LIST_PER_CALL per call)
             if (controller.nextSequenceToBook() > engine.lastIssuedSequence() && controller.queueLength() == 0) break;
-            if (controller.nextSequenceToBook() > engine.lastIssuedSequence() && i > 3) break;
         }
     }
 

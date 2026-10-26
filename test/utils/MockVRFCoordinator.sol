@@ -21,7 +21,12 @@ contract MockVRFCoordinator {
 
     uint256 public nextRequestId = 1;
     uint256 public nextSubId = 1;
-    uint256 public billPerFulfillment = 0.00002 ether;
+    /// @dev Chainlink v2.5 native billing: (callback gas + verification and accounting overhead) x the
+    ///      oracle's gas price x (1 + 60 % premium) + L1 data fee. Defaults from live Base fulfilments.
+    uint256 public billGasPrice = 0.00615 gwei;
+    uint256 public billOverheadGas = 300_000 + 42_500;
+    uint256 public billL1Wei = 0.0000005 ether;
+    uint256 public totalBilled;
     mapping(uint256 => Request) public requests;
     mapping(uint256 => uint96) public nativeBalance;
     mapping(uint256 => address) public subOwner;
@@ -78,9 +83,34 @@ contract MockVRFCoordinator {
         uint256 g = gasleft();
         (success,) = r.consumer.call{gas: r.callbackGasLimit}(abi.encodeCall(IRawFulfill.rawFulfillRandomWords, (id, words)));
         uint256 used = g - gasleft();
-        uint96 bill = uint96(billPerFulfillment);
-        nativeBalance[r.subId] = nativeBalance[r.subId] > bill ? nativeBalance[r.subId] - bill : 0;
+        uint96 bill = uint96((used + billOverheadGas) * billGasPrice * 160 / 100 + billL1Wei);
+        require(nativeBalance[r.subId] >= bill, "subscription underfunded");
+        nativeBalance[r.subId] -= bill;
+        totalBilled += bill;
         emit Fulfilled(id, success, used);
+    }
+
+    /// @notice A batch's requests [start, end): the engine makes one request per
+    ///         `ACQUISITIONS_PER_VRF_REQUEST` acquisitions. Test helpers record each purchase's range.
+    mapping(uint256 start => uint256 end) public groupEnd;
+
+    function markGroup(uint256 start, uint256 end) external {
+        if (end > start + 1) groupEnd[start] = end;
+    }
+
+    /// @notice Fulfils every open request of the batch starting at `id`: the first with `word`, the
+    ///         rest with words derived from it. A request without a recorded group is fulfilled alone.
+    function fulfillGroup(uint256 id, uint256 word) public returns (bool success) {
+        uint256 end = groupEnd[id] == 0 ? id + 1 : groupEnd[id];
+        success = true;
+        for (uint256 j = id; j < end; ++j) {
+            if (requests[j].done) continue;
+            if (!fulfill(j, j == id ? word : uint256(keccak256(abi.encode(word, j))))) success = false;
+        }
+    }
+
+    function setBilling(uint256 gasPrice, uint256 overheadGas, uint256 l1Wei) external {
+        (billGasPrice, billOverheadGas, billL1Wei) = (gasPrice, overheadGas, l1Wei);
     }
 
     /// @notice Marks `id` consumed without a callback (a lost callback).
