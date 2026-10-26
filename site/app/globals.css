@@ -332,3 +332,11 @@ button {
 .testnet-banner { padding: 8px 16px; text-align: center; font-size: 13px; background: #f3ecd2; color: #4a3f17; border-bottom: 1px solid #e3d8b0; }
 .testnet-banner a { color: inherit; text-decoration: underline; }
 .link-button { font: inherit; background: none; border: 0; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; }
+
+/* Terms clickwrap on first connect */
+.terms-gate { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(17, 17, 15, 0.45); }
+.terms-gate-card { width: 100%; max-width: 520px; max-height: calc(100vh - 32px); overflow-y: auto; background: var(--page); border: 1px solid var(--ink); padding: 24px; }
+.terms-gate-points { margin: 12px 0 16px; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--body); }
+.terms-gate-points li + li { margin-top: 6px; }
+.terms-gate-check { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; margin-bottom: 16px; cursor: pointer; }
+.terms-gate-check input { margin-top: 3px; width: 16px; height: 16px; flex: 0 0 auto; }

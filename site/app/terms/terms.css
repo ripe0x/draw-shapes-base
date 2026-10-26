@@ -1,0 +1,12 @@
+.terms-page {
+  max-width: 760px;
+}
+.terms-page p,
+.terms-page li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--body);
+}
+.terms-page ul {
+  padding-left: 20px;
+}

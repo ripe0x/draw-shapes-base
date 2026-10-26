@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useDeployment } from "../Providers";
 import { evmNowAddressUrl } from "../lib/errors";
 
-/** Protocol page and the deployment's contracts on evm.now. */
+/** Protocol and Terms pages, and the deployment's contracts on evm.now. */
 export function SiteFooter() {
   const dep = useDeployment();
   const contracts = [
@@ -21,6 +21,7 @@ export function SiteFooter() {
       <div className="site-footer-inner">
         <div className="site-footer-links">
           <Link href="/protocol">Protocol</Link>
+          <Link href="/terms">Terms</Link>
           {dep.present &&
             contracts.map(([label, address]) =>
               address ? (

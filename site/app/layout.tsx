@@ -4,6 +4,7 @@ import { Providers } from "./Providers";
 import { getDeployment } from "./lib/deployment";
 import { Nav } from "./components/Nav";
 import { SiteFooter } from "./components/SiteFooter";
+import { TermsGate } from "./components/TermsGate";
 import "./globals.css";
 import "./vault.css";
 import "./reveal.css";
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </main>
           )}
           <SiteFooter />
+          {deployment.present && <TermsGate />}
         </Providers>
       </body>
     </html>

@@ -24,7 +24,7 @@ const FAQS = [
   {
     question: "What does the VRF fee pay for?",
     answer:
-      "Chainlink's charge for the batch's random word, priced at the block basefee with Chainlink's 60 % premium and a buffer, forwarded to the subscription in the purchase. The mainnet build adds a 30 % service margin on the same gas cost, credited to development (FWA V2's model); the Base Sepolia test deployment predates it. It is charged once per Chainlink request (one request per 5 pulls) and it is not refunded.",
+      "Chainlink's charge for the batch's random word, priced at the block basefee with Chainlink's 60 % premium and a buffer, forwarded to the subscription in the purchase. A 30 % service margin on the same gas cost is added per pull and credited to development (FWA V2's model). It is charged once per Chainlink request (one request per 5 pulls) and it is not refunded.",
   },
   {
     question: "Why can a pull be refunded?",
