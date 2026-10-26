@@ -171,7 +171,7 @@ def simulate(args):
     shortfall = 0
     windows_per_day = int(round(24 * 60 / settle_minutes))
     lam = pulls_per_day / windows_per_day / batch
-    treasury_per_window = trade_vol_per_day * 0.0175 / windows_per_day
+    treasury_per_window = trade_vol_per_day * plat.get("treasury_rate", 0.0175) / windows_per_day
     gp = basefee * 12 // 10  # oracle gas price: basefee plus priority
     minute = 0
     for day in range(14):
