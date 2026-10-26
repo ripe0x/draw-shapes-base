@@ -6,25 +6,25 @@ Chain 84532, RPC https://sepolia.base.org. Every hash below is a real Base Sepol
 
 | Contract | Address |
 | --- | --- |
-| shapes | [`0x062193A0F3Df55d88a7E37366D442CD2238CCeD0`](https://sepolia.basescan.org/address/0x062193A0F3Df55d88a7E37366D442CD2238CCeD0) |
-| drawPacks | [`0x835C2447878Ca51329eDffFED95bb2977782E6C4`](https://sepolia.basescan.org/address/0x835C2447878Ca51329eDffFED95bb2977782E6C4) |
-| timelock | [`0x0a37004C35BC01Bd5D0E537B85b48Ae650A68bcb`](https://sepolia.basescan.org/address/0x0a37004C35BC01Bd5D0E537B85b48Ae650A68bcb) |
-| engine | [`0xF1A489F5b1e629cc0bC9359f59eb5Adcce36e48f`](https://sepolia.basescan.org/address/0xF1A489F5b1e629cc0bC9359f59eb5Adcce36e48f) |
-| controller | [`0x2071743214FD3460934c79BC33fae1AbD6BEB0DA`](https://sepolia.basescan.org/address/0x2071743214FD3460934c79BC33fae1AbD6BEB0DA) |
-| grailVault | [`0xE58349913Ac8d01DA859369ffa3000BC1B9c3937`](https://sepolia.basescan.org/address/0xE58349913Ac8d01DA859369ffa3000BC1B9c3937) |
-| token | [`0x5a38a453d15EE4e918E2D4A24C4EBBf5f0B0Fc48`](https://sepolia.basescan.org/address/0x5a38a453d15EE4e918E2D4A24C4EBBf5f0B0Fc48) |
-| hook | [`0xe385F6958bd9aFDFCfcfd085767202c10FC9e0cC`](https://sepolia.basescan.org/address/0xe385F6958bd9aFDFCfcfd085767202c10FC9e0cC) |
-| liquidity | [`0x7794be8f04f98430B5Da3719c653Cd9A2d0AD477`](https://sepolia.basescan.org/address/0x7794be8f04f98430B5Da3719c653Cd9A2d0AD477) |
-| farm | [`0xd3A6b5bC9294E6b39374378b17908551308d9df0`](https://sepolia.basescan.org/address/0xd3A6b5bC9294E6b39374378b17908551308d9df0) |
-| treasury | [`0x44736E45E6b547109337C1D405AdE39eD1c1C38c`](https://sepolia.basescan.org/address/0x44736E45E6b547109337C1D405AdE39eD1c1C38c) |
-| buyback | [`0xcd6c48146Fa4DBb7C65B59A22F50c16D16BcE73D`](https://sepolia.basescan.org/address/0xcd6c48146Fa4DBb7C65B59A22F50c16D16BcE73D) |
-| lens | [`0x16367F2722e98092670fAdc1b1d43c5C31f4591F`](https://sepolia.basescan.org/address/0x16367F2722e98092670fAdc1b1d43c5C31f4591F) |
+| shapes | [`0xDf08b4535247D7F175b185a6ADC4E9271Ca125F8`](https://sepolia.basescan.org/address/0xDf08b4535247D7F175b185a6ADC4E9271Ca125F8) |
+| drawPacks | [`0xBFd3D8e3B41D48022dFfFCe39D78D9Bb5eBdE2ba`](https://sepolia.basescan.org/address/0xBFd3D8e3B41D48022dFfFCe39D78D9Bb5eBdE2ba) |
+| timelock | [`0xA4a90693E1218Cea8e58Cf96f2314E3F83643627`](https://sepolia.basescan.org/address/0xA4a90693E1218Cea8e58Cf96f2314E3F83643627) |
+| engine | [`0xA12D21f106962d79ef25af3fC9Ba0b17f5F68418`](https://sepolia.basescan.org/address/0xA12D21f106962d79ef25af3fC9Ba0b17f5F68418) |
+| controller | [`0xdF146f88a566Cbb79fb43300E00193A64545880C`](https://sepolia.basescan.org/address/0xdF146f88a566Cbb79fb43300E00193A64545880C) |
+| grailVault | [`0x009A051d543032F25ACd0364cb98320bc73F2110`](https://sepolia.basescan.org/address/0x009A051d543032F25ACd0364cb98320bc73F2110) |
+| token | [`0xf269ba7B246165c9F70e49Cd90359aA5964F891F`](https://sepolia.basescan.org/address/0xf269ba7B246165c9F70e49Cd90359aA5964F891F) |
+| hook | [`0x5B1667cB1e2cCbC3204a4712B0Fb07d046d860cc`](https://sepolia.basescan.org/address/0x5B1667cB1e2cCbC3204a4712B0Fb07d046d860cc) |
+| liquidity | [`0x01D285a9791146be33Ea15D37741C3C1B2a4D4e7`](https://sepolia.basescan.org/address/0x01D285a9791146be33Ea15D37741C3C1B2a4D4e7) |
+| farm | [`0x8DE90EE3aF9c778773dc23Bc3DD6549db126402B`](https://sepolia.basescan.org/address/0x8DE90EE3aF9c778773dc23Bc3DD6549db126402B) |
+| treasury | [`0x5Fae92ef4E76a40D37AEA6d9bFF09bdb7C65D63a`](https://sepolia.basescan.org/address/0x5Fae92ef4E76a40D37AEA6d9bFF09bdb7C65D63a) |
+| buyback | [`0x23aB84Ce46b4f553f3947f32c6CA2b8DE31C226C`](https://sepolia.basescan.org/address/0x23aB84Ce46b4f553f3947f32c6CA2b8DE31C226C) |
+| lens | [`0x5f2b85D1f6B145feB0D8948535373B337F79feb4`](https://sepolia.basescan.org/address/0x5f2b85D1f6B145feB0D8948535373B337F79feb4) |
 
-Deployment: 46 transactions, 70,410,632 gas, 0.000422 ETH. Opening allocation (testnet scale): pool 0.70 ETH, market 0.20 ETH, board 25 items. VRF subscription 65734759714671740308951963479999569810727601828421277709603279960624053991108.
+Deployment: 39 transactions, 57,662,857 gas, 0.000346 ETH. Opening allocation (testnet scale): pool 0.50 ETH, market 0.05 ETH, board 12 items. VRF subscription 65734759714671740308951963479999569810727601828421277709603279960624053991108.
 
 ## Activation through the timelock
 
-Scheduled at 1792945708, executed at 1792946314: waited 606 s against a 600 s delay. Engine activated: true; market launched: true; governance: timelock.
+Scheduled at 1792987527, executed at 1792988133: waited 606 s against a 600 s delay. Engine activated: true; market launched: true; governance: timelock.
 
 Post-activation batch (surplus sink for genesis end; testnet-only faster GRAIL decay): waited 606 s.
 
@@ -32,135 +32,173 @@ Post-activation batch (surplus sink for genesis end; testnet-only faster GRAIL d
 
 | Scenario | Quote: fee / settlement / VRF (ETH) | Request tx | Fulfilment tx | Fulfilment gas | Oracle charge (ETH) | VRF fee − charge (ETH) | Latency | Outcome |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Single pull (referred) (1) | 0.015764 / 0.000158 / 0.0000136 | [0xef5c695a…](https://sepolia.basescan.org/tx/0xef5c695aff2910e5309fee365d80465f660d4146bc948b0ae14da50609160b80) | [0x753e427e…](https://sepolia.basescan.org/tx/0x753e427e9b8e33bd0603f0d145aa89081538a8323b54f09ede41c272e79debcf) | 698196 | 0.0000077 | 0.0000059 | 1374 s | 1 Fulfilled |
-| Batch of ten (10) | 0.015969 / 0.000160 / 0.0000288 | [0x2ba8b1c3…](https://sepolia.basescan.org/tx/0x2ba8b1c33bdb33b841ad4e7c2b2672da1ef08b41f5bbf184c0ddb46bcbad0e5f) | [0xc28eed6c…](https://sepolia.basescan.org/tx/0xc28eed6c19854fedaa31d344793158a34133681d77b5b3b4d0840aae752f7463) | 256377 | 0.0000026 | 0.0000263 | 1441 s | 10 TimedOut |
-| Batch of eight, zero negative slippage (8) | 0.015632 / 0.000156 / 0.0000288 | [0x9278833a…](https://sepolia.basescan.org/tx/0x9278833a28e09f2ade52d5bd64597df4377243ae8ce6b5c98f19789d66526fba) | [0x30881c9b…](https://sepolia.basescan.org/tx/0x30881c9b756898855d71a256fa61988a46ca3833c5706b5f25bbc76bd4367a54) | 1821521 | 0.0000218 | 0.0000070 | 3 s | 6 Fulfilled, 2 Ready |
-| On behalf of another wallet (1) | 0.016240 / 0.000162 / 0.0000136 | [0x9dbe74e9…](https://sepolia.basescan.org/tx/0x9dbe74e909f36f3412529a0354ffb5b3d2dcbfeef72656b5875e644da253388a) | [0xb34057b9…](https://sepolia.basescan.org/tx/0xb34057b990d466c616cf19f9b5ce8aaac32a50a2b94f2489d1b5ab26f784974c) | 634441 | 0.0000071 | 0.0000065 | 2 s | 1 Fulfilled |
-| Batch with the VRF float (rerun) (7) | 0.016240 / 0.000162 / 0.0000288 | [0x0cd76ff9…](https://sepolia.basescan.org/tx/0x0cd76ff99b41a71f2c807a0c8c6d498ae13ae93023ee16613a83f041903244c9) | [0xbaa3317c…](https://sepolia.basescan.org/tx/0xbaa3317c9fd0070cf82a3d498a87be2b2f91d8a77b35607d68770e633c8a5383) | 1803449 | 0.0000216 | 0.0000073 | 3 s | 6 Fulfilled, 1 Ready |
+| Single pull (referred) (1) | 0.017098 / 0.000171 / 0.0000154 | [0x467426df…](https://sepolia.basescan.org/tx/0x467426dffe935f549e3c49f3030b0c8fd39f8beb5be2446d24605505cdeec321) | [0x9e89701e…](https://sepolia.basescan.org/tx/0x9e89701e8714f1ded96b48fcc7a3aab48329ec6466c9ca34e8bdefbbaf876597) | 667684 | 0.0000074 | 0.0000081 | 1 s | 1 Fulfilled |
+| Batch of ten (10) | 0.017640 / 0.000176 / 0.0000764 | [0x4efd4ed8…](https://sepolia.basescan.org/tx/0x4efd4ed8792db0600baf2c20ff777ae63ac11e196de02fd03ddd5ea3d3fc3e32) | [0x6040bf69…](https://sepolia.basescan.org/tx/0x6040bf69435a8b85c5102374e4a12fa0db0eca89ad60bd9651dffac2620742c1) | 1591011 | 0.0000181 | 0.0000583 | 2 s | 3 Fulfilled, 7 Refunded (2 VRF requests) |
+| Three pulls paid with prizes (PrizeRouter) (3) | — | [0xfb139c42…](https://sepolia.basescan.org/tx/0xfb139c42989e22182d423c1786193e67932210cb06f8158a9024479a08f5b11d) | [0xc10af3c1…](https://sepolia.basescan.org/tx/0xc10af3c15613155a5110ad93e18f005d2d492e4eb7eb1ea7db54109d99644de7) | 1026256 | 0.0000122 | — | 1 s | 3 Fulfilled |
+| Batch of eight, zero negative slippage (8) | 0.016828 / 0.000168 / 0.0000713 | [0xe45c5d30…](https://sepolia.basescan.org/tx/0xe45c5d30ed2f94d387acf5349e40b5476cc700b78c882046ec0f1aff9659b1e8) | [0xf96b4b06…](https://sepolia.basescan.org/tx/0xf96b4b06c6be4fa0f2ea4e0ed4d21cdd24224cb08ab51da690834c2047afec32) | 2063669 | 0.0000241 | 0.0000472 | 2 s | 6 Fulfilled, 1 Refunded, 1 Ready (2 VRF requests) |
+| On behalf of another wallet (1) | 0.016469 / 0.000165 / 0.0000154 | [0x7627e24c…](https://sepolia.basescan.org/tx/0x7627e24c197ac2b95c7513b18405e004a3b720e9def972bb7b46a9b91ec7a440) | [0xc82b2b48…](https://sepolia.basescan.org/tx/0xc82b2b48ae3234518183476afc33154596c6085fd4cf4551c95280fc92e3be5a) | 638188 | 0.0000071 | 0.0000083 | 2 s | 1 Fulfilled |
+| Batch with the VRF float (rerun) (10) | 0.016914 / 0.000169 / 0.0000764 | [0x009553cd…](https://sepolia.basescan.org/tx/0x009553cd59d1688a47a64b9831b3baf9db7f012435f28a40ec6d00bfac41578b) | [0xf2aec862…](https://sepolia.basescan.org/tx/0xf2aec8622c7105120dcaea494a1d3e4b2b25738f49dd29c57a4e08d73327f6b6) | 1645719 | 0.0000185 | 0.0000579 | 2 s | 3 Fulfilled, 7 Refunded (2 VRF requests) |
 
-Batch of ten: 10 of 10 resolved in the callback (the word was late, so they timed out and were refunded).
+Batch of ten: 10 of 10 resolved in the VRF callbacks (2 requests of up to 5 pulls). 7 were refunded by the slippage guard: on a 12-item testnet board the first wins of the batch moved the per-pull price outside the batch's slippage tolerance, so the rest of the batch was refunded as credit that pays for the next pull (on the 100-item launch board the same wins move it about 1–2 %).
 
-### Why words were late before the VRF float
+### Deliveries (batch of ten)
 
-- **First live pull: word arrived after the block deadline (Base Sepolia 0.2 s blocks).** Base Sepolia produces blocks every 0.2 s (Base mainnet 2 s), so the 1,800-block deadline is ~6 min there; the testnet window was raised to 7,200 blocks through the timelock. The word itself was held back by the VRF float (next finding): it arrived just after the deadline, when the cheap timed-out callback fitted the subscription balance. TimedOut (word after the 1,800-block deadline), refunded fee + settlement fee; VRF fee kept (it paid the request)
-- **VRF words waited for the subscription balance (Chainlink Max Cost at the lane max gas price).** The node fulfils only once the subscription covers the fulfilment at the key lane max gas price (30 gwei on Base Sepolia) x 1.6, the Max Cost in Chainlink billing docs; actual gas was 0.006 gwei. At 0.03-0.045 ETH every in-time multi-pull callback was above it, so words arrived only after the deadline (1,808 and 7,205 blocks: cheap timed-out callbacks). The single pull went through ~1 min after a top-up to 0.045 ETH (tx 0x65d836940dd92b4b0bc430758657901f1433c1b99eaa6f439709ab2d2c504717). After raising the float to 0.15 ETH (tx 0xf11d8d6030eafe40c6ca7a24aa7f54bc4915784751537b489265de57c138a2c1), words arrived in 12-14 blocks (2-3 s) for 1-, 7- and 8-pull batches. Mainnet 2 gwei lane needs ~0.0086 ETH; the preflight and keeper alert enforce 0.02 ETH.
+| Acquisition | Prize | Notional (ETH) | Delivered to purchaser |
+| --- | --- | --- | --- |
+| 2 | Shape #2 | 0.01170 | true |
+| 3 | Shape #5 | 0.01170 | true |
+| 4 | Shape #3 | 0.01170 | true |
 
 ## Keeper booking and restocking
 
-Booked sequences 1 → 13; selectable listings 27 → 28; pool cash 0.1520 → 0.1544 ETH; maintenance 0.01032 ETH.
+Booked sequences 1 → 12; selectable listings 12 → 16; pool cash 0.1390 → 0.1300 ETH; maintenance 0.01183 ETH.
 
 | Action | Tx | Gas |
 | --- | --- | --- |
-| settle | [0x4a72d14b…](https://sepolia.basescan.org/tx/0x4a72d14b3363546fe01f1484dfc5d58f14abfdade532560aedd98a2f6963e5db) | 1495087 |
-| grail-step | [0x22a110c2…](https://sepolia.basescan.org/tx/0x22a110c2f22e4c33eca3d604e6047884b8a279baca67df11c56f08fbca081c68) | 336227 |
+| settle | [0x875fd0d7…](https://sepolia.basescan.org/tx/0x875fd0d7d19352cf72ec863e5d7e9120b831e9601145cb28d919c80c5e52f14c) | 3387744 |
+| grail-step | [0x918a4767…](https://sepolia.basescan.org/tx/0x918a476757b8994634d0276daa4f4a2206f24e306e30b5ec7c0e4efb96ff42c5) | 336537 |
 
-Keeper net cost after the maintenance refund: -0.0000075 ETH.
+Keeper net cost after the maintenance refund: -0.0000068 ETH.
 
 ## GRAIL listing, odds and repricing
 
 | | Backing | Notional | Status | Odds per pull |
 | --- | --- | --- | --- | --- |
-| before | 0.050 | 0.0250 | Active (selectable) | 1 in 45 |
-| after pulls + keeper step | 0.050 | 0.0250 | Active (selectable) | 1 in 45 |
-| before the in-time rerun | 0.050 | 0.0250 | Active (selectable) | 1 in 43 |
-| after the in-time rerun + keeper step | 0.050 | 0.0250 | Active (selectable) | 1 in 44 |
+| before | 0.050 | 0.0250 | Active (selectable) | 1 in 13 |
+| after pulls + keeper step | 0.050 | 0.0250 | Active (selectable) | 1 in 24 |
+| before the in-time rerun | 0.050 | 0.0400 | Active (selectable) | 1 in 38 |
+| after the in-time rerun + keeper step | 0.050 | 0.0250 | Active (selectable) | 1 in 23 |
 
-Decay is accelerated on testnet only (0.002 ETH per pull, set through the timelock); selection of a GRAIL by the live VRF is a matter of chance at these odds. The first GRAIL pull's word was late (below the VRF float), so its pulls were refunded. By the rerun the GRAIL was already at its floor notional (50 % of backing), so its notional held; its odds move only with the rest of the board (restocking). Decay above the floor is covered by GrailReprice.t.sol and the fork rehearsal.
+Decay is accelerated on testnet only (0.002 ETH per pull, set through the timelock); selection of a GRAIL by the live VRF is a matter of chance at these odds. Once the GRAIL reaches its floor notional (50 % of backing) its notional holds, and its odds move only with the rest of the board (captures and restocking). Decay above the floor is covered by GrailReprice.t.sol and the fork rehearsal.
 
 ## Refunds
 
-Batch with zero negative slippage tolerance: 6 Fulfilled, 2 Ready; refund credit 0.000000 ETH, withdrawn in —. Expiry (no VRF word within 1,800 blocks) cannot be forced on a live coordinator; it is covered by Engine.t.sol.
+Batch with zero negative slippage tolerance: 6 Fulfilled, 1 Refunded, 1 Ready; refund credit 0.016996 ETH, withdrawn in [0x04ed6325…](https://sepolia.basescan.org/tx/0x04ed6325121ae155f5acdc833ca6a7d991ae7a788e587d08cc34f11312c285cc). Expiry (no VRF word within 1,800 blocks) cannot be forced on a live coordinator; it is covered by Engine.t.sol.
 
 ## Referral and purchase on behalf
 
-Referrer credit 0.0007041 ETH, withdrawn in [0x3bc8fb03…](https://sepolia.basescan.org/tx/0x3bc8fb03647d19196d99900eff2cd502fa22a34dc22eb26f3f6e1084fa761ae6); prize delivered to the beneficiary: true. Token Works / development credit (testnet: deployer) 0.0008665 ETH.
+Referrer credit 0.0016012 ETH, withdrawn in [0xdc71922a…](https://sepolia.basescan.org/tx/0xdc71922a55cf6d864afbf495ef59be8ccfddf87289e390e5dfc446f96d6d9a15); prize delivered to the beneficiary: true. Token Works / development credit (testnet: deployer) 0.0018240 ETH.
 
 ## ENGINE trading and fee routing
 
-Buy 0.01 ETH and sell half through the canonical PoolManager (test router [`0x6cb052355170e52e8e988685dac140786f8061cf`](https://sepolia.basescan.org/address/0x6cb052355170e52e8e988685dac140786f8061cf)): volume 0.015017 ETH, hook fees 0.0003003 ETH = 199 bps of volume; operator 0.0000375, treasury 0.0002628 ETH; after distribute the treasury received 0.0002628 ETH (GRAIL fund now 0.00823 ETH, POL pending 0.0000263 ETH).
+Buy 0.01 ETH and sell half through the canonical PoolManager (test router [`0x3186bdceb0820f15946c6ed88fb2c6262cbe3f1a`](https://sepolia.basescan.org/address/0x3186bdceb0820f15946c6ed88fb2c6262cbe3f1a)): volume 0.015337 ETH, hook fees 0.0003067 ETH = 199 bps of volume; operator 0.0000383, treasury 0.0002684 ETH; after distribute the treasury received 0.0002684 ETH (GRAIL fund now 0.04576 ETH, POL pending 0.0000000 ETH).
 
 ## Genesis ledger
 
-Epoch 0: 26 accepted, 26 resolved, 10 units, 10 bonus weight; test player 9 units. Claims open after epoch 0 closes and resolves (24 h of real time); rerun the runner then.
+Epoch 0: 31 accepted, 31 resolved, 19 units, 27 bonus weight; test player 18 units. Claims open after epoch 0 closes and resolves (24 h of real time); rerun the runner then.
 
 ## Keeper outage and recovery (two keepers)
 
-With keepers stopped, three batches settled in their callbacks: selectable listings 28 → 19, 9 sequences unbooked. Two keepers then ran at the same moment: keeper 1 [settle, deploy-pol], keeper 2 [settle]; listings back to 28, books level: true.
+With keepers stopped, three batches settled in their callbacks: selectable listings 7 → 4, 18 sequences unbooked. Two keepers then ran at the same moment: keeper 1 [settle, settle, grail-step], keeper 2 [settle]; listings back to 16, books level: true.
+
+## Playing winnings (PrizeRouter)
+
+Every PrizeRouter transaction of the run: Shapes.setApprovalForAll(router) [0x16310c1a…](https://sepolia.basescan.org/tx/0x16310c1a086aa0eaba10742cb965841c4f52383d8832596dba1f6ed8d30ab48b); Draw Packs.setApprovalForAll(router) [0xb2246658…](https://sepolia.basescan.org/tx/0xb2246658b6b8978b5f2617eaf98561e6e42e414fa66671146629391cc3840de4); pullWithPrizes(3) paid with 4 prizes [0x919bb7ba…](https://sepolia.basescan.org/tx/0x919bb7ba2eb6b8b35fc976dfa6d02b4174641e708a6ca20759a86911a7ac0416); Shapes.setApprovalForAll(router) [0xb930fa05…](https://sepolia.basescan.org/tx/0xb930fa0521bb1991a44e3ea5252222c6e87c0368899d15008804f51d63279402); Draw Packs.setApprovalForAll(router) [0x4d1fdc5f…](https://sepolia.basescan.org/tx/0x4d1fdc5f47cc47cd2b5e8986a9552744ec4c112cf4e023f26b814b9e0b279e3c); pullWithPrizes(3) paid with 0 prizes [0xfb139c42…](https://sepolia.basescan.org/tx/0xfb139c42989e22182d423c1786193e67932210cb06f8158a9024479a08f5b11d).
+
+Last scenario run: Two one-time approvals ([0xb930fa05…](https://sepolia.basescan.org/tx/0xb930fa0521bb1991a44e3ea5252222c6e87c0368899d15008804f51d63279402), [0x4d1fdc5f…](https://sepolia.basescan.org/tx/0x4d1fdc5f47cc47cd2b5e8986a9552744ec4c112cf4e023f26b814b9e0b279e3c)), then one transaction ([0xfb139c42…](https://sepolia.basescan.org/tx/0xfb139c42989e22182d423c1786193e67932210cb06f8158a9024479a08f5b11d), gas 827534) paid a 3-pull price of 0.05795 ETH with 0 prizes at face (0.00000 ETH) and 0.06374 ETH sent; wallet change excluding gas -0.05795 ETH. Outcome: 3 Fulfilled.
 
 ## Prize redemption
 
-Redeemed 1 prize (notional 0.01170 ETH): 0.01000 ETH of backing returned to the winner. Before the rerun, 9 more prizes returned 0.11000 ETH.
+Before the in-time rerun, 3 more prizes returned 0.16000 ETH. In all, the player redeemed 25 prizes for their backing during the run (listed under All transactions), recycling winnings into later scenarios.
 
 ## All transactions
 
 | Label | Tx | Status | Gas | Cost (ETH) |
 | --- | --- | --- | --- | --- |
-| vrf.createSubscription | [0x7b24dd0c…](https://sepolia.basescan.org/tx/0x7b24dd0c66ceaa7b610a483190e8f5fd8fbaa264076bd377675b806bbfd894bb) | success | 109806 | 0.00000066 |
-| vrf.fundSubscriptionWithNative | [0xce772f30…](https://sepolia.basescan.org/tx/0xce772f306c9cf06f8c133d8f850255ddf0a6b0b8382312f271f13709e1559e33) | success | 56125 | 0.00000034 |
-| vrf.addConsumer(engine) | [0xd3b9567d…](https://sepolia.basescan.org/tx/0xd3b9567de1243216232a9f41e019513092d33a8bcd7f5297f641a2364cfb899f) | success | 95266 | 0.00000057 |
-| timelock.scheduleBatch(activation) | [0xe5c525e9…](https://sepolia.basescan.org/tx/0xe5c525e9d99882320451d991a368d6de6042a0aab4011f6f39b0345f80004df3) | success | 93740 | 0.00000056 |
-| timelock.executeBatch(activation) | [0x329773ee…](https://sepolia.basescan.org/tx/0x329773eee31b2bb92861dacf13b4078a9ff9bb66b9351106d49993ae9eaafb10) | success | 480579 | 0.00000288 |
-| timelock.scheduleBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only)) | [0x36cec7be…](https://sepolia.basescan.org/tx/0x36cec7beaa014400af4ff36b23eaad43a5a7d8a6ed07814bc0283e019ea691f6) | success | 75136 | 0.00000045 |
-| timelock.executeBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only)) | [0x2a384a0f…](https://sepolia.basescan.org/tx/0x2a384a0f19f7d90c66681517a657b4d6171e89ace12f7334e040621a8a3c5189) | success | 115832 | 0.00000069 |
-| vault.fundGrail(testnet GRAIL backing + mint fee) | [0x315c0907…](https://sepolia.basescan.org/tx/0x315c0907f297cdb4227a6ef696022e99d0e18b4480f8edbf94d1080d8c78c983) | success | 67321 | 0.00000040 |
-| vault.step(mint + list GRAIL) | [0xcf773985…](https://sepolia.basescan.org/tx/0xcf773985e12924e45ee8ba85f604bff582a7aea1dd19d31282e89e2b1b3af83b) | success | 840662 | 0.00000504 |
-| fund player | [0x7dcd3d8b…](https://sepolia.basescan.org/tx/0x7dcd3d8b86dc141c657b213fa538859f38b85d016b36ba53c375a65240cd91ec) | success | 21000 |  |
-| fund referrer | [0x5634b3cc…](https://sepolia.basescan.org/tx/0x5634b3ccf1786b0501ec70cc7f769c8a6d9fa6dc32fe896693ef7b137f667e69) | success | 21000 |  |
-| fund keeper-2 | [0x98b88178…](https://sepolia.basescan.org/tx/0x98b881780677ee79be127ddee5d2c36f980ba4b3372f930ab74fddced2a12724) | success | 21000 |  |
-| acquireBatch(1) with referrer | [0xb440a518…](https://sepolia.basescan.org/tx/0xb440a51850ad241c94982a9213d19ebc809d50b192b31053ad8bb79b093d2c5a) | success | 481289 | 0.00000289 |
-| processAcquisitions (late word: refund) | [0xc2193182…](https://sepolia.basescan.org/tx/0xc219318207e963d63d461e78da7a12930f3423042403aca7bd9e3ce5d8685c80) | success | 103799 | 0.00000062 |
-| timelock.scheduleBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only)) | [0xae6dd00a…](https://sepolia.basescan.org/tx/0xae6dd00afa17a93c0586a5fe98a469c40a96feb46f3fde21bed7492f1d23277c) | success | 62414 | 0.00000037 |
-| timelock.executeBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only)) | [0x314277c7…](https://sepolia.basescan.org/tx/0x314277c7bf35cdaf08c2434792ab861a28d8b5eb741debc2c7753be3281fd7df) | success | 74895 | 0.00000045 |
-| acquireBatch(1) with referrer | [0xef5c695a…](https://sepolia.basescan.org/tx/0xef5c695aff2910e5309fee365d80465f660d4146bc948b0ae14da50609160b80) | success | 447089 | 0.00000268 |
-| vrf fulfilment 261033580198815560118571741680257357204030624022187115917134765671864906740 | [0x753e427e…](https://sepolia.basescan.org/tx/0x753e427e9b8e33bd0603f0d145aa89081538a8323b54f09ede41c272e79debcf) |  | 698196 |  |
-| acquireBatch(10) | [0x2ba8b1c3…](https://sepolia.basescan.org/tx/0x2ba8b1c33bdb33b841ad4e7c2b2672da1ef08b41f5bbf184c0ddb46bcbad0e5f) | success | 1986525 | 0.00001192 |
-| vrf fulfilment 63123750908519524823758993897184430472085467584117785558063229366484879055295 | [0xc28eed6c…](https://sepolia.basescan.org/tx/0xc28eed6c19854fedaa31d344793158a34133681d77b5b3b4d0840aae752f7463) |  | 256377 |  |
-| settle | [0x4a72d14b…](https://sepolia.basescan.org/tx/0x4a72d14b3363546fe01f1484dfc5d58f14abfdade532560aedd98a2f6963e5db) | success | 1495087 | 0.00000897 |
-| grail-step | [0x22a110c2…](https://sepolia.basescan.org/tx/0x22a110c2f22e4c33eca3d604e6047884b8a279baca67df11c56f08fbca081c68) | success | 336227 | 0.00000202 |
-| redeem Shape #8 (batch prizes) | [0x6a20ee9b…](https://sepolia.basescan.org/tx/0x6a20ee9bdfa930b51ea03e9fae6c0c8a3b12b5c9cb5b6b699c9a2c97423fb776) | success | 61989 | 0.00000037 |
-| acquireBatch(5) for GRAIL decay | [0x950f9a0d…](https://sepolia.basescan.org/tx/0x950f9a0d5787e0bef0727fb54869fa2a580331655842adb50fe2fee31f7fcc4e) | success | 1131282 | 0.00000679 |
-| vrf fulfilment 17739670982657830849365232750453616445636606812539810658524866835761161884625 | [0x64cbe9f4…](https://sepolia.basescan.org/tx/0x64cbe9f4db98fdd65e3cbed512cea76e1376c9c10a37c8242a6b2d30496e3701) |  | 194798 |  |
-| settle | [0x480b4f09…](https://sepolia.basescan.org/tx/0x480b4f0970049600294c88f586ee2e95b55f02e1651f3dc139038ee208004542) | success | 256097 | 0.00000154 |
-| withdrawAcquisitionRefund | [0x351630e6…](https://sepolia.basescan.org/tx/0x351630e6b8d188da166c4563861262d51336da6c375e24fcdd229d9ef136bff7) | success | 36762 | 0.00000022 |
-| fundSubscriptionWithNative (VRF float) | [0xf11d8d60…](https://sepolia.basescan.org/tx/0xf11d8d6030eafe40c6ca7a24aa7f54bc4915784751537b489265de57c138a2c1) | success | 39025 | 0.00000023 |
-| acquireBatch(8, maxNegativeSlippage 0) | [0x9278833a…](https://sepolia.basescan.org/tx/0x9278833a28e09f2ade52d5bd64597df4377243ae8ce6b5c98f19789d66526fba) | success | 1644401 | 0.00000987 |
-| vrf fulfilment 15405078487804265200242313741158126532862249190140575074404946366961276447207 | [0x30881c9b…](https://sepolia.basescan.org/tx/0x30881c9b756898855d71a256fa61988a46ca3833c5706b5f25bbc76bd4367a54) |  | 1821521 |  |
-| settle | [0xf739d82b…](https://sepolia.basescan.org/tx/0xf739d82bd69a861bc71492a92c671e21f09a8c925daa05e89c014d7c4861e77f) | success | 6003354 | 0.00003602 |
-| acquireBatch(1) paid by player for referrer | [0x9dbe74e9…](https://sepolia.basescan.org/tx/0x9dbe74e909f36f3412529a0354ffb5b3d2dcbfeef72656b5875e644da253388a) | success | 447101 | 0.00000268 |
-| vrf fulfilment 59663193646395356548906427505253721931753508864686696196338373383958955670878 | [0xb34057b9…](https://sepolia.basescan.org/tx/0xb34057b990d466c616cf19f9b5ce8aaac32a50a2b94f2489d1b5ab26f784974c) |  | 634441 |  |
-| settle | [0xa338b3f9…](https://sepolia.basescan.org/tx/0xa338b3f91f5a10ab607986aa16f12a47f7dec78b8a4ac0e20d8cea726633bfa2) | success | 1007061 | 0.00000604 |
-| withdrawFeeCredit(referrer) | [0x3bc8fb03…](https://sepolia.basescan.org/tx/0x3bc8fb03647d19196d99900eff2cd502fa22a34dc22eb26f3f6e1084fa761ae6) | success | 38216 | 0.00000023 |
-| deploy Swapper (test router) | [0x6fe66896…](https://sepolia.basescan.org/tx/0x6fe66896d82327968e83193b74bac8ba0215409241ae4dd682d4b9ccf7150021) |  | 726205 |  |
-| swap: buy ENGINE with 0.01 ETH | [0x591b620c…](https://sepolia.basescan.org/tx/0x591b620c6a654d00c902b5474864a46c92cf88654db0ed31f738a752f4f067ae) | success | 213776 | 0.00000128 |
-| approve router | [0x56dc2626…](https://sepolia.basescan.org/tx/0x56dc262696205cc3c92d58c807d603a5eedb98ff6e409490cd52585df298d504) | success | 45970 | 0.00000028 |
-| swap: sell half the ENGINE | [0x3ef53635…](https://sepolia.basescan.org/tx/0x3ef53635f801bf7d25ee28f498e1298ba16f1ceaae31aa2bf9758c4031b8f43c) | success | 137105 | 0.00000082 |
-| hook.distribute | [0x667ea842…](https://sepolia.basescan.org/tx/0x667ea842c57cc359f8d5163a57697d40fc984bb2a9f7fd79a831ae8c78f9e0c0) | success | 213945 | 0.00000128 |
-| redeem Shape #15 (slippage scenario) | [0xe0a36fff…](https://sepolia.basescan.org/tx/0xe0a36fffa00bd1fee9fd9f34619deae1d71ee2d2ebbe11a59b217c8e8160fee1) | success | 61989 | 0.00000037 |
-| redeem Shape #16 (slippage scenario) | [0xacb6cc31…](https://sepolia.basescan.org/tx/0xacb6cc3101462eb3d338de72344694cff3936fbe0b0be18cc17a18d4ea3a4fa4) | success | 61989 | 0.00000037 |
-| redeem Shape #10 (slippage scenario) | [0x0a0d4592…](https://sepolia.basescan.org/tx/0x0a0d45920f42d9c643c0dc78a4e13ccb2bf54053e3937f9c773077382ec15ad7) | success | 61989 | 0.00000037 |
-| redeem Draw Pack #5 (slippage scenario) | [0x16587b9f…](https://sepolia.basescan.org/tx/0x16587b9ff5f4b33c7b93565be58534fed2c78ff450b758fc7a8b1338cbd24090) | success | 153912 | 0.00000092 |
-| redeem Shape #1 (slippage scenario) | [0x3f26607b…](https://sepolia.basescan.org/tx/0x3f26607b247aa89dadf2c116d7a7917824aecb3d163eea1016357727655c89ed) | success | 61989 | 0.00000037 |
-| redeem Draw Pack #8 (slippage scenario) | [0xb3d915a4…](https://sepolia.basescan.org/tx/0xb3d915a44230ebfb98459facbcbb8f444a5490c7dcafab9857768fae4b47d530) | success | 183328 | 0.00000110 |
-| redeem Shape #6 (slippage scenario) | [0xa590ae1d…](https://sepolia.basescan.org/tx/0xa590ae1d6d49496924ce504e7e90bdf3b9525f57dcfb00cd7b63d6ea5374b460) | success | 61989 | 0.00000037 |
-| redeem Shape #12 (slippage scenario) | [0x765488f6…](https://sepolia.basescan.org/tx/0x765488f673722f8386d39988d8e45d87d139f2b25dc2a6de5e4d389df96f794e) | success | 61989 | 0.00000037 |
-| outage acquireBatch(3) #1 | [0x9b688562…](https://sepolia.basescan.org/tx/0x9b688562309ac6bd4f05df8ce8dbfc305a07834bd574dc35f7c34856b4a1f3d2) | success | 789181 | 0.00000474 |
-| vrf fulfilment 100009701841889224925893199765864705827683608251486410761247391586928620170079 | [0xeb4f7735…](https://sepolia.basescan.org/tx/0xeb4f77357a8c05d2aa66b62ef880ebd51073f8b4a6916050681bf5f23ff57c37) |  | 1075928 |  |
-| outage acquireBatch(3) #2 | [0x47ce9c3d…](https://sepolia.basescan.org/tx/0x47ce9c3d135ab5b5008ff2631f8c85bce9b1459214c02e115b7b2b4ef7b3e538) | success | 789181 | 0.00000474 |
-| vrf fulfilment 24273584807571514069978513091068955535563965592444750299400144216071489281570 | [0x168b7d83…](https://sepolia.basescan.org/tx/0x168b7d830af795eb5e23e73098d667d54a9f9738574fe486bb5a1fe1eb60d006) |  | 1042452 |  |
-| outage acquireBatch(3) #3 | [0x4902ffd4…](https://sepolia.basescan.org/tx/0x4902ffd443fa162428fbeba3d0f21f87d1c95ff40723881462561d70dc464a84) | success | 789181 | 0.00000474 |
-| vrf fulfilment 28891581271209689860260874116276600112806947623091524899117845450719335455179 | [0xd92a15e4…](https://sepolia.basescan.org/tx/0xd92a15e44b81263f278f7851d850d6064f6d8201e9777df5ed55181637320391) |  | 1017438 |  |
-| settle | [0xecd8d373…](https://sepolia.basescan.org/tx/0xecd8d373a1d436c0fdc391d5595176dc7d8ea17faf57115c165d6f4f3f41d455) | success | 6059804 | 0.00003636 |
-| deploy-pol | [0x50a55a38…](https://sepolia.basescan.org/tx/0x50a55a384eda7b62ecc2a3aed49ed2416c1fda3e93df55ede7a04a8ad819ca3c) | success | 171722 | 0.00000103 |
-| settle | [0x6e2b7d41…](https://sepolia.basescan.org/tx/0x6e2b7d4185b14f8bc5e4dfae557bfccae5e43ccce9f8f169461ff252b0417199) | success | 80714 | 0.00000048 |
-| redeem Shape #3 (recycle before in-time batches) | [0x2a04d037…](https://sepolia.basescan.org/tx/0x2a04d037acf2bb412fc77e840afd847a8190b112d67833585925b1fa508136ee) | success | 61989 | 0.00000037 |
-| redeem Shape #43 (recycle before in-time batches) | [0xf20d7099…](https://sepolia.basescan.org/tx/0xf20d7099fe2b53d55ba0ca6171010541c0f92b5a2c1e9ccda1ef2e7339bf48c6) | success | 61989 | 0.00000037 |
-| redeem Shape #9 (recycle before in-time batches) | [0xf440d3a9…](https://sepolia.basescan.org/tx/0xf440d3a9bbd6ad8f5e870cc96669b433403bd277ed86bda1c610d1ae7b973286) | success | 61989 | 0.00000037 |
-| redeem Shape #11 (recycle before in-time batches) | [0xbf279ef1…](https://sepolia.basescan.org/tx/0xbf279ef1c219abfefd42c4dff5c919682dd98b4645817994cc6ed0d0ee47b9ac) | success | 61989 | 0.00000037 |
-| redeem Draw Pack #3 (recycle before in-time batches) | [0x21476b9f…](https://sepolia.basescan.org/tx/0x21476b9f00e464a1c2b719a78fab0f9d70b1ee2151f2234835b10462ebc514dc) | success | 153912 | 0.00000092 |
-| redeem Draw Pack #11 (recycle before in-time batches) | [0x5d3bda43…](https://sepolia.basescan.org/tx/0x5d3bda432720bb45fb76d173c8ceae355f77e26e49858d8015fcc36d22d87c3a) | success | 153912 | 0.00000092 |
-| redeem Shape #40 (recycle before in-time batches) | [0x2e82f77f…](https://sepolia.basescan.org/tx/0x2e82f77ffb5299bf09fbbf7a0fd6ec989c486b727a55bc9b2c4514ec804d3b1b) | success | 61989 | 0.00000037 |
-| redeem Shape #14 (recycle before in-time batches) | [0x4c8da3c8…](https://sepolia.basescan.org/tx/0x4c8da3c823e0017c72e8982793a988279c6ee1cee754bbd7fcf8a67091fddc6b) | success | 61989 | 0.00000037 |
-| redeem Shape #2 (recycle before in-time batches) | [0x1a6c34a3…](https://sepolia.basescan.org/tx/0x1a6c34a3f58fe2cf8e3b122ceb6a21ff4fa314df467ef993cdf13ce04cfa86c7) | success | 61989 | 0.00000037 |
-| acquireBatch(7) with the VRF float | [0x0cd76ff9…](https://sepolia.basescan.org/tx/0x0cd76ff99b41a71f2c807a0c8c6d498ae13ae93023ee16613a83f041903244c9) | success | 1473377 | 0.00000884 |
-| vrf fulfilment 66672454273205216479941305596011963094483456086258634409195679504991112547677 | [0xbaa3317c…](https://sepolia.basescan.org/tx/0xbaa3317c9fd0070cf82a3d498a87be2b2f91d8a77b35607d68770e633c8a5383) |  | 1803449 |  |
-| settle | [0x3f96cda3…](https://sepolia.basescan.org/tx/0x3f96cda34014b1e8b5166afb7c4800f1337ff289589be0c0b833bae0af797bd7) | success | 5370780 | 0.00003222 |
+| vrf.addConsumer(engine) | [0xad0ed7c4…](https://sepolia.basescan.org/tx/0xad0ed7c43f2af673a73ea003dc8e48ca69da449dc6da58d6300c41c382b0be1f) | success | 78166 | 0.00000047 |
+| timelock.scheduleBatch(activation) | [0x80ee4669…](https://sepolia.basescan.org/tx/0x80ee4669346e5251dd37c5fb69f76318aa69eaa6b22d262412ba9ce81d99e8b7) | success | 93716 | 0.00000056 |
+| timelock.executeBatch(activation) | [0x53031c87…](https://sepolia.basescan.org/tx/0x53031c879c0d40ea7714b4d7e98ddc69cf2d3c2b7ec36af86f1acfb00085c723) | success | 479709 | 0.00000288 |
+| timelock.scheduleBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only)) | [0x2133dc12…](https://sepolia.basescan.org/tx/0x2133dc12c954844dc16c0be1d0188c09665ec4de321ab55b85513f5e722b4d00) | success | 75124 | 0.00000045 |
+| timelock.executeBatch(setSurplusSink(buyback, genesis end) + vault.setConfig(decay 0.002, testnet only) + vault.setLadder(0.05, 0.1 ETH, testnet only)) | [0xed2aa78a…](https://sepolia.basescan.org/tx/0xed2aa78affd910c1debebd02ec59618bbf22becf2ab2bc1e3100a0fd96eee67a) | success | 115820 | 0.00000069 |
+| vault.fundGrail(testnet GRAIL backing + mint fee) | [0xbd22492a…](https://sepolia.basescan.org/tx/0xbd22492a9d68be509f1f8ca17923e877513b80be9cc1ad83456a7435bd10ec75) | success | 67321 | 0.00000040 |
+| vault.step(mint + list GRAIL) | [0xf4839d1f…](https://sepolia.basescan.org/tx/0xf4839d1fee23567cb3ddd4e0801a5d50f8a2444c72917a6fbbc8974ab546b3d7) | success | 840973 | 0.00000505 |
+| timelock.scheduleBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only)) | [0x99eda604…](https://sepolia.basescan.org/tx/0x99eda6045589b277a079ac7f6461f81a4ad80f7ffbfd038e2456667709cd0433) | success | 62414 | 0.00000037 |
+| timelock.executeBatch(engine.setVrfConfig(word deadline 7,200 blocks, testnet only)) | [0x3b293293…](https://sepolia.basescan.org/tx/0x3b2932938dd52eec7b6127446fcea29cea44c11eafed454c6f93a77bf400ba9f) | success | 74942 | 0.00000045 |
+| fund player | [0xea7f1230…](https://sepolia.basescan.org/tx/0xea7f123066319eef1a2660079f9f855b19aefe743494029985cc672b7cc4f0ff) | success | 21000 |  |
+| fund referrer | [0x144c01a0…](https://sepolia.basescan.org/tx/0x144c01a0b6cca7b8a78bae20425e1db799ab82a09049c3b4d5f4cddd268be53e) | success | 21000 |  |
+| fund keeper-2 | [0x86335755…](https://sepolia.basescan.org/tx/0x86335755856b9356e425e3af9f485f4575fa8096083e9ab666ebc11c13ff88fb) | success | 21000 |  |
+| acquireBatch(1) with referrer | [0x467426df…](https://sepolia.basescan.org/tx/0x467426dffe935f549e3c49f3030b0c8fd39f8beb5be2446d24605505cdeec321) | success | 529951 | 0.00000318 |
+| vrf fulfilment 71054585493358879505969181910425938233992450721316667008371252571450217644815 | [0x9e89701e…](https://sepolia.basescan.org/tx/0x9e89701e8714f1ded96b48fcc7a3aab48329ec6466c9ca34e8bdefbbaf876597) |  | 667684 |  |
+| acquireBatch(10) | [0x4efd4ed8…](https://sepolia.basescan.org/tx/0x4efd4ed8792db0600baf2c20ff777ae63ac11e196de02fd03ddd5ea3d3fc3e32) | success | 2062285 | 0.00001237 |
+| vrf fulfilment (request 2 of 2) | [0x2063cf2a…](https://sepolia.basescan.org/tx/0x2063cf2a19d2b92779f154c4e24964a0c5c34a6e5d8b95d7be596115a6d09153) |  | 439407 |  |
+| vrf fulfilment 27973963310067159041517136288889336954625115313198055920568961642341784320549 | [0x6040bf69…](https://sepolia.basescan.org/tx/0x6040bf69435a8b85c5102374e4a12fa0db0eca89ad60bd9651dffac2620742c1) |  | 1591011 |  |
+| settle | [0x875fd0d7…](https://sepolia.basescan.org/tx/0x875fd0d7d19352cf72ec863e5d7e9120b831e9601145cb28d919c80c5e52f14c) | success | 3387744 | 0.00002033 |
+| grail-step | [0x918a4767…](https://sepolia.basescan.org/tx/0x918a476757b8994634d0276daa4f4a2206f24e306e30b5ec7c0e4efb96ff42c5) | success | 336537 | 0.00000202 |
+| Shapes.setApprovalForAll(router) | [0x16310c1a…](https://sepolia.basescan.org/tx/0x16310c1a086aa0eaba10742cb965841c4f52383d8832596dba1f6ed8d30ab48b) | success | 47358 | 0.00000028 |
+| Draw Packs.setApprovalForAll(router) | [0xb2246658…](https://sepolia.basescan.org/tx/0xb2246658b6b8978b5f2617eaf98561e6e42e414fa66671146629391cc3840de4) | success | 46774 | 0.00000028 |
+| pullWithPrizes(3) paid with 4 prizes | [0x919bb7ba…](https://sepolia.basescan.org/tx/0x919bb7ba2eb6b8b35fc976dfa6d02b4174641e708a6ca20759a86911a7ac0416) | success | 942794 | 0.00000566 |
+| Shapes.setApprovalForAll(router) | [0xb930fa05…](https://sepolia.basescan.org/tx/0xb930fa0521bb1991a44e3ea5252222c6e87c0368899d15008804f51d63279402) | success | 27458 | 0.00000016 |
+| Draw Packs.setApprovalForAll(router) | [0x4d1fdc5f…](https://sepolia.basescan.org/tx/0x4d1fdc5f47cc47cd2b5e8986a9552744ec4c112cf4e023f26b814b9e0b279e3c) | success | 26874 | 0.00000016 |
+| pullWithPrizes(3) paid with 0 prizes | [0xfb139c42…](https://sepolia.basescan.org/tx/0xfb139c42989e22182d423c1786193e67932210cb06f8158a9024479a08f5b11d) | success | 827534 | 0.00000497 |
+| vrf fulfilment 99439427335726643498687727953144335815032041226359739805434192132922331736171 | [0xc10af3c1…](https://sepolia.basescan.org/tx/0xc10af3c15613155a5110ad93e18f005d2d492e4eb7eb1ea7db54109d99644de7) |  | 1026256 |  |
+| withdrawAcquisitionRefund | [0xb7c83166…](https://sepolia.basescan.org/tx/0xb7c831663f78d02d80ce1de7c0f8e41c48477e1c1c7866b40a783cf71559053f) | success | 36782 | 0.00000022 |
+| acquireBatch(5) for GRAIL decay | [0xfee6b457…](https://sepolia.basescan.org/tx/0xfee6b457c4b0d497c875322a4f7125e9130c7c0ae48e08c9cb716f9cd2af8d4d) | success | 1145612 | 0.00000687 |
+| vrf fulfilment 22744332308705973563823536092557755569703074796915213834147954800767093094941 | [0x31974816…](https://sepolia.basescan.org/tx/0x319748160adda10bf53f0317384c4c34caa783e4e8b3ab204a6482fb5c84259f) |  | 974344 |  |
+| settle | [0xb564051d…](https://sepolia.basescan.org/tx/0xb564051df31c34325c8f9bfda1e2f0296e534c98b94896e1cc56a0445ccb5afe) | success | 4635793 | 0.00002781 |
+| settle | [0x4258d3af…](https://sepolia.basescan.org/tx/0x4258d3af12bcf37295df38d26bf4e8dac38bdac7ab8c6558e0f862b7cb9a9267) | success | 1360857 | 0.00000817 |
+| redeem Shape #7 (GRAIL scenario) | [0xd5ff7180…](https://sepolia.basescan.org/tx/0xd5ff71809dfd0b2d954349112cbb375550f327a586cfa9ed6fdf288693898a20) | success | 61989 | 0.00000037 |
+| redeem Shape #8 (GRAIL scenario) | [0x2d0f76f0…](https://sepolia.basescan.org/tx/0x2d0f76f07078a721cc1b4214169bc4720df2a4c5abf32772a6d61f2f74252e9f) | success | 61989 | 0.00000037 |
+| withdrawAcquisitionRefund | [0xa7ca2910…](https://sepolia.basescan.org/tx/0xa7ca291031842d3982d833469c78ead9c089653d9d2a950cbb968eba49d6327d) | success | 36782 | 0.00000022 |
+| acquireBatch(8, maxNegativeSlippage 0) | [0xe45c5d30…](https://sepolia.basescan.org/tx/0xe45c5d30ed2f94d387acf5349e40b5476cc700b78c882046ec0f1aff9659b1e8) | success | 1720250 | 0.00001032 |
+| vrf fulfilment (request 2 of 2) | [0x4a9b9287…](https://sepolia.basescan.org/tx/0x4a9b92878d99eddb31af397d47465267b426a964fa563f5154db8841eae07719) |  | 263069 |  |
+| vrf fulfilment 22472661716191591479586277519482109193904698484612346293749371618594922605060 | [0xf96b4b06…](https://sepolia.basescan.org/tx/0xf96b4b06c6be4fa0f2ea4e0ed4d21cdd24224cb08ab51da690834c2047afec32) |  | 2063669 |  |
+| withdrawAcquisitionRefund | [0x04ed6325…](https://sepolia.basescan.org/tx/0x04ed6325121ae155f5acdc833ca6a7d991ae7a788e587d08cc34f11312c285cc) | success | 36782 | 0.00000022 |
+| settle | [0xc3a9a3e5…](https://sepolia.basescan.org/tx/0xc3a9a3e55152d08d8fba722a544bb63f3f76ee6c84929e48444ee195ed258b1d) | success | 3688624 | 0.00002213 |
+| grail-step | [0x8e0d5b7f…](https://sepolia.basescan.org/tx/0x8e0d5b7f4efc0d24c33f7ad459578b3e3f702f3bd4adb4c8769db7ced548c836) | success | 143580 | 0.00000086 |
+| withdrawAcquisitionRefund | [0x6b7b6dba…](https://sepolia.basescan.org/tx/0x6b7b6dbabf698ff930e2a343a8adbfc2e5fb5809fbea6dfaeba39d2651671f27) | success | 36782 | 0.00000022 |
+| acquireBatch(1) paid by player for referrer | [0x7627e24c…](https://sepolia.basescan.org/tx/0x7627e24c197ac2b95c7513b18405e004a3b720e9def972bb7b46a9b91ec7a440) | success | 461551 | 0.00000277 |
+| vrf fulfilment 50405705933009137975628363522303579701553004576441157904383099677870182634567 | [0xc82b2b48…](https://sepolia.basescan.org/tx/0xc82b2b48ae3234518183476afc33154596c6085fd4cf4551c95280fc92e3be5a) |  | 638188 |  |
+| settle | [0x3ce7bf96…](https://sepolia.basescan.org/tx/0x3ce7bf96b61d6646206621503f46f65210ce88a5d4ec41acfdcf6235f7afb80b) | success | 1052375 | 0.00000631 |
+| withdrawFeeCredit(referrer) | [0xdc71922a…](https://sepolia.basescan.org/tx/0xdc71922a55cf6d864afbf495ef59be8ccfddf87289e390e5dfc446f96d6d9a15) | success | 38219 | 0.00000023 |
+| deploy Swapper (test router) | [0x5b50c19c…](https://sepolia.basescan.org/tx/0x5b50c19c724c976cdc9a2b607d8142a736789a5a1f8f78ace98df3c37eabe349) |  | 726205 |  |
+| swap: buy ENGINE with 0.01 ETH | [0x28076fa4…](https://sepolia.basescan.org/tx/0x28076fa403ff7099168cb998faafdb5c00d3b958594a13c52c945966b015b329) | success | 213836 | 0.00000128 |
+| approve router | [0xb100a85e…](https://sepolia.basescan.org/tx/0xb100a85e921f7e9ba7f66c1ac0e965b12e1618ac00dcc6057b1d7179638caff5) | success | 45982 | 0.00000028 |
+| swap: sell half the ENGINE | [0x5f976469…](https://sepolia.basescan.org/tx/0x5f976469f10ad4916038095804adee5ab473c242744c9295faf7095ee8c5018c) | success | 137233 | 0.00000082 |
+| hook.distribute | [0xf69995fd…](https://sepolia.basescan.org/tx/0xf69995fdfd926340404c31891124bff89749239063eb7a61b6f3b0d94777d4be) | success | 171974 | 0.00000103 |
+| redeem Shape #29 (slippage scenario) | [0x29363663…](https://sepolia.basescan.org/tx/0x293636631ba9d8308411f9dffba1013e0d6d7f05b7f18f773f65014e592c25d4) | success | 61989 | 0.00000037 |
+| redeem Shape #22 (slippage scenario) | [0x0e766126…](https://sepolia.basescan.org/tx/0x0e7661269a00069c4b6930fbf4639e7ae479a2b8a4a9af923f150543486bbdfb) | success | 62007 | 0.00000037 |
+| redeem Shape #27 (slippage scenario) | [0x1a835737…](https://sepolia.basescan.org/tx/0x1a835737d5e997b20b78104053ff7ce1d2128ed1f7266200817b913d5556283f) | success | 61989 | 0.00000037 |
+| redeem Shape #28 (slippage scenario) | [0xd728859b…](https://sepolia.basescan.org/tx/0xd728859b8f962c43bb5de26cca8d4a47238a6dacb83a74e47788deee29b1aaad) | success | 61989 | 0.00000037 |
+| redeem Draw Pack #7 (slippage scenario) | [0xe59dbeb9…](https://sepolia.basescan.org/tx/0xe59dbeb9ecd3af72bcb5992346aa1008e8d596ef70488dfd443f0f29029ecc38) | success | 153912 | 0.00000092 |
+| redeem Shape #36 (slippage scenario) | [0xaa373fe6…](https://sepolia.basescan.org/tx/0xaa373fe65575d03edeb5da58253b1c21f01f9db6dc0af071b456c707353b9a08) | success | 61989 | 0.00000037 |
+| outage acquireBatch(3) #1 | [0xab0aaa62…](https://sepolia.basescan.org/tx/0xab0aaa621264974dbd677bc76353875e79e7bc1fa34988f9eaa9a1ab8167a240) | success | 803620 | 0.00000482 |
+| vrf fulfilment 18687830130380858670897644865203164633003504488873844108899692960528133730605 | [0x81bed9cc…](https://sepolia.basescan.org/tx/0x81bed9cc0cd52389638fa6d12cd5cde92d68f82a69c81bad1bfa4dae260070e9) |  | 1047660 |  |
+| outage acquireBatch(3) #2 | [0x3a341ce3…](https://sepolia.basescan.org/tx/0x3a341ce3d4f764d80fef8814137475cbb88c53dbf7509b78efcf2e169f3d6797) | success | 803620 | 0.00000482 |
+| redeem Draw Pack #1 (top up for the next pull) | [0xf0cccc6e…](https://sepolia.basescan.org/tx/0xf0cccc6e3c6845e8f9f5cdd9e0cca7dbe4f4ede08a87e3a73691ec3f6f9c73bc) | success | 153912 | 0.00000092 |
+| redeem Shape #4 (top up for the next pull) | [0xa542fbd0…](https://sepolia.basescan.org/tx/0xa542fbd0c95ec501d2fc73f7545ab2d3151fa49b141fc92820b71fe44e7e9bc7) | success | 61989 | 0.00000037 |
+| redeem Draw Pack #5 (top up for the next pull) | [0x872b1949…](https://sepolia.basescan.org/tx/0x872b19492f064150131c9fb18d9833988d8fdef15541edc9838130b28982cfc5) | success | 183328 | 0.00000110 |
+| outage acquireBatch(3) #1 | [0x72556742…](https://sepolia.basescan.org/tx/0x72556742977ea6940dcb0792042f29567538848385ead957a22443a4b9221abc) | success | 803620 | 0.00000482 |
+| vrf fulfilment 88858978147300124395337705302012438989942888322062733431627190180964887414629 | [0xb1695160…](https://sepolia.basescan.org/tx/0xb169516037bd628bbaf79d49ea9c8b9233d799733408593c2517bd7c74865803) |  | 896357 |  |
+| withdrawAcquisitionRefund | [0xb1e25be9…](https://sepolia.basescan.org/tx/0xb1e25be9952f21357e481b6ae5c488a0a16233b0565ca973aacd453ebc3a0dd9) | success | 36782 | 0.00000022 |
+| redeem Shape #1 (top up for the next pull) | [0xa8907fc7…](https://sepolia.basescan.org/tx/0xa8907fc7e96c0ff74f587623879034ea82dac6316cbe855fd4a977310cd12d41) | success | 61989 | 0.00000037 |
+| redeem Draw Pack #3 (top up for the next pull) | [0x46d8afb2…](https://sepolia.basescan.org/tx/0x46d8afb24079c654fc02bc57f026f9aaf1a3e9ba70da7114bbc63212fcfc7f86) | success | 153912 | 0.00000092 |
+| redeem Shape #26 (top up for the next pull) | [0x2dfdf35e…](https://sepolia.basescan.org/tx/0x2dfdf35e04967f8d8f7470b76d8ca7c03d4f488a3aa1bc88eaf6610cfe918d4c) | success | 61989 | 0.00000037 |
+| redeem Draw Pack #4 (top up for the next pull) | [0x7d4d1ea5…](https://sepolia.basescan.org/tx/0x7d4d1ea50b771d9c51cabfd486bb0505bfb2607e8f965ed8b8de7b9532834311) | success | 153912 | 0.00000092 |
+| redeem Draw Pack #2 (top up for the next pull) | [0x27d8d55e…](https://sepolia.basescan.org/tx/0x27d8d55e247def3b898f921a42f2dc2acdc3a34a597756736a99210c09396d3a) | success | 153912 | 0.00000092 |
+| redeem Shape #37 (top up for the next pull) | [0x8e50ce4d…](https://sepolia.basescan.org/tx/0x8e50ce4d6ec48c266a2f3d014648cb95f087577fad8bfe2b864d379a9c7acbe8) | success | 61989 | 0.00000037 |
+| redeem Shape #38 (top up for the next pull) | [0x8eb9fd94…](https://sepolia.basescan.org/tx/0x8eb9fd94da66baadb37667bbbcc4a2a19c4340434f8a9117f42bcf1ef543ab13) | success | 61989 | 0.00000037 |
+| redeem Shape #40 (top up for the next pull) | [0x5d624b75…](https://sepolia.basescan.org/tx/0x5d624b75be7a08a7b1f8e1ba93c635402d30e6bef2d1ad4a10f7453631b678fd) | success | 61989 | 0.00000037 |
+| redeem Shape #45 (top up for the next pull) | [0xde5674f2…](https://sepolia.basescan.org/tx/0xde5674f218f614e4acb5972253a50d620401fdc7ddd4fd86eca5e9993364c462) | success | 61989 | 0.00000037 |
+| redeem Shape #42 (top up for the next pull) | [0xfe7a8c8c…](https://sepolia.basescan.org/tx/0xfe7a8c8c1c26c563b91701adc15515fb493750a4a7c13a9bb8f5c656d17c020c) | success | 61989 | 0.00000037 |
+| redeem Shape #31 (top up for the next pull) | [0xb0e33997…](https://sepolia.basescan.org/tx/0xb0e33997b46f4dea1b4d9daf76b405a0017ae1fa31017c9d46d6908b548c5d73) | success | 61989 | 0.00000037 |
+| outage acquireBatch(3) #1 | [0x274ee608…](https://sepolia.basescan.org/tx/0x274ee608600e6b341403f1203932b2e021ec2409740b58520f9e7e639d514bca) | success | 803620 | 0.00000482 |
+| vrf fulfilment 35385681518566140661081266064915477420736001572937612654990358168186807161221 | [0x3298c835…](https://sepolia.basescan.org/tx/0x3298c835f06413e82bc68db2fffa78cd2f6daaaa54b1ad1253edc6fe6a4a16ab) |  | 756856 |  |
+| withdrawAcquisitionRefund | [0xd71aad36…](https://sepolia.basescan.org/tx/0xd71aad3671be3ce2603a07b71917426431c959ea82ad2cc4e838ef95ce05809d) | success | 36782 | 0.00000022 |
+| outage acquireBatch(3) #2 | [0xc8619cc4…](https://sepolia.basescan.org/tx/0xc8619cc44a5ac1c95c50c3a0dcdefe817e019b21e7733e2b55a3c1c72a58961e) | success | 803620 | 0.00000482 |
+| vrf fulfilment 59374474976240689492237855080386277281925307156705415555744086954710599171595 | [0x10230955…](https://sepolia.basescan.org/tx/0x102309558534d645da06594412d8ab5ecd3355a1e697cb85eda93ba9fd55cf1e) |  | 724433 |  |
+| withdrawAcquisitionRefund | [0xe12b2964…](https://sepolia.basescan.org/tx/0xe12b2964d210895e1bba1743e6bfb71cfba01b328c689f5ecc10e8c2dc86c953) | success | 36782 | 0.00000022 |
+| outage acquireBatch(3) #3 | [0xb9cfa07e…](https://sepolia.basescan.org/tx/0xb9cfa07eba1b95a954a2d143d7def61f016d575e02e37a139f93a77fbbac7f12) | success | 803620 | 0.00000482 |
+| vrf fulfilment 24110381154068841499848299144396008972718577640491009917907684806233904022791 | [0x49897144…](https://sepolia.basescan.org/tx/0x49897144e92e8d21012da0ed4e546a12bfd00bee8254e113257ccec5c471db46) |  | 729383 |  |
+| settle | [0x150f47f1…](https://sepolia.basescan.org/tx/0x150f47f1aa6040efb88fbd113d5e7db7d8af7faaab5b98ef7781793d233f3589) | success | 5424575 | 0.00003255 |
+| settle | [0xd41a8f9d…](https://sepolia.basescan.org/tx/0xd41a8f9d3c2f683adb0f9c0320a34b9f7cddddb14bd752fc7bc8ed751825cf74) | success | 2865404 | 0.00001719 |
+| grail-step | [0xd8540ef9…](https://sepolia.basescan.org/tx/0xd8540ef9dd628b429fec5b971f5ced46bf9456eda799d7a491287bff1237ec48) | success | 806857 | 0.00000484 |
+| settle | [0x549434be…](https://sepolia.basescan.org/tx/0x549434be41b6d73fb16c38f3d1641ed1e7e1048b85dd59dadafd9b6bb4dae981) | success | 71703 | 0.00000043 |
+| redeem Shape #21 (recycle before in-time batches) | [0x805487ed…](https://sepolia.basescan.org/tx/0x805487ed222ff77282e33a45fd2bd4a2a6133480a450565a3824ca123d079cac) | success | 62024 | 0.00000037 |
+| redeem Shape #39 (recycle before in-time batches) | [0x86967085…](https://sepolia.basescan.org/tx/0x869670857ce15c348a749cc93e9a9e45e99944b1e4cbdf99fbd0f95e3560716e) | success | 61989 | 0.00000037 |
+| redeem Shape #20 (recycle before in-time batches) | [0x87bcae18…](https://sepolia.basescan.org/tx/0x87bcae18da462922a9afe979d40574f660dd8de0f39b1f824ce6f5485f6fc52b) | success | 62007 | 0.00000037 |
+| withdrawAcquisitionRefund | [0xeba64399…](https://sepolia.basescan.org/tx/0xeba64399e5a889ff250c9697682c74ae7446fd9e73ae4dab6d0e0f06051c2bc4) | success | 36782 | 0.00000022 |
+| acquireBatch(10) with the VRF float | [0x009553cd…](https://sepolia.basescan.org/tx/0x009553cd59d1688a47a64b9831b3baf9db7f012435f28a40ec6d00bfac41578b) | success | 2062285 | 0.00001237 |
+| vrf fulfilment (request 2 of 2) | [0xf9cef1c7…](https://sepolia.basescan.org/tx/0xf9cef1c7bf757ca49fd9acf4cdec2d46429887f292c5a1e1f13a7cd8896dece7) |  | 433884 |  |
+| vrf fulfilment 1760431571666695526125163054788778897474112645547120549116267491410067129273 | [0xf2aec862…](https://sepolia.basescan.org/tx/0xf2aec8622c7105120dcaea494a1d3e4b2b25738f49dd29c57a4e08d73327f6b6) |  | 1645719 |  |
+| settle | [0xb6c06a2d…](https://sepolia.basescan.org/tx/0xb6c06a2db77a47de06e96852a057c0083a5a5f9670c21db309ce3cd01b2da6d5) | success | 2554473 | 0.00001533 |
+| grail-step | [0xb883456d…](https://sepolia.basescan.org/tx/0xb883456d92ddec222282499ee7cac342052e63d601ba5d961b74b5914f52e35b) | success | 319437 | 0.00000192 |

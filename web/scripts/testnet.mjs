@@ -262,6 +262,11 @@ async function pull(label, count, { ref = referrer.address, negSlippage = 1000n,
     await tx("withdrawAcquisitionRefund", payer, { address: A.engine, abi: ops.engine, functionName: "withdrawAcquisitionRefund" });
   }
   const [fee, sfee, vrfFee, total] = await rd(A.engine, ops.engine, "quoteAcquisitionPrice", [BigInt(count)]);
+  // a small testnet budget: when the player cannot pay, redeem every prize it still holds from earlier scenarios
+  if (payer === player && (await pub.getBalance({ address: player.address })) < total + vrfFee / 4n + parseEther("0.002")) {
+    const last = (await rd(A.lens, ops.lens, "game")).lastIssued;
+    await recycle(Array.from({ length: Number(last) }, (_, i) => BigInt(i + 1)), "top up for the next pull");
+  }
   const subBefore = await rd(base.vrfCoordinator, coordinatorAbi, "getSubscription", [BigInt(vrf.subId)]);
   const block = await pub.getBlock();
   const r = await tx(label, payer, { address: A.engine, abi: ops.engine, functionName: "acquireBatch",
@@ -301,21 +306,28 @@ async function awaitFulfilment(p) {
     }
     const latencyWallSec = (Date.now() - t0) / 1000;
     const ev = coordinatorAbi.find((x) => x.name === "RandomWordsFulfilled");
-    const head = await pub.getBlockNumber();
     const rb = await pub.getBlock({ blockNumber: BigInt(p.requestBlock) });
     for (const req of reqs) {
       let f = null;
-      for (let from = BigInt(p.requestBlock); from <= head && !f; from += 200n) {
-        const to = from + 199n > head ? head : from + 199n;
-        const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: req }, fromBlock: from, toBlock: to });
-        if (logs.length) {
-          const l = logs[0];
-          const [r, b] = await Promise.all([pub.getTransactionReceipt({ hash: l.transactionHash }), pub.getBlock({ blockNumber: l.blockNumber })]);
-          f = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice,
-            latencyBlocks: Number(l.blockNumber - BigInt(p.requestBlock)), latencySec: Number(b.timestamp - rb.timestamp), latencyWallSec };
+      // the public RPC is load balanced: a fast word can land past the head one node reports, so
+      // keep extending the scan to a fresh head for a minute before giving up
+      let from = BigInt(p.requestBlock);
+      for (let tries = 0; !f && tries < 20; tries++) {
+        if (tries) await new Promise((r) => setTimeout(r, 3_000));
+        const head = await pub.getBlockNumber();
+        while (!f && from <= head) {
+          const to = from + 199n > head ? head : from + 199n;
+          const logs = await pub.getLogs({ address: base.vrfCoordinator, event: ev, args: { requestId: req }, fromBlock: from, toBlock: to });
+          if (logs.length) {
+            const l = logs[0];
+            const [r, b] = await Promise.all([pub.getTransactionReceipt({ hash: l.transactionHash }), pub.getBlock({ blockNumber: l.blockNumber })]);
+            f = { hash: l.transactionHash, payment: l.args.payment, success: l.args.success, gasUsed: r.gasUsed, effectiveGasPrice: r.effectiveGasPrice,
+              latencyBlocks: Number(l.blockNumber - BigInt(p.requestBlock)), latencySec: Number(b.timestamp - rb.timestamp), latencyWallSec };
+          } else if (to === head) break; // a window ending at the head is scanned again on the next try
+          else from = to + 1n;
         }
       }
-      if (!f) throw new Error(`no VRF fulfilment for request ${req} within 30 min`);
+      if (!f) throw new Error(`no RandomWordsFulfilled log found for request ${req}`);
       fulfils.push(f);
     }
   }
