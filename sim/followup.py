@@ -128,7 +128,8 @@ def simulate(args):
     pool_mult = 1 + plat["edge"] / 2
     fwa_take = settle_take = 0.0
     name, prem, maint_bps, feed_bps, tw, purchaser_vrf, new_policy = cfg
-    markup = 1 + (prem + maint_bps + feed_bps) / BPS
+    # list-price markup over backing; a platform may set it apart from the margin split (negative: below cost)
+    markup = 1 + plat.get("markup_bps", prem + maint_bps + feed_bps) / BPS
     split = (prem, maint_bps, feed_bps)
     row_b = [b / E for b in ROW_B_WEI]
     row_p = [b * markup + FEE * n for b, n in zip(row_b, ROW_N)]
@@ -261,7 +262,7 @@ def simulate(args):
                 cover = min(margin, mint_line)
                 mint_line -= cover
                 rest = margin - cover
-                tot = sum(split)
+                tot = sum(split) or 1
                 m = rest * split[1] / tot
                 f = rest * split[2] / tot
                 cash -= m + f
